@@ -2,7 +2,9 @@
 
 namespace Msingi;
 
-class Module
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+
+class Module implements AutoloaderProviderInterface
 {
     public function onBootstrap($e)
     {
@@ -14,6 +16,7 @@ class Module
         return array(
             'invokables' => array(
                 'assets' => 'Msingi\View\Helper\Assets',
+                'formElementErrorClass' => 'Msingi\View\Helper\FormElementErrorClass',
             )
         );
     }
@@ -25,6 +28,27 @@ class Module
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),
+            ),
+        );
+    }
+
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'Msingi\Model\Backend\AuthStorage' => function ($sm) {
+                        return new \Msingi\Model\Backend\AuthStorage('msingi-backend');
+                    },
+                'AuthService' => function ($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $dbTableAuthAdapter = new DbTableAuthAdapter($dbAdapter, 'backend_users', 'username', 'password', 'MD5(?)');
+
+                        $authService = new AuthenticationService();
+                        $authService->setAdapter($dbTableAuthAdapter);
+                        $authService->setStorage($sm->get('Msingi\Model\Backend\AuthStorage'));
+
+                        return $authService;
+                    },
             ),
         );
     }
