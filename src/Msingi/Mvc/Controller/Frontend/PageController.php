@@ -7,17 +7,4 @@ use Zend\View\Model\ViewModel;
 
 class PageController extends AbstractActionController
 {
-    /**
-     * @return ViewModel
-     */
-    public function pageAction()
-    {
-        $vm = new ViewModel(array(
-            'language' => $this->params('language')
-        ));
-
-        $vm->setTemplate('frontend/page/default.phtml');
-
-        return $vm;
-    }
 }
