@@ -3,6 +3,7 @@
 namespace Msingi;
 
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\Mvc\MvcEvent;
 
 class Module implements AutoloaderProviderInterface
 {
@@ -11,15 +12,20 @@ class Module implements AutoloaderProviderInterface
         $this->initLayouts($e);
     }
 
-    public function getViewHelperConfig()
+    public function getConfig()
     {
-        return array(
-            'invokables' => array(
-                'assets' => 'Msingi\View\Helper\Assets',
-                'formElementErrorClass' => 'Msingi\View\Helper\FormElementErrorClass',
-            )
-        );
+        return include __DIR__ . '/config/module.config.php';
     }
+
+//    public function getViewHelperConfig()
+//    {
+//        return array(
+//            'invokables' => array(
+//                'assets' => 'Msingi\View\Helper\Assets',
+//                'formElementErrorClass' => 'Msingi\View\Helper\FormElementErrorClass',
+//            )
+//        );
+//    }
 
     public function getAutoloaderConfig()
     {
@@ -53,7 +59,7 @@ class Module implements AutoloaderProviderInterface
         );
     }
 
-    protected function initLayouts($e)
+    protected function initLayouts(MvcEvent $e)
     {
         $e->getApplication()->getEventManager()->getSharedManager()->attach('Zend\Mvc\Controller\AbstractController', 'dispatch', function ($e) {
             $controller = $e->getTarget();

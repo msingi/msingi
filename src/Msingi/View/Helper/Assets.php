@@ -9,8 +9,11 @@ class Assets extends AbstractHelper implements ServiceLocatorAwareInterface
 {
     public function __invoke()
     {
-        $route_name = $this->getServiceLocator()->getServiceLocator()->get('application')->getMvcEvent()
-            ->getRouteMatch()->getMatchedRouteName();
+        $route_match = $this->getServiceLocator()->getServiceLocator()->get('application')->getMvcEvent()->getRouteMatch();
+        if($route_match == null)
+            return '';
+
+        $route_name = $route_match->getMatchedRouteName();
 
         $module = substr($route_name, 0, strpos($route_name, '/'));
 
