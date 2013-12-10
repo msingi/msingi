@@ -12,7 +12,9 @@ class PageController extends AbstractActionController
      */
     public function pageAction()
     {
-        $vm = new ViewModel();
+        $vm = new ViewModel(array(
+            'language' => $this->params('language')
+        ));
 
         $vm->setTemplate('frontend/page/default.phtml');
 

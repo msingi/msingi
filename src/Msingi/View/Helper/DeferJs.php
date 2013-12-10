@@ -45,7 +45,7 @@ class DeferJs extends \Zend\View\Helper\Placeholder\Container\AbstractStandalone
     }
 
     /**
-     * 
+     *
      */
     public function updateHeadScript()
     {

@@ -41,9 +41,7 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
             'path' => $path
         ));
 
-        //return new RouteMatch($routeParams, strlen($path));
-
-        return null;
+        return new RouteMatch($routeParams, strlen($path));
     }
 
     /**
