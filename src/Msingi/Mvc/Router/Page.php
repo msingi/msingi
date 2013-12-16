@@ -49,10 +49,7 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
      */
     public function assemble(array $params = array(), array $options = array())
     {
-        echo 'assemble';
-        die;
-
-        return '';
+        return '/page';
     }
 
     /**
