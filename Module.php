@@ -42,6 +42,10 @@ class Module implements AutoloaderProviderInterface
     {
         return array(
             'factories' => array(
+                'Msingi\Cms\Model\Table\Menu' => 'Msingi\Cms\Service\MenuFactory',
+                'MenuTableGateway' => 'Msingi\Cms\Model\Gateway\MenuTableGatewayFactory',
+
+
                 'Msingi\Model\Backend\AuthStorage' => function ($sm) {
                         return new \Msingi\Model\Backend\AuthStorage('msingi-backend');
                     },
