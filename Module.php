@@ -9,7 +9,7 @@ class Module implements AutoloaderProviderInterface
 {
     public function onBootstrap($e)
     {
-        $this->initLayouts($e);
+        //$this->initLayouts($e);
     }
 
     public function getConfig()
@@ -43,7 +43,13 @@ class Module implements AutoloaderProviderInterface
         return array(
             'factories' => array(
                 'Msingi\Cms\Model\Table\Menu' => 'Msingi\Cms\Service\MenuFactory',
+                'Msingi\Cms\Model\Table\Pages' => 'Msingi\Cms\Service\PagesFactory',
+
+
                 'MenuTableGateway' => 'Msingi\Cms\Model\Gateway\MenuTableGatewayFactory',
+                'PagesTableGateway' => 'Msingi\Cms\Model\Gateway\PagesTableGatewayFactory',
+
+
 
 
                 'Msingi\Model\Backend\AuthStorage' => function ($sm) {

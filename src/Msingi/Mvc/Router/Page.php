@@ -12,14 +12,19 @@ use Zend\Stdlib\RequestInterface;
 
 class Page implements RouteInterface, ServiceLocatorAwareInterface
 {
+    protected $route = '';
+    protected $page = '';
     protected $defaults = array();
     protected $routePluginManager = null;
 
     /**
      * Create a new page route.
      */
-    public function __construct(array $defaults = array())
+    public function __construct($route, $page, array $defaults = array())
     {
+        $this->route = $route;
+        $this->page = $page;
+
         $this->defaults = array_merge(array(
             'controller' => 'page',
             'action' => 'page'
@@ -37,11 +42,16 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
         $uri = $request->getUri();
         $path = substr($uri->getPath(), $pathOffset);
 
-        $routeParams = array_merge($this->defaults, array(
-            'path' => $path
-        ));
+        if ($path === $this->route) {
+            $routeParams = array_merge($this->defaults, array(
+                'path' => $path,
+                'page' => $this->page
+            ));
 
-        return new RouteMatch($routeParams, strlen($path));
+            return new RouteMatch($routeParams, strlen($path));
+        }
+
+        return null;
     }
 
     /**
@@ -49,7 +59,7 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
      */
     public function assemble(array $params = array(), array $options = array())
     {
-        return 'page';
+        return $this->route;
     }
 
     /**
@@ -78,7 +88,7 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
             $options['defaults'] = array();
         }
 
-        return new static($options['defaults']);
+        return new static($options['route'], $options['page'], $options['defaults']);
     }
 
     /**
