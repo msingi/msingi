@@ -3,19 +3,17 @@
 return array(
     'view_helpers' => array(
         'invokables' => array(
-            'assets' => 'Msingi\View\Helper\Assets',
-            'headLess' => 'Msingi\View\Helper\HeadLess',
-            'deferJs' => 'Msingi\View\Helper\DeferJs',
+            'assets' => 'Msingi\Cms\View\Helper\Assets',
+            'headLess' => 'Msingi\Cms\View\Helper\HeadLess',
+            'deferJs' => 'Msingi\Cms\View\Helper\DeferJs',
 
-            'language' => 'Msingi\View\Helper\Language',
-            'locale' => 'Msingi\View\Helper\Locale',
+            'language' => 'Msingi\Cms\View\Helper\Language',
+            'locale' => 'Msingi\Cms\View\Helper\Locale',
 
             '_' => 'Zend\I18n\View\Helper\Translate',
             '_p' => 'Zend\I18n\View\Helper\TranslatePlural',
 
-            'fragment' => 'Msingi\View\Helper\PageFragment',
-
-            'formElementErrorClass' => 'Msingi\View\Helper\FormElementErrorClass',
+            'formElementErrorClass' => 'Msingi\Cms\View\Helper\FormElementErrorClass',
         ),
     ),
 );

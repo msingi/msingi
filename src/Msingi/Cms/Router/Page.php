@@ -1,10 +1,9 @@
 <?php
 
-namespace Msingi\Mvc\Router;
+namespace Msingi\Cms\Router;
 
 use Zend\Mvc\Router\Http\RouteInterface;
 use Zend\Mvc\Router\Http\RouteMatch;
-use Zend\Mvc\Router\Http\TreeRouteStack;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\ArrayUtils;
@@ -12,18 +11,19 @@ use Zend\Stdlib\RequestInterface;
 
 class Page implements RouteInterface, ServiceLocatorAwareInterface
 {
-    protected $route = '';
-    protected $page = '';
+//    protected $route = '';
+//    protected $page = '';
     protected $defaults = array();
     protected $routePluginManager = null;
+    protected $pages;
 
     /**
      * Create a new page route.
      */
-    public function __construct($route, $page, array $defaults = array())
+    public function __construct(array $defaults = array())
     {
-        $this->route = $route;
-        $this->page = $page;
+//        $this->route = $route;
+//        $this->page = $page;
 
         $this->defaults = array_merge(array(
             'controller' => 'page',
@@ -36,16 +36,14 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
      */
     public function match(RequestInterface $request, $pathOffset = null)
     {
-        // get the service locator
-        $serviceLocator = $this->routePluginManager->getServiceLocator();
-
         $uri = $request->getUri();
         $path = substr($uri->getPath(), $pathOffset);
 
-        if ($path === $this->route) {
+        $page = $this->loadPage($path);
+
+        if ($page != null) {
             $routeParams = array_merge($this->defaults, array(
-                'path' => $path,
-                'page' => $this->page
+                'cms_page' => $page
             ));
 
             return new RouteMatch($routeParams, strlen($path));
@@ -55,11 +53,37 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
     }
 
     /**
+     * @param $path
+     */
+    protected function loadPage($path)
+    {
+        $serviceLocator = $this->routePluginManager->getServiceLocator();
+
+        $pagesTable = $serviceLocator->get('Msingi\Cms\Model\Table\Pages');
+
+        $path = explode('/', $path);
+
+        // 1 is root page always
+        $parent_id = 1;
+        foreach ($path as $slug) {
+            $page = $pagesTable->fetchPage($slug, $parent_id);
+
+            if ($page == null) {
+                return null;
+            }
+
+            $parent_id = $page->id;
+        }
+
+        return $page;
+    }
+
+    /**
      * Assemble the route.
      */
     public function assemble(array $params = array(), array $options = array())
     {
-        return $this->route;
+        return $params['path'];
     }
 
     /**
@@ -88,7 +112,7 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
             $options['defaults'] = array();
         }
 
-        return new static($options['route'], $options['page'], $options['defaults']);
+        return new static($options['defaults']);
     }
 
     /**
@@ -110,5 +134,4 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
     {
         return $this->routePluginManager;
     }
-
 }

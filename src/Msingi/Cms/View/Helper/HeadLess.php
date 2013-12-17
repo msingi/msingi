@@ -1,6 +1,6 @@
 <?php
 
-namespace Msingi\View\Helper;
+namespace Msingi\Cms\View\Helper;
 
 class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalone
 {

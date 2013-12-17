@@ -1,6 +1,6 @@
 <?php
 
-namespace Msingi\View\Helper;
+namespace Msingi\Cms\View\Helper;
 
 class DeferJs extends \Zend\View\Helper\Placeholder\Container\AbstractStandalone
 {

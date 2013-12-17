@@ -2,14 +2,19 @@
 
 namespace Msingi;
 
+use Msingi\Cms\View\Helper\PageFragment;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
-use Zend\Mvc\MvcEvent;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Module implements AutoloaderProviderInterface
 {
     public function onBootstrap($e)
     {
-        //$this->initLayouts($e);
+        $serviceManager = $e->getApplication()->getServiceManager();
+
+        $eventManager = $e->getApplication()->getEventManager();
+
+        $eventManager->attach($serviceManager->get('Msingi\Cms\RouteListener'));
     }
 
     public function getConfig()
@@ -42,12 +47,16 @@ class Module implements AutoloaderProviderInterface
     {
         return array(
             'factories' => array(
+                'Msingi\Cms\RouteListener' => 'Msingi\Cms\Service\RouteListenerFactory',
+
                 'Msingi\Cms\Model\Table\Menu' => 'Msingi\Cms\Service\MenuFactory',
                 'Msingi\Cms\Model\Table\Pages' => 'Msingi\Cms\Service\PagesFactory',
-
+                'Msingi\Cms\Model\Table\PageFragments' => 'Msingi\Cms\Service\PageFragmentsFactory',
 
                 'MenuTableGateway' => 'Msingi\Cms\Model\Gateway\MenuTableGatewayFactory',
                 'PagesTableGateway' => 'Msingi\Cms\Model\Gateway\PagesTableGatewayFactory',
+                'PageFragmentsTableGateway' => 'Msingi\Cms\Model\Gateway\PageFragmentsTableGatewayFactory',
+
 
 
 
@@ -69,18 +78,16 @@ class Module implements AutoloaderProviderInterface
         );
     }
 
-    protected function initLayouts(MvcEvent $e)
+    public function getViewHelperConfig()
     {
-        $e->getApplication()->getEventManager()->getSharedManager()->attach('Zend\Mvc\Controller\AbstractController', 'dispatch', function ($e) {
-            $controller = $e->getTarget();
-            $controllerClass = get_class($controller);
-            $moduleNamespace = substr($controllerClass, 0, strpos($controllerClass, '\\'));
-            $config = $e->getApplication()->getServiceManager()->get('config');
-            if (isset($config['module_layouts'][$moduleNamespace])) {
-                $controller->layout($config['module_layouts'][$moduleNamespace]);
-            } else {
-                $controller->layout('layout/' . strtolower($moduleNamespace) . '.phtml');
-            }
-        }, 100);
+        return array(
+            'factories' => array(
+                'Fragment' => function (ServiceLocatorInterface $helpers) {
+                        $services = $helpers->getServiceLocator();
+                        $app = $services->get('Application');
+                        return new PageFragment($app->getMvcEvent());
+                    }
+            ),
+        );
     }
 }

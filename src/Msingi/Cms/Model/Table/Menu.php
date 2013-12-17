@@ -7,24 +7,26 @@ use Zend\Db\TableGateway\TableGateway;
 
 class Menu
 {
-    protected $_tableGateway;
+    protected $tableGateway;
 
     /**
      * @param TableGateway $tableGateway
      */
     public function __construct(TableGateway $tableGateway)
     {
-        $this->_tableGateway = $tableGateway;
+        $this->tableGateway = $tableGateway;
     }
 
     /**
+     *
+     *
      * @param $name
      * @param $language
      * @return array
      */
     public function fetchMenu($name, $language, $parent_id = null)
     {
-        $rowset = $this->_tableGateway->select(function (Select $select) use ($name, $parent_id, $language) {
+        $rowset = $this->tableGateway->select(function (Select $select) use ($name, $parent_id, $language) {
             $select->join('cms_menu_i18n', 'cms_menu_i18n.parent_id = cms_menu.id', array('label'), 'left');
             $select->where(array('menu' => $name, 'cms_menu.parent_id' => $parent_id, 'language' => $language));
             $select->order('order');
@@ -39,6 +41,9 @@ class Menu
 
             if ($row->route != '') {
                 $page['route'] = $row->route;
+                $params = array();
+                parse_str(trim($row->params), $params);
+                $page['params'] = $params;
             }
 
             $subpages = $this->fetchMenu($name, $language, $row->id);

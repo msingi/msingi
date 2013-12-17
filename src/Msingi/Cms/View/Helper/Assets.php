@@ -1,6 +1,6 @@
 <?php
 
-namespace Msingi\View\Helper;
+namespace Msingi\Cms\View\Helper;
 
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\View\Helper\AbstractHelper;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Msingi\Service;
+namespace Msingi\Cms\Service;
 
 use Zend\Navigation\Service;
 use Zend\ServiceManager\ServiceLocatorInterface;
