@@ -1,8 +1,8 @@
 <?php
 
-namespace Msingi\Cms\Model\Gateway;
+namespace Msingi\Cms\Service;
 
-use Msingi\Cms\Model\PageFragment;
+use Msingi\Cms\Model\Table\PageFragments;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\ServiceManager\FactoryInterface;
@@ -18,7 +18,7 @@ class PageFragmentsTableGatewayFactory implements FactoryInterface
     {
         $dbAdapter = $serviceLocator->get('Zend\Db\Adapter\Adapter');
         $resultSetPrototype = new ResultSet();
-        $resultSetPrototype->setArrayObjectPrototype(PageFragment::getPrototype());
+        $resultSetPrototype->setArrayObjectPrototype(PageFragments::getPrototype());
         return new TableGateway('cms_page_fragments', $dbAdapter, null, $resultSetPrototype);
     }
 }

@@ -7,6 +7,17 @@ use Zend\Db\Sql\Select;
 
 class PageFragments extends Table
 {
+    protected static function getDefinition()
+    {
+        return array(
+            'table' => 'cms_page_fragments',
+            'object' => 'Msingi\Cms\Model\PageFragment',
+            'fields' => array(
+                'content' => 'string'
+            )
+        );
+    }
+
     /**
      *
      *

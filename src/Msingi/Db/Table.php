@@ -4,11 +4,24 @@ namespace Msingi\Db;
 
 use Zend\Db\TableGateway\TableGateway;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\Stdlib\ArrayObject;
 
-class Table
+abstract class Table
 {
+    /**
+     * @var \Zend\Db\TableGateway\TableGateway
+     */
     protected $tableGateway;
+
+    /**
+     * @var \Zend\ServiceManager\ServiceLocatorInterface
+     */
     protected $serviceLocator;
+
+    /**
+     * @var array
+     */
+    protected static $definitions = array();
 
     /**
      * @param TableGateway $tableGateway
@@ -17,6 +30,25 @@ class Table
     {
         $this->tableGateway = $tableGateway;
         $this->serviceLocator = $serviceLocator;
+    }
+
+    /**
+     * Get definition of the object properties
+     * @return array
+     */
+    abstract protected static function getDefinition();
+
+    /**
+     *
+     */
+    public static function getPrototype()
+    {
+        $class = get_called_class();
+        $definition = $class::getDefinition();
+
+        $objectClass = $definition['object'];
+
+        return new $objectClass();
     }
 
     /**

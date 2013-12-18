@@ -77,9 +77,9 @@ class Module implements AutoloaderProviderInterface
                 'Msingi\Cms\Model\Table\Pages' => 'Msingi\Cms\Service\PagesFactory',
                 'Msingi\Cms\Model\Table\PageFragments' => 'Msingi\Cms\Service\PageFragmentsFactory',
 
-                'MenuTableGateway' => 'Msingi\Cms\Model\Gateway\MenuTableGatewayFactory',
-                'PagesTableGateway' => 'Msingi\Cms\Model\Gateway\PagesTableGatewayFactory',
-                'PageFragmentsTableGateway' => 'Msingi\Cms\Model\Gateway\PageFragmentsTableGatewayFactory',
+                'MenuTableGateway' => 'Msingi\Cms\Service\MenuTableGatewayFactory',
+                'PagesTableGateway' => 'Msingi\Cms\Service\PagesTableGatewayFactory',
+                'PageFragmentsTableGateway' => 'Msingi\Cms\Service\PageFragmentsTableGatewayFactory',
 
                 'Msingi\Model\Backend\AuthStorage' => function ($sm) {
                         return new \Msingi\Model\Backend\AuthStorage('msingi-backend');

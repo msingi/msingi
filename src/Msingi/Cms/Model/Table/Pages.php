@@ -7,6 +7,19 @@ use Zend\Db\Sql\Select;
 
 class Pages extends Table
 {
+    protected static function getDefinition()
+    {
+        return array(
+            'table' => 'cms_pages',
+            'object' => 'Msingi\Cms\Model\Page',
+            'fields' => array(
+                'type' => 'string',
+                'path' => 'string',
+                'template' => 'string'
+            )
+        );
+    }
+
     /**
      *
      *

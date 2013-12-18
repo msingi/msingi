@@ -7,6 +7,19 @@ use Zend\Db\Sql\Select;
 
 class Menu extends Table
 {
+    protected static function getDefinition()
+    {
+        return array(
+            'table' => 'cms_menu',
+            'object' => 'Msingi\Cms\Model\Menu',
+            'fields' => array(
+                'route' => 'string',
+                'params' => 'string',
+                'label' => 'string'
+            )
+        );
+    }
+
     /**
      *
      *
