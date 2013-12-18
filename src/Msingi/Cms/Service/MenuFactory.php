@@ -11,6 +11,6 @@ class MenuFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $tableGateway = $serviceLocator->get('MenuTableGateway');
-        return new Menu($tableGateway);
+        return new Menu($tableGateway, $serviceLocator);
     }
 }

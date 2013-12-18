@@ -8,6 +8,9 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Module implements AutoloaderProviderInterface
 {
+    /**
+     * @param $e
+     */
     public function onBootstrap($e)
     {
         $serviceManager = $e->getApplication()->getServiceManager();
@@ -17,21 +20,39 @@ class Module implements AutoloaderProviderInterface
         $eventManager->attach($serviceManager->get('Msingi\Cms\RouteListener'));
     }
 
-    public function getConfig()
+    /**
+     * @return array
+     */
+    public function getViewHelperConfig()
     {
-        return include __DIR__ . '/config/module.config.php';
+        return array(
+            'invokables' => array(
+                'assets' => 'Msingi\Cms\View\Helper\Assets',
+                'headLess' => 'Msingi\Cms\View\Helper\HeadLess',
+                'deferJs' => 'Msingi\Cms\View\Helper\DeferJs',
+
+                'language' => 'Msingi\Cms\View\Helper\Language',
+                'locale' => 'Msingi\Cms\View\Helper\Locale',
+
+                '_' => 'Zend\I18n\View\Helper\Translate',
+                '_p' => 'Zend\I18n\View\Helper\TranslatePlural',
+
+                'formElementErrorClass' => 'Msingi\Cms\View\Helper\FormElementErrorClass',
+            ),
+            'factories' => array(
+                'Fragment' => function (ServiceLocatorInterface $helpers) {
+                        $services = $helpers->getServiceLocator();
+                        $app = $services->get('Application');
+                        return new PageFragment($app->getMvcEvent());
+                    }
+            ),
+
+        );
     }
 
-//    public function getViewHelperConfig()
-//    {
-//        return array(
-//            'invokables' => array(
-//                'assets' => 'Msingi\View\Helper\Assets',
-//                'formElementErrorClass' => 'Msingi\View\Helper\FormElementErrorClass',
-//            )
-//        );
-//    }
-
+    /**
+     * @return array
+     */
     public function getAutoloaderConfig()
     {
         return array(
@@ -43,6 +64,9 @@ class Module implements AutoloaderProviderInterface
         );
     }
 
+    /**
+     * @return array
+     */
     public function getServiceConfig()
     {
         return array(
@@ -57,10 +81,6 @@ class Module implements AutoloaderProviderInterface
                 'PagesTableGateway' => 'Msingi\Cms\Model\Gateway\PagesTableGatewayFactory',
                 'PageFragmentsTableGateway' => 'Msingi\Cms\Model\Gateway\PageFragmentsTableGatewayFactory',
 
-
-
-
-
                 'Msingi\Model\Backend\AuthStorage' => function ($sm) {
                         return new \Msingi\Model\Backend\AuthStorage('msingi-backend');
                     },
@@ -74,19 +94,6 @@ class Module implements AutoloaderProviderInterface
 
                         return $authService;
                     },
-            ),
-        );
-    }
-
-    public function getViewHelperConfig()
-    {
-        return array(
-            'factories' => array(
-                'Fragment' => function (ServiceLocatorInterface $helpers) {
-                        $services = $helpers->getServiceLocator();
-                        $app = $services->get('Application');
-                        return new PageFragment($app->getMvcEvent());
-                    }
             ),
         );
     }

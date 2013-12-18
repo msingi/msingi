@@ -2,21 +2,11 @@
 
 namespace Msingi\Cms\Model\Table;
 
+use Msingi\Db\Table;
 use Zend\Db\Sql\Select;
-use Zend\Db\TableGateway\TableGateway;
 
-class Pages
+class Pages extends Table
 {
-    protected $tableGateway;
-
-    /**
-     * @param TableGateway $tableGateway
-     */
-    public function __construct(TableGateway $tableGateway)
-    {
-        $this->tableGateway = $tableGateway;
-    }
-
     /**
      *
      *

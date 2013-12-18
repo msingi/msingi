@@ -11,6 +11,6 @@ class PagesFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $tableGateway = $serviceLocator->get('PagesTableGateway');
-        return new Pages($tableGateway);
+        return new Pages($tableGateway, $serviceLocator);
     }
 }

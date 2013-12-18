@@ -18,7 +18,7 @@ class MenuTableGatewayFactory implements FactoryInterface
     {
         $dbAdapter = $serviceLocator->get('Zend\Db\Adapter\Adapter');
         $resultSetPrototype = new ResultSet();
-        $resultSetPrototype->setArrayObjectPrototype(new Menu());
+        $resultSetPrototype->setArrayObjectPrototype(Menu::getPrototype());
         return new TableGateway('cms_menu', $dbAdapter, null, $resultSetPrototype);
     }
 }

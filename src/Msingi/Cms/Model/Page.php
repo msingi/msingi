@@ -2,19 +2,16 @@
 
 namespace Msingi\Cms\Model;
 
-class Page
+use Msingi\Db\TableRow;
+
+class Page extends TableRow
 {
-    public $id;
-    public $type;
-    public $path;
-    public $template;
-
-    public function exchangeArray($data)
+    protected static function getDefinition()
     {
-        $this->id = (isset($data['id'])) ? $data['id'] : null;
-        $this->type = (isset($data['type'])) ? $data['type'] : null;
-        $this->path = (isset($data['path'])) ? $data['path'] : null;
-        $this->template = (isset($data['template'])) ? $data['template'] : null;
+        return array(
+            'type' => 'string',
+            'path' => 'string',
+            'template' => 'string'
+        );
     }
-
 }

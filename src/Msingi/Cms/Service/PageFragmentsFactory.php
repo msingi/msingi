@@ -11,6 +11,6 @@ class PageFragmentsFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $tableGateway = $serviceLocator->get('PageFragmentsTableGateway');
-        return new PageFragments($tableGateway);
+        return new PageFragments($tableGateway, $serviceLocator);
     }
 }

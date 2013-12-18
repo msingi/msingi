@@ -2,15 +2,14 @@
 
 namespace Msingi\Cms\Model;
 
-class PageFragment
+use Msingi\Db\TableRow;
+
+class PageFragment extends TableRow
 {
-    public $id;
-    public $content;
-
-    public function exchangeArray($data)
+    protected static function getDefinition()
     {
-        $this->id = (isset($data['id'])) ? $data['id'] : null;
-        $this->content = (isset($data['content'])) ? $data['content'] : null;
+        return array(
+            'content' => 'string'
+        );
     }
-
 }

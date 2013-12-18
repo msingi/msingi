@@ -12,10 +12,9 @@ class PageController extends AbstractActionController
      */
     public function pageAction()
     {
-        $cms_page = $this->params('cms_page');
-
         $vm = new ViewModel(array());
 
+        $cms_page = $this->params('cms_page');
         $vm->setTemplate('frontend/page/' . $cms_page->template . '.phtml');
 
         return $vm;

@@ -18,7 +18,7 @@ class PagesTableGatewayFactory implements FactoryInterface
     {
         $dbAdapter = $serviceLocator->get('Zend\Db\Adapter\Adapter');
         $resultSetPrototype = new ResultSet();
-        $resultSetPrototype->setArrayObjectPrototype(new Page());
+        $resultSetPrototype->setArrayObjectPrototype(Page::getPrototype());
         return new TableGateway('cms_pages', $dbAdapter, null, $resultSetPrototype);
     }
 }
