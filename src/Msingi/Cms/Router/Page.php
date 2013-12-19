@@ -26,7 +26,7 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
 //        $this->page = $page;
 
         $this->defaults = array_merge(array(
-            'controller' => 'page',
+            'controller' => 'frontend-page',
             'action' => 'page'
         ), $defaults);
     }
