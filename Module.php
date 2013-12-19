@@ -4,6 +4,8 @@ namespace Msingi;
 
 use Msingi\Cms\View\Helper\PageFragment;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\Mvc\ModuleRouteListener;
+use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Module implements AutoloaderProviderInterface
@@ -16,8 +18,11 @@ class Module implements AutoloaderProviderInterface
         $serviceManager = $e->getApplication()->getServiceManager();
 
         $eventManager = $e->getApplication()->getEventManager();
-
         $eventManager->attach($serviceManager->get('Msingi\Cms\RouteListener'));
+
+        $this->initLayouts($e);
+
+
     }
 
     /**
@@ -96,5 +101,25 @@ class Module implements AutoloaderProviderInterface
                     },
             ),
         );
+    }
+
+    protected function initLayouts(MvcEvent $e)
+    {
+        $eventManager = $e->getApplication()->getEventManager();
+
+        $eventManager->getSharedManager()->attach('Zend\Mvc\Controller\AbstractController', 'dispatch', function ($e) {
+            $controller = $e->getTarget();
+            $controllerClass = get_class($controller);
+            $moduleNamespace = substr($controllerClass, 0, strpos($controllerClass, '\\'));
+            $config = $e->getApplication()->getServiceManager()->get('config');
+            if (isset($config['module_layouts'][$moduleNamespace])) {
+                $controller->layout($config['module_layouts'][$moduleNamespace]);
+            } else {
+                $controller->layout('layout/' . strtolower($moduleNamespace) . '.phtml');
+            }
+        }, 100);
+
+        $moduleRouteListener = new ModuleRouteListener();
+        $moduleRouteListener->attach($eventManager);
     }
 }

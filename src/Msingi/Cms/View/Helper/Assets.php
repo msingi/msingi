@@ -3,24 +3,28 @@
 namespace Msingi\Cms\View\Helper;
 
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Helper\AbstractHelper;
 
 class Assets extends AbstractHelper implements ServiceLocatorAwareInterface
 {
+    protected $serviceLocator;
+
     /**
      * @return string
      */
     public function __invoke()
     {
-        $route_match = $this->getServiceLocator()->getServiceLocator()->get('application')->getMvcEvent()->getRouteMatch();
-        if($route_match == null)
-            return '';
+        $config = $this->serviceLocator->getServiceLocator()->get('Config');
+
+        $route_match = $this->serviceLocator->getServiceLocator()->get('application')->getMvcEvent()->getRouteMatch();
+        if ($route_match == null) {
+            return $config['assets']['frontend'];
+        }
 
         $route_name = $route_match->getMatchedRouteName();
 
         $module = substr($route_name, 0, strpos($route_name, '/'));
-
-        $config = $this->getServiceLocator()->getServiceLocator()->get('Config');
 
         return $config['assets'][$module];
     }
@@ -37,7 +41,7 @@ class Assets extends AbstractHelper implements ServiceLocatorAwareInterface
      * @param \Zend\ServiceManager\ServiceLocatorInterface $serviceLocator
      * @return $this
      */
-    public function setServiceLocator(\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator)
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
         $this->serviceLocator = $serviceLocator;
         return $this;
