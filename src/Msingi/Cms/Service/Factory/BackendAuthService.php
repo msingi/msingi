@@ -16,7 +16,7 @@ class BackendAuthService implements FactoryInterface
         $salt = $config['backend']['auth']['salt'];
 
         $dbAdapter = $serviceLocator->get('Zend\Db\Adapter\Adapter');
-        $dbTableAuthAdapter = new DbTable($dbAdapter, 'cms_backend_users', 'username', 'password', 'SHA1(CONCAT("' . $salt . '", ?))');
+        $dbTableAuthAdapter = new DbTable($dbAdapter, 'cms_backend_users', 'username', 'password', 'SHA1(CONCAT("' . $salt . '", ?, password_salt))');
 
         $authService = new AuthenticationService();
         $authService->setAdapter($dbTableAuthAdapter);
