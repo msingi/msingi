@@ -8,6 +8,7 @@ use Zend\View\Helper\AbstractHelper;
 class PageFragment extends AbstractHelper
 {
     protected $page;
+    protected $fragments;
     protected $event;
 
     public function __construct(MvcEvent $event)
@@ -22,19 +23,19 @@ class PageFragment extends AbstractHelper
      */
     public function __invoke($name)
     {
-        $serviceManager = $this->event->getApplication()->getServiceManager();
+        if ($this->fragments == null) {
 
-        $pageFragmentsTable = $serviceManager->get('Msingi\Cms\Db\Table\PageFragments');
+            $serviceManager = $this->event->getApplication()->getServiceManager();
 
-        $translator = $serviceManager->get('Translator');
+            $pageFragmentsTable = $serviceManager->get('Msingi\Cms\Db\Table\PageFragments');
 
-        $locale = $translator->getLocale();
+            $translator = $serviceManager->get('Translator');
 
-        $fragment = $pageFragmentsTable->fetchFragment($this->page->id, $name, \Locale::getPrimaryLanguage($locale));
-        if ($fragment != null) {
-            return $fragment->content;
+            $locale = $translator->getLocale();
+
+            $this->fragments = $pageFragmentsTable->fetchFragments($this->page->id, \Locale::getPrimaryLanguage($locale));
         }
 
-        return '';
+        return isset($this->fragments[$name]) ? $this->fragments[$name]->content : '';
     }
 }

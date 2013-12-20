@@ -21,28 +21,30 @@ class PageFragments extends Table
     /**
      *
      *
-     * @param $name
      * @param $language
      * @return array
      */
-    public function fetchFragment($page_id, $name, $language)
+    public function fetchFragments($page_id, $language)
     {
-        $key = sprintf('page_fragment_%d_%s_%s', $page_id, $name, $language);
+        $key = sprintf('page_%d_fragments_%s', $page_id, $language);
 
         $cache = $this->getCache();
 
-        $fragment = $cache->getItem($key);
-        if ($fragment == null) {
-            $rowset = $this->tableGateway->select(function (Select $select) use ($page_id, $name, $language) {
+        $fragments = $cache->getItem($key);
+        if ($fragments == null) {
+            $rowset = $this->tableGateway->select(function (Select $select) use ($page_id, $language) {
                 $select->join('cms_page_fragments_i18n', 'cms_page_fragments_i18n.parent_id = cms_page_fragments.id', array('content'), 'left');
-                $select->where(array('name' => $name, 'page_id' => $page_id, 'language' => $language));
+                $select->where(array('page_id' => $page_id, 'language' => $language));
             });
 
-            $fragment = $rowset->current();
+            $fragments = array();
+            foreach ($rowset as $row) {
+                $fragments[$row->name] = $row;
+            }
 
-            $cache->setItem($key, $fragment);
+            $cache->setItem($key, $fragments);
         }
 
-        return $fragment;
+        return $fragments;
     }
 }

@@ -59,7 +59,7 @@ class Page implements RouteInterface, ServiceLocatorAwareInterface
     {
         $serviceLocator = $this->routePluginManager->getServiceLocator();
 
-        $pagesTable = $serviceLocator->get('Msingi\Cms\Model\Table\Pages');
+        $pagesTable = $serviceLocator->get('Msingi\Cms\Db\Table\Pages');
 
         $path = explode('/', $path);
 
