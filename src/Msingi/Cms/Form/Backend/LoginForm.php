@@ -1,6 +1,6 @@
 <?php
 
-namespace Msingi\Form\Backend;
+namespace Msingi\Cms\Form\Backend;
 
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilterProviderInterface;

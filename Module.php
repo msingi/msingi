@@ -2,7 +2,9 @@
 
 namespace Msingi;
 
+use Msingi\Cms\Model\Backend\AuthStorage;
 use Msingi\Cms\View\Helper\PageFragment;
+use Zend\Authentication\Adapter\DbTable;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
@@ -21,8 +23,6 @@ class Module implements AutoloaderProviderInterface
         $eventManager->attach($serviceManager->get('Msingi\Cms\RouteListener'));
 
         $this->initLayouts($e);
-
-
     }
 
     /**
@@ -38,6 +38,9 @@ class Module implements AutoloaderProviderInterface
 
                 'language' => 'Msingi\Cms\View\Helper\Language',
                 'locale' => 'Msingi\Cms\View\Helper\Locale',
+
+
+                'gravatar' => 'Msingi\Cms\View\Helper\Gravatar',
 
                 '_' => 'Zend\I18n\View\Helper\Translate',
                 '_p' => 'Zend\I18n\View\Helper\TranslatePlural',
@@ -86,19 +89,11 @@ class Module implements AutoloaderProviderInterface
                 'PagesTableGateway' => 'Msingi\Cms\Service\PagesTableGatewayFactory',
                 'PageFragmentsTableGateway' => 'Msingi\Cms\Service\PageFragmentsTableGatewayFactory',
 
-                'Msingi\Model\Backend\AuthStorage' => function ($sm) {
-                        return new \Msingi\Model\Backend\AuthStorage('msingi-backend');
+                'Msingi\Cms\Model\BackendAuthStorage' => function ($sm) {
+                        return new AuthStorage();
                     },
-                'AuthService' => function ($sm) {
-                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                        $dbTableAuthAdapter = new DbTableAuthAdapter($dbAdapter, 'backend_users', 'username', 'password', 'MD5(?)');
 
-                        $authService = new AuthenticationService();
-                        $authService->setAdapter($dbTableAuthAdapter);
-                        $authService->setStorage($sm->get('Msingi\Model\Backend\AuthStorage'));
-
-                        return $authService;
-                    },
+                'BackendAuthService' => 'Msingi\Cms\Service\Factory\BackendAuthService'
             ),
         );
     }
