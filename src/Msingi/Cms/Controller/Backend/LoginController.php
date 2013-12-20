@@ -51,12 +51,14 @@ class LoginController extends AbstractController
 
                 $result = $this->getAuthService()->authenticate();
 
+                //save message temporary into flashmessenger
                 foreach ($result->getMessages() as $message) {
-                    //save message temporary into flashmessenger
                     $this->flashmessenger()->addMessage($message);
                 }
 
+                //
                 if ($result->isValid()) {
+                    //
                     if ($request->getPost('rememberme') == 1) {
                         $this->getSessionStorage()->setRememberMe(1);
 

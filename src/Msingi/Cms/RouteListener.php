@@ -47,7 +47,7 @@ class RouteListener implements ListenerAggregateInterface
         if ($cms_page == null) {
             $serviceManager = $e->getApplication()->getServiceManager();
 
-            $pagesTable = $serviceManager->get('Msingi\Cms\Model\Table\Pages');
+            $pagesTable = $serviceManager->get('Msingi\Cms\Db\Table\Pages');
 
             $cms_page = $pagesTable->fetchOrCreate($routeMatch->getMatchedRouteName());
 

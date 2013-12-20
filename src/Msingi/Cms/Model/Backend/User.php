@@ -2,12 +2,9 @@
 
 namespace Msingi\Cms\Model\Backend;
 
+use Msingi\Db\TableRow;
 use Zend\Form\Annotation;
 
-class User
+class User extends TableRow
 {
-    public $username;
-    public $password;
-    public $name;
-    public $role;
 }

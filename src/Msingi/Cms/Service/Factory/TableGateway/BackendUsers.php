@@ -1,14 +1,13 @@
 <?php
 
-namespace Msingi\Cms\Service;
+namespace Msingi\Cms\Service\Factory\TableGateway;
 
-use Msingi\Cms\Model\Table\Pages;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class PagesTableGatewayFactory implements FactoryInterface
+class BackendUsers implements FactoryInterface
 {
     /**
      * @param ServiceLocatorInterface $serviceLocator
@@ -18,7 +17,7 @@ class PagesTableGatewayFactory implements FactoryInterface
     {
         $dbAdapter = $serviceLocator->get('Zend\Db\Adapter\Adapter');
         $resultSetPrototype = new ResultSet();
-        $resultSetPrototype->setArrayObjectPrototype(Pages::getPrototype());
-        return new TableGateway('cms_pages', $dbAdapter, null, $resultSetPrototype);
+        $resultSetPrototype->setArrayObjectPrototype(\Msingi\Cms\Db\Table\BackendUsers::getPrototype());
+        return new TableGateway('cms_backend_users', $dbAdapter, null, $resultSetPrototype);
     }
 }

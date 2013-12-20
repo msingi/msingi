@@ -14,7 +14,8 @@ abstract class AbstractNavigationFactory extends \Zend\Navigation\Service\Abstra
     protected function getPages(ServiceLocatorInterface $serviceLocator)
     {
         if (null === $this->pages) {
-            $menuTable = $serviceLocator->get('Msingi\Cms\Model\Table\Menu');
+
+            $menuTable = $serviceLocator->get('Msingi\Cms\Db\Table\Menu');
 
             $translator = $serviceLocator->get('Translator');
 

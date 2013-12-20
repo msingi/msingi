@@ -1,14 +1,13 @@
 <?php
 
-namespace Msingi\Cms\Service;
+namespace Msingi\Cms\Service\Factory\TableGateway;
 
-use Msingi\Cms\Model\Table\Menu;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class MenuTableGatewayFactory implements FactoryInterface
+class Pages implements FactoryInterface
 {
     /**
      * @param ServiceLocatorInterface $serviceLocator
@@ -18,7 +17,7 @@ class MenuTableGatewayFactory implements FactoryInterface
     {
         $dbAdapter = $serviceLocator->get('Zend\Db\Adapter\Adapter');
         $resultSetPrototype = new ResultSet();
-        $resultSetPrototype->setArrayObjectPrototype(Menu::getPrototype());
-        return new TableGateway('cms_menu', $dbAdapter, null, $resultSetPrototype);
+        $resultSetPrototype->setArrayObjectPrototype(\Msingi\Cms\Db\Table\Pages::getPrototype());
+        return new TableGateway('cms_pages', $dbAdapter, null, $resultSetPrototype);
     }
 }

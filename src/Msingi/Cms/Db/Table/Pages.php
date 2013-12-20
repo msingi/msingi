@@ -1,6 +1,6 @@
 <?php
 
-namespace Msingi\Cms\Model\Table;
+namespace Msingi\Cms\Db\Table;
 
 use Msingi\Db\Table;
 use Zend\Db\Sql\Select;

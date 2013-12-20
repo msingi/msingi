@@ -1,27 +1,13 @@
 <?php
 
-namespace Msingi\Cms\View\Helper;
+namespace Msingi\Cms\View;
 
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\View\Helper\AbstractHelper;
 
-class BackendCurrentUser extends AbstractHelper implements ServiceLocatorAwareInterface
+class AbstractHelper extends \Zend\View\Helper\AbstractHelper implements ServiceLocatorAwareInterface
 {
     protected $serviceLocator;
-
-    /**
-     * @return string
-     */
-    public function __invoke()
-    {
-        //$authStorage = $this->getServiceLocator()->get('Msingi\Cms\Model\Backend\AuthStorage');
-
-        return (object)array(
-            'name' => 'current user',
-            'email' => 'user@example.com'
-        );
-    }
 
     /**
      * @return \Zend\ServiceManager\ServiceLocatorInterface

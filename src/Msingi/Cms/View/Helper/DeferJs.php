@@ -51,8 +51,7 @@ class DeferJs extends \Zend\View\Helper\Placeholder\Container\AbstractStandalone
     {
         $items = array();
         $this->getContainer()->ksort();
-        foreach ($this as $item)
-        {
+        foreach ($this as $item) {
             $items[] = sprintf('"%s"', $item->file);
         }
 

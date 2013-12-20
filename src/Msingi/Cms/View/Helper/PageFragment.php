@@ -24,7 +24,7 @@ class PageFragment extends AbstractHelper
     {
         $serviceManager = $this->event->getApplication()->getServiceManager();
 
-        $pageFragmentsTable = $serviceManager->get('Msingi\Cms\Model\Table\PageFragments');
+        $pageFragmentsTable = $serviceManager->get('Msingi\Cms\Db\Table\PageFragments');
 
         $translator = $serviceManager->get('Translator');
 

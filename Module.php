@@ -81,13 +81,15 @@ class Module implements AutoloaderProviderInterface
             'factories' => array(
                 'Msingi\Cms\RouteListener' => 'Msingi\Cms\Service\RouteListenerFactory',
 
-                'Msingi\Cms\Model\Table\Menu' => 'Msingi\Cms\Service\MenuFactory',
-                'Msingi\Cms\Model\Table\Pages' => 'Msingi\Cms\Service\PagesFactory',
-                'Msingi\Cms\Model\Table\PageFragments' => 'Msingi\Cms\Service\PageFragmentsFactory',
+                'Msingi\Cms\Db\Table\Menu' => 'Msingi\Cms\Service\Factory\Menu',
+                'Msingi\Cms\Db\Table\Pages' => 'Msingi\Cms\Service\Factory\Pages',
+                'Msingi\Cms\Db\Table\PageFragments' => 'Msingi\Cms\Service\Factory\PageFragments',
+                'Msingi\Cms\Db\Table\BackendUsers' => 'Msingi\Cms\Service\Factory\BackendUsers',
 
-                'MenuTableGateway' => 'Msingi\Cms\Service\MenuTableGatewayFactory',
-                'PagesTableGateway' => 'Msingi\Cms\Service\PagesTableGatewayFactory',
-                'PageFragmentsTableGateway' => 'Msingi\Cms\Service\PageFragmentsTableGatewayFactory',
+                'MenuTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\Menu',
+                'PagesTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\Pages',
+                'PageFragmentsTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\PageFragments',
+                'BackendUsersTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\BackendUsers',
 
                 'Msingi\Cms\Model\BackendAuthStorage' => function ($sm) {
                         return new AuthStorage();

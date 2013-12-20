@@ -1,16 +1,15 @@
 <?php
 
-namespace Msingi\Cms\Service;
+namespace Msingi\Cms\Service\Factory;
 
-use Msingi\Cms\Model\Table\Pages;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class PagesFactory implements FactoryInterface
+class Pages implements FactoryInterface
 {
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $tableGateway = $serviceLocator->get('PagesTableGateway');
-        return new Pages($tableGateway, $serviceLocator);
+        return new \Msingi\Cms\Db\Table\Pages($tableGateway, $serviceLocator);
     }
 }
