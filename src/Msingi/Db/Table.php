@@ -79,4 +79,25 @@ abstract class Table
     {
         return $this->serviceLocator->get('Application\Cache');
     }
+
+    /**
+     * @param $object
+     * @return int
+     */
+    public function save($object)
+    {
+        $class = get_called_class();
+        $definition = $class::getDefinition();
+
+        $set = array();
+        foreach ($definition['fields'] as $field => $desc) {
+            if ($object->valueChanged($field)) {
+                $set[$field] = $object->__get($field);
+            }
+        }
+
+        if (count($set) > 0) {
+            $this->tableGateway->update($set, array('id' => $object->id));
+        }
+    }
 }

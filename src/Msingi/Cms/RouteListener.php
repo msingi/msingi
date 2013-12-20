@@ -42,16 +42,20 @@ class RouteListener implements ListenerAggregateInterface
     public function onRoute(MvcEvent $e)
     {
         $routeMatch = $e->getRouteMatch();
+        $routeName = $routeMatch->getMatchedRouteName();
 
-        $cms_page = $routeMatch->getParam('cms_page');
-        if ($cms_page == null) {
-            $serviceManager = $e->getApplication()->getServiceManager();
+        if (substr($routeName, 0, 9) == 'frontend/') {
 
-            $pagesTable = $serviceManager->get('Msingi\Cms\Db\Table\Pages');
+            $cms_page = $routeMatch->getParam('cms_page');
+            if ($cms_page == null) {
+                $serviceManager = $e->getApplication()->getServiceManager();
 
-            $cms_page = $pagesTable->fetchOrCreate($routeMatch->getMatchedRouteName());
+                $pagesTable = $serviceManager->get('Msingi\Cms\Db\Table\Pages');
 
-            $routeMatch->setParam('cms_page', $cms_page);
+                $cms_page = $pagesTable->fetchOrCreate($routeMatch->getMatchedRouteName());
+
+                $routeMatch->setParam('cms_page', $cms_page);
+            }
         }
     }
 }

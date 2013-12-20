@@ -7,6 +7,7 @@ use Zend\Stdlib\ArrayObject;
 class TableRow
 {
     protected $data = array();
+    protected $originalData = array();
 
     /**
      * @param $name
@@ -49,12 +50,19 @@ class TableRow
     public function exchangeArray($data)
     {
         $this->data = $data;
+        $this->originalData = $data;
+
 //        $class = get_called_class();
 //        $definition = TableRow::$definitions[$class];
 //
 //        foreach ($definition as $field => $desc) {
 //            $this->data[$field] = (isset($data[$field])) ? $data[$field] : null;
 //        }
+    }
+
+    public function valueChanged($field)
+    {
+        return ($this->data[$field] != $this->originalData[$field]);
     }
 
 }

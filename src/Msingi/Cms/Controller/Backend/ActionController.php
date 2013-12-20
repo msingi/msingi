@@ -2,16 +2,21 @@
 
 namespace Msingi\Cms\Controller\Backend;
 
-use Zend\Mvc\MvcEvent;
+use Zend\Mvc\Controller\AbstractActionController;
 
-class ActionController extends AbstractController
+class ActionController extends AbstractActionController
 {
-    public function onDispatch(MvcEvent $e)
+    protected $authService;
+
+    /**
+     * @return null|\Zend\Authentication\AuthenticationService
+     */
+    protected function getAuthService()
     {
-        if (!$this->getAuthService()->hasIdentity()) {
-            return $this->redirect()->toRoute('backend/login');
+        if (!$this->authService) {
+            $this->authService = $this->getServiceLocator()->get('BackendAuthService');
         }
 
-        return parent::onDispatch($e);
+        return $this->authService;
     }
 }
