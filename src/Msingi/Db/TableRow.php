@@ -60,9 +60,20 @@ class TableRow
 //        }
     }
 
+    /**
+     * @param $field
+     * @return bool
+     */
     public function valueChanged($field)
     {
         return ($this->data[$field] != $this->originalData[$field]);
     }
 
+    /**
+     * @return array
+     */
+    public function getArrayCopy()
+    {
+        return $this->data;
+    }
 }

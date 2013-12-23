@@ -26,6 +26,14 @@ class Module implements AutoloaderProviderInterface
     }
 
     /**
+     * @return mixed
+     */
+    public function getConfig()
+    {
+        return include __DIR__ . '/config/module.config.php';
+    }
+
+    /**
      * @return array
      */
     public function getViewHelperConfig()
@@ -96,6 +104,9 @@ class Module implements AutoloaderProviderInterface
                     },
 
                 'BackendAuthService' => 'Msingi\Cms\Service\Factory\BackendAuthService'
+            ),
+            'invokables' => array(
+                'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',
             ),
         );
     }

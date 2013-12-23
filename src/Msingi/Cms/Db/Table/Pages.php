@@ -105,9 +105,10 @@ class Pages extends Table
 
         if ($page == null) {
             $this->tableGateway->insert(array(
+                'parent_id' => 1,
                 'type' => 'mvc',
                 'path' => $route,
-                'parent_id' => 1
+                'template' => $route
             ));
 
             $rowset = $this->tableGateway->select(array('id' => $this->tableGateway->lastInsertValue));
