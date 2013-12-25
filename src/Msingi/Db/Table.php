@@ -46,6 +46,10 @@ abstract class Table
         $class = get_called_class();
         $definition = $class::getDefinition();
 
+        if (!isset($definition['object'])) {
+            throw new Exception();
+        }
+
         $objectClass = $definition['object'];
 
         return new $objectClass();

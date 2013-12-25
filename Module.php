@@ -93,11 +93,13 @@ class Module implements AutoloaderProviderInterface
                 'Msingi\Cms\Db\Table\Pages' => 'Msingi\Cms\Service\Factory\Pages',
                 'Msingi\Cms\Db\Table\PageFragments' => 'Msingi\Cms\Service\Factory\PageFragments',
                 'Msingi\Cms\Db\Table\BackendUsers' => 'Msingi\Cms\Service\Factory\BackendUsers',
+                'Msingi\Cms\Db\Table\Settings' => 'Msingi\Cms\Service\Factory\Settings',
 
                 'MenuTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\Menu',
                 'PagesTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\Pages',
                 'PageFragmentsTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\PageFragments',
                 'BackendUsersTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\BackendUsers',
+                'SettingsTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\Settings',
 
                 'Msingi\Cms\Model\BackendAuthStorage' => function ($sm) {
                         return new AuthStorage();
@@ -107,6 +109,7 @@ class Module implements AutoloaderProviderInterface
             ),
             'invokables' => array(
                 'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',
+                'Settings' => 'Msingi\Cms\Model\Settings',
             ),
         );
     }

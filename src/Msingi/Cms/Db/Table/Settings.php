@@ -11,6 +11,7 @@ class Settings extends Table
     {
         return array(
             'table' => 'cms_settings',
+            'object' => '\ArrayObject',
             'fields' => array(
                 'name' => 'string',
                 'value' => 'string'
@@ -18,5 +19,72 @@ class Settings extends Table
         );
     }
 
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function fetch($name)
+    {
+        $key = $this->getCacheKey($name);
 
+        $cache = $this->getCache();
+
+        $setting = $cache->getItem($key);
+        if (!$setting) {
+            $rowset = $this->tableGateway->select(array(
+                'name' => $name
+            ));
+
+            $row = $rowset->current();
+            if ($row != null) {
+                $setting = $row['value'];
+
+                $cache->setItem($key, $setting);
+            }
+        }
+
+        return $setting;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     */
+    public function set($name, $value)
+    {
+        $rowset = $this->tableGateway->select(array(
+            'name' => $name
+        ));
+
+        $row = $rowset->current();
+        if ($row == null) {
+            $this->tableGateway->insert(array(
+                'name' => $name,
+                'value' => $value
+            ));
+        } else {
+            $this->tableGateway->update(array(
+                    'value' => $value
+                ),
+                array(
+                    'id' => $row['id']
+                )
+            );
+        }
+
+        $key = $this->getCacheKey($name);
+
+        $cache = $this->getCache();
+
+        $cache->setItem($key, $value);
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    protected function getCacheKey($name)
+    {
+        return sprintf('setting_%s', \Msingi\Cms\Model\Settings::formatValueName($name));
+    }
 }

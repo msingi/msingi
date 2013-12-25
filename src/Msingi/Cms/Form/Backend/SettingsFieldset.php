@@ -2,11 +2,14 @@
 
 namespace Msingi\Cms\Form\Backend;
 
-use Zend\Feed\PubSubHubbub\HttpResponse;
+use Msingi\Cms\Model\Settings;
 use Zend\Form\Fieldset;
+use Zend\InputFilter\InputFilterProviderInterface;
 
-class SettingsFieldset extends Fieldset
+class SettingsFieldset extends Fieldset implements InputFilterProviderInterface
 {
+    protected $inputFilter = array();
+
     /**
      * @param null $name
      * @param array $options
@@ -23,8 +26,10 @@ class SettingsFieldset extends Fieldset
     {
         foreach ($spec['values'] as $value => $valueSpec) {
 
+            $name = Settings::formatValueName($value);
+
             $options = array(
-                'name' => $this->formatValueName($value),
+                'name' => $name,
                 'options' => array(
                     'label' => $valueSpec['label']
                 ),
@@ -36,22 +41,28 @@ class SettingsFieldset extends Fieldset
             if (isset($valueSpec['type']))
                 $options['type'] = $valueSpec['type'];
 
+            if (isset($valueSpec['default'])) {
+                $default = $valueSpec['default'];
+                $options['options']['value'] = $default;
+            }
+
             if (isset($valueSpec['value_options']))
                 $options['options']['value_options'] = $valueSpec['value_options'];
 
             $this->add($options);
 
+            //
+            $this->inputFilter[$name] = array(
+                'required' => isset($valueSpec['required']) && $valueSpec['required']
+            );
         }
     }
 
     /**
-     * @param $valueName
-     * @return mixed
+     * @return array
      */
-    protected function formatValueName($valueName)
+    public function getInputFilterSpecification()
     {
-        $valueName = preg_replace('/[^a-z0-9_]/i', '_', $valueName);
-        $valueName = preg_replace('/[_]+/', '_', $valueName);
-        return $valueName;
+        return $this->inputFilter;
     }
 }
