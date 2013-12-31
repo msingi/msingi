@@ -31,7 +31,7 @@ class Settings extends Table
 
         $setting = $cache->getItem($key);
         if (!$setting) {
-            $rowset = $this->tableGateway->select(array(
+            $rowset = $this->select(array(
                 'name' => $name
             ));
 
@@ -52,18 +52,18 @@ class Settings extends Table
      */
     public function set($name, $value)
     {
-        $rowset = $this->tableGateway->select(array(
+        $rowset = $this->select(array(
             'name' => $name
         ));
 
         $row = $rowset->current();
         if ($row == null) {
-            $this->tableGateway->insert(array(
+            $this->insert(array(
                 'name' => $name,
                 'value' => $value
             ));
         } else {
-            $this->tableGateway->update(array(
+            $this->update(array(
                     'value' => $value
                 ),
                 array(

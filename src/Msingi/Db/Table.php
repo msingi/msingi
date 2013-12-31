@@ -2,41 +2,37 @@
 
 namespace Msingi\Db;
 
+use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\ArrayObject;
+use Zend\Db\Adapter\AdapterInterface;
 
-abstract class Table
+abstract class Table extends TableGateway
 {
-    /**
-     * @var \Zend\Db\TableGateway\TableGateway
-     */
-    protected $tableGateway;
-
-    /**
-     * @var \Zend\ServiceManager\ServiceLocatorInterface
-     */
-    protected $serviceLocator;
-
-    /**
-     * @var array
-     */
-    protected static $definitions = array();
-
-    /**
-     * @param TableGateway $tableGateway
-     */
-    public function __construct(TableGateway $tableGateway, ServiceLocatorInterface $serviceLocator)
-    {
-        $this->tableGateway = $tableGateway;
-        $this->serviceLocator = $serviceLocator;
-    }
+    protected $name;
+    protected $cache;
 
     /**
      * Get definition of the object properties
      * @return array
      */
     abstract protected static function getDefinition();
+
+    /**
+     * @param AdapterInterface $dbAdapter
+     */
+    public function __construct(AdapterInterface $dbAdapter)
+    {
+        $class = get_called_class();
+        $definition = $class::getDefinition();
+
+        $this->name = $definition['table'];
+
+        $resultSetPrototype = new ResultSet();
+        $resultSetPrototype->setArrayObjectPrototype($class::getPrototype());
+
+        parent::__construct($this->name, $dbAdapter, null, $resultSetPrototype);
+    }
 
     /**
      *
@@ -56,14 +52,29 @@ abstract class Table
     }
 
     /**
+     * @param $cache
+     */
+    public function setCache($cache)
+    {
+        $this->cache = $cache;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCache()
+    {
+        return $this->cache;
+    }
+
+    /**
      * @param $id
      * @return array|\ArrayObject|null
      */
     public function fetchById($id)
     {
-        $cache = $this->getCache();
+        $resultSet = $this->select(array('id' => $id));
 
-        $resultSet = $this->tableGateway->select(array('id' => $id));
         return $resultSet->current();
     }
 
@@ -72,16 +83,32 @@ abstract class Table
      */
     public function fetchAll()
     {
-        $resultSet = $this->tableGateway->select();
+        $resultSet = $this->select();
         return $resultSet;
     }
 
     /**
-     * @return null|\Zend\Cache\Storage\StorageInterface
+     * @param array $where
+     * @return array|\ArrayObject|null
      */
-    protected function getCache()
+    public function fetchRow(array $where)
     {
-        return $this->serviceLocator->get('Application\Cache');
+        $rowset = $this->select($where);
+        if ($rowset != null)
+            return $rowset->current();
+
+        return null;
+    }
+
+    /**
+     * @param array $rowData
+     * @return array|\ArrayObject|null
+     */
+    public function createRow(array $rowData)
+    {
+        $this->insert($rowData);
+
+        return $this->fetchRow(array('id' => $this->lastInsertValue));
     }
 
     /**
@@ -101,7 +128,7 @@ abstract class Table
         }
 
         if (count($set) > 0) {
-            $this->tableGateway->update($set, array('id' => $object->id));
+            $this->update($set, array('id' => $object->id));
         }
     }
 }

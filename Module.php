@@ -4,6 +4,7 @@ namespace Msingi;
 
 use Msingi\Cms\Model\Backend\AuthStorage;
 use Msingi\Cms\View\Helper\PageFragment;
+use Msingi\Cms\View\Helper\Url;
 use Zend\Authentication\Adapter\DbTable;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
@@ -45,8 +46,8 @@ class Module implements AutoloaderProviderInterface
                 'deferJs' => 'Msingi\Cms\View\Helper\DeferJs',
 
                 'language' => 'Msingi\Cms\View\Helper\Language',
+                'languageName' => 'Msingi\Cms\View\Helper\LanguageName',
                 'locale' => 'Msingi\Cms\View\Helper\Locale',
-
 
                 'gravatar' => 'Msingi\Cms\View\Helper\Gravatar',
 
@@ -60,6 +61,16 @@ class Module implements AutoloaderProviderInterface
                         $services = $helpers->getServiceLocator();
                         $app = $services->get('Application');
                         return new PageFragment($app->getMvcEvent());
+                    },
+                'u' => function (ServiceLocatorInterface $helpers) {
+                        $helper = new Url();
+                        //
+                        $helper->setRouter($helpers->getServiceLocator()->get('Router'));
+                        //
+                        $match = $helpers->getServiceLocator()->get('Application')->getMvcEvent()->getRouteMatch();
+                        $helper->setRouteMatch($match);
+                        //
+                        return $helper;
                     }
             ),
 
@@ -86,26 +97,24 @@ class Module implements AutoloaderProviderInterface
     public function getServiceConfig()
     {
         return array(
+            'abstract_factories' => array(
+                'Msingi\Service\TableGatewayFactory'
+            ),
             'factories' => array(
                 'Msingi\Cms\RouteListener' => 'Msingi\Cms\Service\RouteListenerFactory',
 
-                'Msingi\Cms\Db\Table\Menu' => 'Msingi\Cms\Service\Factory\Menu',
-                'Msingi\Cms\Db\Table\Pages' => 'Msingi\Cms\Service\Factory\Pages',
-                'Msingi\Cms\Db\Table\PageFragments' => 'Msingi\Cms\Service\Factory\PageFragments',
-                'Msingi\Cms\Db\Table\BackendUsers' => 'Msingi\Cms\Service\Factory\BackendUsers',
-                'Msingi\Cms\Db\Table\Settings' => 'Msingi\Cms\Service\Factory\Settings',
+//                'Msingi\Cms\Db\Table\Menu' => 'Msingi\Cms\Service\MenuTableFactory',
+//                'Msingi\Cms\Db\Table\Pages' => 'Msingi\Cms\Service\PagesTableFactory',
+//                'Msingi\Cms\Db\Table\PageFragments' => 'Msingi\Cms\Service\PageFragmentsTableFactory',
+//                'Msingi\Cms\Db\Table\PageTemplates' => 'Msingi\Cms\Service\PageTemplatesTableFactory',
+//                'Msingi\Cms\Db\Table\BackendUsers' => 'Msingi\Cms\Service\BackendUsersTableFactory',
+//                'Msingi\Cms\Db\Table\Settings' => 'Msingi\Cms\Service\SettingsTableFactory',
 
-                'MenuTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\Menu',
-                'PagesTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\Pages',
-                'PageFragmentsTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\PageFragments',
-                'BackendUsersTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\BackendUsers',
-                'SettingsTableGateway' => 'Msingi\Cms\Service\Factory\TableGateway\Settings',
-
+                'BackendAuthService' => 'Msingi\Cms\Service\Factory\BackendAuthService',
                 'Msingi\Cms\Model\BackendAuthStorage' => function ($sm) {
                         return new AuthStorage();
                     },
 
-                'BackendAuthService' => 'Msingi\Cms\Service\Factory\BackendAuthService'
             ),
             'invokables' => array(
                 'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',

@@ -37,7 +37,7 @@ class Menu extends Table
 
         if ($menu == null) {
 
-            $rowset = $this->tableGateway->select(function (Select $select) use ($name, $language) {
+            $rowset = $this->select(function (Select $select) use ($name, $language) {
                 $select->join('cms_menu_i18n', 'cms_menu_i18n.parent_id = cms_menu.id', array('label'), 'left');
                 $select->where(array('menu' => $name, 'language' => $language));
                 $select->order('cms_menu.parent_id')->order('order');

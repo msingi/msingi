@@ -19,22 +19,110 @@ class PagesController extends AuthenticatedController
     }
 
     /**
+     *
+     */
+    public function editAction()
+    {
+        //
+        $pagesTable = $this->getPagesTable();
+        $templatesTable = $this->getPageTemplatesTable();
+        $pageFragmentsTable = $this->getPageFragmentsTable();
+
+        //
+        $language = trim($this->params()->fromQuery('language'));
+        $page_id = intval($this->params()->fromQuery('page'));
+
+        //
+        $page = $pagesTable->fetchById($page_id);
+        if ($page == null) {
+            return $this->redirect()->toRoute('backend/default', array('controller' => 'pages', 'action' => 'index'));
+        }
+
+        //
+        $template = $templatesTable->fetchByName($page->template);
+
+        $fragmentNames = array_filter(explode(',', $template['fragments']));
+
+        $fragments = $pageFragmentsTable->fetchFragments($page_id, \Locale::getPrimaryLanguage($language));
+
+        //
+        return new ViewModel(array(
+            'page' => $page,
+            'fragmentNames' => $fragmentNames,
+            'fragments' => $fragments,
+            'language' => $language
+        ));
+    }
+
+    /**
+     *
+     */
+    public function saveAction()
+    {
+        //
+        $pagesTable = $this->getPagesTable();
+        $templatesTable = $this->getPageTemplatesTable();
+        $pageFragmentsTable = $this->getPageFragmentsTable();
+
+        //
+        $language = trim($this->params()->fromPost('language'));
+        $page_id = intval($this->params()->fromPost('page'));
+
+        //
+        $page = $pagesTable->fetchById($page_id);
+        if ($page == null) {
+            return $this->redirect()->toRoute('backend/default', array('controller' => 'pages', 'action' => 'index'));
+        }
+
+        //
+        $template = $templatesTable->fetchByName($page->template);
+
+        $fragmentNames = array_filter(explode(',', $template['fragments']));
+
+        foreach ($fragmentNames as $fragmentName) {
+            $fragment = $pageFragmentsTable->fetchOrCreate(array(
+                'page_id' => $page_id,
+                'name' => $fragmentName,
+            ));
+
+            // @todo filter content!
+            $fragmentContent = trim($this->params()->fromPost('fragment_' . $fragmentName));
+
+            $pageFragmentsTable->update_i18n($fragment->id, $language, array(
+                'content' => $fragmentContent,
+            ));
+        }
+
+        return $this->redirect()->toRoute('backend/default', array('controller' => 'pages', 'action' => 'index'));
+    }
+
+    /**
      * @return ViewModel
      */
     public function propertiesAction()
     {
+        //
+        $settings = $this->getServiceLocator()->get('Settings');
+
+        //
         $pagesTable = $this->getPagesTable();
 
         $page_id = intval(str_replace('page-', '', $this->params()->fromQuery('page')));
 
         $page = $pagesTable->fetchById($page_id);
 
+        //
         $form = new PagePropertiesForm();
 
         $form->bind($page);
 
-        $vm = new ViewModel(array('page' => $page, 'form' => $form));
+        $vm = new ViewModel(array(
+            'page' => $page,
+            'form' => $form,
+            'languages' => $settings->get('frontend:languages:enabled'),
+        ));
 
+        // disable layout
         $vm->setTerminal(true);
 
         return $vm;
@@ -72,4 +160,25 @@ class PagesController extends AuthenticatedController
 
         return $serviceManager->get('Msingi\Cms\Db\Table\Pages');
     }
+
+    /**
+     * @return \Msingi\Cms\Db\Table\PageTemplates
+     */
+    protected function getPageTemplatesTable()
+    {
+        $serviceManager = $this->getServiceLocator();
+
+        return $serviceManager->get('Msingi\Cms\Db\Table\PageTemplates');
+    }
+
+    /**
+     * @return \Msingi\Cms\Db\Table\PageFragments
+     */
+    protected function getPageFragmentsTable()
+    {
+        $serviceManager = $this->getServiceLocator();
+
+        return $serviceManager->get('Msingi\Cms\Db\Table\PageFragments');
+    }
+
 }

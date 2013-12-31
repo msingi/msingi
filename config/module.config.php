@@ -8,6 +8,15 @@ $available_languages = array(
 
 return array(
 
+    'tables' => array(
+        'Msingi\Cms\Db\Table\BackendUsers',
+        'Msingi\Cms\Db\Table\Menu',
+        'Msingi\Cms\Db\Table\PageFragments',
+        'Msingi\Cms\Db\Table\Pages',
+        'Msingi\Cms\Db\Table\PageTemplates',
+        'Msingi\Cms\Db\Table\Settings',
+    ),
+
     'settings' => array(
         'general' => array(
             'label' => 'General settings',

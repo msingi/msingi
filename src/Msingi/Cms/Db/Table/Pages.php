@@ -30,7 +30,7 @@ class Pages extends Table
      */
     public function fetchPage($path, $parent_id = null)
     {
-        $rowset = $this->tableGateway->select(function (Select $select) use ($path, $parent_id) {
+        $rowset = $this->select(function (Select $select) use ($path, $parent_id) {
             $select->where(array('type' => 'static', 'path' => $path, 'parent_id' => $parent_id));
         });
 
@@ -42,7 +42,7 @@ class Pages extends Table
      */
     public function fetchTree()
     {
-        $rowset = $this->tableGateway->select();
+        $rowset = $this->select();
 
         $pages = array();
         foreach ($rowset as $row) {
@@ -99,19 +99,19 @@ class Pages extends Table
      */
     public function fetchOrCreate($route)
     {
-        $rowset = $this->tableGateway->select(array('type' => 'mvc', 'path' => $route));
+        $rowset = $this->select(array('type' => 'mvc', 'path' => $route));
 
         $page = $rowset->current();
 
         if ($page == null) {
-            $this->tableGateway->insert(array(
+            $this->insert(array(
                 'parent_id' => 1,
                 'type' => 'mvc',
                 'path' => $route,
                 'template' => $route
             ));
 
-            $rowset = $this->tableGateway->select(array('id' => $this->tableGateway->lastInsertValue));
+            $rowset = $this->select(array('id' => $this->lastInsertValue));
             $page = $rowset->current();
         }
 

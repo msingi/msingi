@@ -27,7 +27,7 @@ class BackendUsers extends Table
      */
     public function fetchByUsername($username)
     {
-        $rowset = $this->tableGateway->select(array('username' => $username));
+        $rowset = $this->select(array('username' => $username));
 
         return $rowset->current();
 

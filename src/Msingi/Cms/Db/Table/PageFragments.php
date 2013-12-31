@@ -2,10 +2,10 @@
 
 namespace Msingi\Cms\Db\Table;
 
-use Msingi\Db\Table;
+use Msingi\Db\TableI18n;
 use Zend\Db\Sql\Select;
 
-class PageFragments extends Table
+class PageFragments extends TableI18n
 {
     protected static function getDefinition()
     {
@@ -32,7 +32,7 @@ class PageFragments extends Table
 
         $fragments = $cache->getItem($key);
         if ($fragments == null) {
-            $rowset = $this->tableGateway->select(function (Select $select) use ($page_id, $language) {
+            $rowset = $this->select(function (Select $select) use ($page_id, $language) {
                 $select->join('cms_page_fragments_i18n', 'cms_page_fragments_i18n.parent_id = cms_page_fragments.id', array('content'), 'left');
                 $select->where(array('page_id' => $page_id, 'language' => $language));
             });
@@ -47,4 +47,21 @@ class PageFragments extends Table
 
         return $fragments;
     }
+
+    /**
+     * @param $route
+     */
+    public function fetchOrCreate($params)
+    {
+        $fragment = $this->fetchRow(array('page_id' => $params['page_id'], 'name' => $params['name']));
+        if ($fragment == null) {
+            $fragment = $this->createRow(array(
+                'page_id' => $params['page_id'],
+                'name' => $params['name'],
+            ));
+        }
+
+        return $fragment;
+    }
+
 }

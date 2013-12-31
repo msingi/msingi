@@ -45,7 +45,6 @@ class RouteListener implements ListenerAggregateInterface
         $routeName = $routeMatch->getMatchedRouteName();
 
         if (substr($routeName, 0, 9) == 'frontend/') {
-
             $cms_page = $routeMatch->getParam('cms_page');
             if ($cms_page == null) {
                 $serviceManager = $e->getApplication()->getServiceManager();
