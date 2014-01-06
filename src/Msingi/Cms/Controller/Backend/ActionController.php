@@ -19,4 +19,21 @@ class ActionController extends AbstractActionController
 
         return $this->authService;
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    protected function getActionUrl($action, array $params = null)
+    {
+        $event = $this->getEvent();
+
+        $rm = $event->getRouteMatch();
+
+        $params = $rm->getParams();
+        $params['action'] = $action;
+
+        return $event->getRouter()->assemble($params, array('name' => $rm->getMatchedRouteName()));
+    }
+
 }

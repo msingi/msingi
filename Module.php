@@ -54,6 +54,8 @@ class Module implements AutoloaderProviderInterface
                 '_' => 'Zend\I18n\View\Helper\Translate',
                 '_p' => 'Zend\I18n\View\Helper\TranslatePlural',
 
+                'excerpt' => 'Msingi\Cms\View\Helper\Excerpt',
+
                 'formElementErrorClass' => 'Msingi\Cms\View\Helper\FormElementErrorClass',
             ),
             'factories' => array(
@@ -123,6 +125,9 @@ class Module implements AutoloaderProviderInterface
         );
     }
 
+    /**
+     * @param MvcEvent $e
+     */
     protected function initLayouts(MvcEvent $e)
     {
         $eventManager = $e->getApplication()->getEventManager();

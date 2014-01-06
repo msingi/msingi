@@ -106,7 +106,17 @@ abstract class Table extends TableGateway
      */
     public function createRow(array $rowData)
     {
-        $this->insert($rowData);
+        $class = get_called_class();
+        $definition = $class::getDefinition();
+
+        $set = array();
+        foreach ($definition['fields'] as $field => $desc) {
+            if (isset($rowData[$field])) {
+                $set[$field] = $rowData[$field];
+            }
+        }
+
+        $this->insert($set);
 
         return $this->fetchRow(array('id' => $this->lastInsertValue));
     }

@@ -61,6 +61,14 @@ class TableRow
     }
 
     /**
+     * @param $data
+     */
+    public function setValues($data)
+    {
+        $this->data = $data;
+    }
+
+    /**
      * @param $field
      * @return bool
      */

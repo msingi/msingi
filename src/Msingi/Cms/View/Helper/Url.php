@@ -24,12 +24,13 @@ class Url extends AbstractHelper
      */
     protected $routeMatch;
 
-
     /**
-     *
-     * @return string Url
+     * @param $route
+     * @param null $query
+     * @return mixed
+     * @throws \Zend\View\Exception\RuntimeException
      */
-    public function __invoke($route, $query)
+    public function __invoke($route, $query = null)
     {
         if (null === $this->router) {
             throw new Exception\RuntimeException('No RouteStackInterface instance provided');
