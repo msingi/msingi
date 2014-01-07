@@ -49,6 +49,8 @@ class Module implements AutoloaderProviderInterface
                 'languageName' => 'Msingi\Cms\View\Helper\LanguageName',
                 'locale' => 'Msingi\Cms\View\Helper\Locale',
 
+                'imageAttachment' => 'Msingi\Cms\View\Helper\ImageAttachment',
+
                 'gravatar' => 'Msingi\Cms\View\Helper\Gravatar',
 
                 '_' => 'Zend\I18n\View\Helper\Translate',
@@ -100,18 +102,16 @@ class Module implements AutoloaderProviderInterface
     {
         return array(
             'abstract_factories' => array(
-                'Msingi\Service\TableGatewayFactory'
+                'Msingi\Service\TableGatewayFactory',
             ),
             'factories' => array(
+                //
                 'Msingi\Cms\RouteListener' => 'Msingi\Cms\Service\RouteListenerFactory',
 
-//                'Msingi\Cms\Db\Table\Menu' => 'Msingi\Cms\Service\MenuTableFactory',
-//                'Msingi\Cms\Db\Table\Pages' => 'Msingi\Cms\Service\PagesTableFactory',
-//                'Msingi\Cms\Db\Table\PageFragments' => 'Msingi\Cms\Service\PageFragmentsTableFactory',
-//                'Msingi\Cms\Db\Table\PageTemplates' => 'Msingi\Cms\Service\PageTemplatesTableFactory',
-//                'Msingi\Cms\Db\Table\BackendUsers' => 'Msingi\Cms\Service\BackendUsersTableFactory',
-//                'Msingi\Cms\Db\Table\Settings' => 'Msingi\Cms\Service\SettingsTableFactory',
+                //
+                'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManagerFactory',
 
+                //
                 'BackendAuthService' => 'Msingi\Cms\Service\Factory\BackendAuthService',
                 'Msingi\Cms\Model\BackendAuthStorage' => function ($sm) {
                         return new AuthStorage();

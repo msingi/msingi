@@ -10,6 +10,8 @@ use Zend\Db\Sql\Select;
 abstract class AbstractEntitiesController extends AuthenticatedController
 {
     /**
+     * Get storage
+     *
      * @return \Msingi\Db\Table
      */
     abstract protected function getTable();
@@ -90,10 +92,18 @@ abstract class AbstractEntitiesController extends AuthenticatedController
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $form->setData($request->getPost());
+
+            // Make certain to merge the files info!
+            $post = array_merge_recursive(
+                $request->getPost()->toArray(),
+                $request->getFiles()->toArray()
+            );
+
+            $form->setData($post);
 
             // check if form data is valid
             if ($form->isValid()) {
+
                 // get form data
                 $values = $form->getData();
 
@@ -111,6 +121,8 @@ abstract class AbstractEntitiesController extends AuthenticatedController
                     $entity->setValues($values);
                     $this->getTable()->save($entity);
                 }
+
+                $this->onEntitySave($entity, $values);
 
                 // redirect back to index action
                 return $this->redirect()->toUrl($this->getActionUrl('index'));
@@ -153,4 +165,15 @@ abstract class AbstractEntitiesController extends AuthenticatedController
         return $this->redirect()->toUrl($this->getActionUrl('index'));
     }
 
+    /**
+     * Called after the entity is created and saved
+     * Used for processing extra data as depended objects of file attachements
+     *
+     * @param $entity
+     * @param $values
+     */
+    protected function onEntitySave($entity, $values)
+    {
+
+    }
 }
