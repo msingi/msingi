@@ -21,10 +21,13 @@ class ActionController extends AbstractActionController
     }
 
     /**
-     * @param $name
-     * @return string
+     * @todo solve problem with non-default routes here or in router?
+     *
+     * @param $action
+     * @param array $options
+     * @return mixed
      */
-    protected function getActionUrl($action, array $params = null)
+    protected function getActionUrl($action, array $query = null)
     {
         $event = $this->getEvent();
 
@@ -33,7 +36,12 @@ class ActionController extends AbstractActionController
         $params = $rm->getParams();
         $params['action'] = $action;
 
-        return $event->getRouter()->assemble($params, array('name' => $rm->getMatchedRouteName()));
+        $options = array(
+            'name' => $rm->getMatchedRouteName(),
+            'query' => $query
+        );
+
+        return $event->getRouter()->assemble($params, $options);
     }
 
 }
