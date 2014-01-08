@@ -49,6 +49,9 @@ class SettingsFieldset extends Fieldset implements InputFilterProviderInterface
             if (isset($valueSpec['value_options']))
                 $options['options']['value_options'] = $valueSpec['value_options'];
 
+            if (isset($valueSpec['help']))
+                $options['options']['help'] = $valueSpec['help'];
+
             $this->add($options);
 
             //
