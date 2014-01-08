@@ -5,8 +5,14 @@ $available_languages = array(
     'de' => 'German',
 );
 
-
 return array(
+
+    'models' => array(
+        'Msingi\Cms\Model\Backend\User',
+        'Msingi\Cms\Model\Menu',
+        'Msingi\Cms\Model\Page',
+        'Msingi\Cms\Model\PageFragment',
+    ),
 
     'tables' => array(
         'Msingi\Cms\Db\Table\BackendUsers',
@@ -23,6 +29,7 @@ return array(
             'values' => array(
                 'application:name' => array(
                     'label' => 'Application name',
+                    'input_class' => 'form-control input-large'
                 ),
             ),
         ),
@@ -34,6 +41,7 @@ return array(
                     'label' => 'Default language',
                     'value_options' => $available_languages,
                     'default' => 'en',
+                    'input_class' => 'form-control input-medium'
                 ),
                 'frontend:languages:multilanguage' => array(
                     'type' => 'checkbox',
@@ -55,7 +63,8 @@ return array(
                     'type' => 'select',
                     'label' => 'Default language',
                     'value_options' => $available_languages,
-                    'default' => 'en'
+                    'default' => 'en',
+                    'input_class' => 'form-control input-medium'
                 ),
             ),
         ),

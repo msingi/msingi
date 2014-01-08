@@ -51,7 +51,7 @@ class SettingsController extends AuthenticatedController
             foreach ($spec['values'] as $value => $valueSpec) {
                 $valueName = Settings::formatValueName($value);
 
-                $data[$section][$valueName] = $settings->get($value, $valueSpec['default']);
+                $data[$section][$valueName] = $settings->get($value, isset($valueSpec['default']) ? $valueSpec['default'] : null);
             }
         }
 

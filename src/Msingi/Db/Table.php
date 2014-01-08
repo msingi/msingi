@@ -4,13 +4,17 @@ namespace Msingi\Db;
 
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\ServiceManager;
 use Zend\Stdlib\ArrayObject;
 use Zend\Db\Adapter\AdapterInterface;
 
-abstract class Table extends TableGateway
+abstract class Table extends TableGateway implements ServiceLocatorAwareInterface
 {
     protected $name;
     protected $cache;
+    protected $serviceLocator;
 
     /**
      * Get definition of the object properties
@@ -20,35 +24,42 @@ abstract class Table extends TableGateway
 
     /**
      * @param AdapterInterface $dbAdapter
+     * @param ServiceLocatorInterface $serviceLocator
      */
-    public function __construct(AdapterInterface $dbAdapter)
+    public function __construct(AdapterInterface $dbAdapter, ServiceLocatorInterface $serviceLocator)
     {
         $class = get_called_class();
         $definition = $class::getDefinition();
 
         $this->name = $definition['table'];
+        $this->serviceLocator = $serviceLocator;
+
+        $objectClass = $definition['object'];
 
         $resultSetPrototype = new ResultSet();
-        $resultSetPrototype->setArrayObjectPrototype($class::getPrototype());
+        if ($serviceLocator->has($objectClass)) {
+            $resultSetPrototype->setArrayObjectPrototype(clone $serviceLocator->get($objectClass));
+        } else {
+            $resultSetPrototype->setArrayObjectPrototype(new $objectClass());
+        }
 
         parent::__construct($this->name, $dbAdapter, null, $resultSetPrototype);
     }
 
     /**
-     *
+     * @param ServiceLocatorInterface $serviceLocator
      */
-    public static function getPrototype()
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
-        $class = get_called_class();
-        $definition = $class::getDefinition();
+        $this->serviceLocator = $serviceLocator;
+    }
 
-        if (!isset($definition['object'])) {
-            throw new Exception();
-        }
-
-        $objectClass = $definition['object'];
-
-        return new $objectClass();
+    /**
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
     }
 
     /**

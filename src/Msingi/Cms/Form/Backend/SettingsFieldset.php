@@ -34,7 +34,7 @@ class SettingsFieldset extends Fieldset implements InputFilterProviderInterface
                     'label' => $valueSpec['label']
                 ),
                 'attributes' => array(
-                    'class' => 'form-control'
+                    'class' => isset($valueSpec['input_class']) ? $valueSpec['input_class'] : 'form-control',
                 ),
             );
 

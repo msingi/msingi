@@ -4,6 +4,7 @@ namespace Msingi;
 
 use Msingi\Cms\Model\Backend\AuthStorage;
 use Msingi\Cms\View\Helper\PageFragment;
+use Msingi\Cms\View\Helper\SettingsValue;
 use Msingi\Cms\View\Helper\Url;
 use Zend\Authentication\Adapter\DbTable;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
@@ -61,10 +62,15 @@ class Module implements AutoloaderProviderInterface
                 'formElementErrorClass' => 'Msingi\Cms\View\Helper\FormElementErrorClass',
             ),
             'factories' => array(
-                'Fragment' => function (ServiceLocatorInterface $helpers) {
+                'fragment' => function (ServiceLocatorInterface $helpers) {
                         $services = $helpers->getServiceLocator();
                         $app = $services->get('Application');
                         return new PageFragment($app->getMvcEvent());
+                    },
+                'settingsValue' => function (ServiceLocatorInterface $helpers) {
+                        $viewHelper = new SettingsValue();
+                        $viewHelper->setServiceLocator($helpers->getServiceLocator());
+                        return $viewHelper;
                     },
                 'u' => function (ServiceLocatorInterface $helpers) {
                         $helper = new Url();
@@ -103,6 +109,7 @@ class Module implements AutoloaderProviderInterface
         return array(
             'abstract_factories' => array(
                 'Msingi\Service\TableGatewayFactory',
+                'Msingi\Service\TableRowFactory',
             ),
             'factories' => array(
                 //

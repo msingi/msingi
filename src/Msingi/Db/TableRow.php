@@ -2,12 +2,15 @@
 
 namespace Msingi\Db;
 
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\ArrayObject;
 
-class TableRow
+class TableRow implements ServiceLocatorAwareInterface
 {
     protected $data = array();
     protected $originalData = array();
+    protected $serviceLocator;
 
     /**
      * @param $name
@@ -83,5 +86,25 @@ class TableRow
     public function getArrayCopy()
     {
         return $this->data;
+    }
+
+    /**
+     * Set service locator
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+    }
+
+    /**
+     * Get service locator
+     *
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
     }
 }

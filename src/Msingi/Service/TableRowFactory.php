@@ -5,10 +5,10 @@ namespace Msingi\Service;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class TableGatewayFactory implements AbstractFactoryInterface
+class TableRowFactory implements AbstractFactoryInterface
 {
     protected $config;
-    protected $configKey = 'tables';
+    protected $configKey = 'models';
 
     /**
      * Determine if we can create a service with name
@@ -38,16 +38,10 @@ class TableGatewayFactory implements AbstractFactoryInterface
      */
     public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
-        $dbAdapter = $serviceLocator->get('Zend\Db\Adapter\Adapter');
+        $tableRow = new $requestedName();
+        $tableRow->setServiceLocator($serviceLocator);
 
-        $table = new $requestedName($dbAdapter, $serviceLocator);
-
-        if ($serviceLocator->has('Application\Cache')) {
-            $cache = $serviceLocator->get('Application\Cache');
-            $table->setCache($cache);
-        }
-
-        return $table;
+        return $tableRow;
     }
 
 
@@ -77,5 +71,4 @@ class TableGatewayFactory implements AbstractFactoryInterface
         $this->config = $config[$this->configKey];
         return $this->config;
     }
-
 }
