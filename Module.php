@@ -114,6 +114,7 @@ class Module implements AutoloaderProviderInterface
             'factories' => array(
                 //
                 'Msingi\Cms\RouteListener' => 'Msingi\Cms\Service\RouteListenerFactory',
+                'Msingi\Cms\HttpListener' => 'Msingi\Cms\Service\HttpListenerFactory',
 
                 //
                 'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManagerFactory',
