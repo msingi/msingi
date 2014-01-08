@@ -15,8 +15,10 @@ class BackendUsers extends Table
             'table' => 'cms_backend_users',
             'object' => 'Msingi\Cms\Model\Backend\User',
             'fields' => array(
+                'name' => 'string',
                 'username' => 'string',
-                'name' => 'name',
+                'email' => 'string',
+                'role' => 'string'
             )
         );
     }

@@ -11,7 +11,7 @@ class AuthStorage extends Session
      */
     public function __construct()
     {
-        parent::__construct('msingi\backend\auth');
+        parent::__construct('Msingi\Backend\Auth');
     }
 
     /**
