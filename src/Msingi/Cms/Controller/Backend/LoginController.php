@@ -37,6 +37,10 @@ class LoginController extends ActionController
      */
     public function indexAction()
     {
+        if ($this->getAuthService()->hasIdentity()) {
+            return $this->redirect()->toRoute('backend/home');
+        }
+
         $form = new LoginForm();
 
         $request = $this->getRequest();
@@ -81,6 +85,10 @@ class LoginController extends ActionController
      */
     public function logoutAction()
     {
+        if (!$this->getAuthService()->hasIdentity()) {
+            return $this->redirect()->toRoute('backend/login');
+        }
+
         $this->getSessionStorage()->forgetMe();
         $this->getAuthService()->clearIdentity();
 
