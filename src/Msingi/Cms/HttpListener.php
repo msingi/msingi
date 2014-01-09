@@ -54,11 +54,15 @@ class HttpListener implements ListenerAggregateInterface
         }
 
         if ($settings->get('performance:cache_control')) {
-            $this->addCacheControl($e, $settings->get('performance:cache_lifetime', 300));
-        }
+            if ($e->getResponse()->getMetadata('No-Cache')) {
+                $this->addCacheControl($e, false);
+            } else {
+                $this->addCacheControl($e, $settings->get('performance:cache_lifetime', 300));
+            }
 
-        if ($settings->get('performance:conditional')) {
-            $this->addConditional($e);
+            if ($settings->get('performance:conditional')) {
+                $this->addConditional($e);
+            }
         }
     }
 
@@ -72,9 +76,15 @@ class HttpListener implements ListenerAggregateInterface
     {
         $responseHeaders = $e->getResponse()->getHeaders();
 
-        $responseHeaders->addHeaderLine('Pragma', '', true);
-        $responseHeaders->addHeaderLine('Expires', gmdate('D, d M Y H:i:s', time() + $lifetime) . ' GMT', true);
-        $responseHeaders->addHeaderLine('Cache-Control', 'public, must-revalidate, max-age=' . $lifetime, true);
+        if ($lifetime === false) {
+            $responseHeaders->addHeaderLine('Pragma', 'no-cache', true);
+            $responseHeaders->addHeaderLine('Cache-Control', 'no-cache', true);
+            $responseHeaders->addHeaderLine('Expires', gmdate('D, d M Y H:i:s', time() - 1) . ' GMT', true);
+        } else {
+            $responseHeaders->addHeaderLine('Pragma', '', true);
+            $responseHeaders->addHeaderLine('Expires', gmdate('D, d M Y H:i:s', time() + $lifetime) . ' GMT', true);
+            $responseHeaders->addHeaderLine('Cache-Control', 'public, must-revalidate, max-age=' . $lifetime, true);
+        }
     }
 
     /**

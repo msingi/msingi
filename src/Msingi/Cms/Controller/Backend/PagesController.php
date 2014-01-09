@@ -8,14 +8,16 @@ use Zend\View\Model\ViewModel;
 
 class PagesController extends AuthenticatedController
 {
+    protected $pagesTable;
+
     /**
      * @return array|ViewModel
      */
     public function indexAction()
     {
-        $pagesTable = $this->getPagesTable();
-
-        return new ViewModel(array('pages' => $pagesTable->fetchTree()));
+        return new ViewModel(array(
+            'pages' => $this->getPagesTable()->fetchTree()
+        ));
     }
 
     /**
@@ -156,9 +158,13 @@ class PagesController extends AuthenticatedController
      */
     protected function getPagesTable()
     {
-        $serviceManager = $this->getServiceLocator();
+        if ($this->pagesTable == null) {
+            $serviceManager = $this->getServiceLocator();
 
-        return $serviceManager->get('Msingi\Cms\Db\Table\Pages');
+            $this->pagesTable = $serviceManager->get('Msingi\Cms\Db\Table\Pages');
+        }
+
+        return $this->pagesTable;
     }
 
     /**

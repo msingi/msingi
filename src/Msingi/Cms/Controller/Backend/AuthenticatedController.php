@@ -16,6 +16,8 @@ class AuthenticatedController extends ActionController
             return $this->redirect()->toRoute('backend/login');
         }
 
+        $e->getResponse()->setMetadata('No-Cache', true);
+
         return parent::onDispatch($e);
     }
 }
