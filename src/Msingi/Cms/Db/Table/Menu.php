@@ -34,11 +34,11 @@ class Menu extends TableI18n
         $cache = $this->getCache();
 
         if ($useCache && $cache != null) {
-            $key = sprintf('menu_%s_%s', $name, $language);
-            $menu = $cache->getItem($key);
+            $cacheKey = sprintf('menu_%s_%s', $name, $language);
+            $menu = $cache->getItem($cacheKey);
             if ($menu == null) {
                 $menu = $this->fetchMenuRaw($name, $language);
-                $cache->setItem($key, $menu);
+                $cache->setItem($cacheKey, $menu);
             }
         } else {
             $menu = $this->fetchMenuRaw($name, $language);

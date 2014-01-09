@@ -95,12 +95,14 @@ class MenuController extends AuthenticatedController
         $menu = $this->params()->fromPost('menu');
         $data = $this->params()->fromPost('data');
 
+        $order = 0;
         foreach ($data as $item) {
             if (intval($item['item_id']) == 0)
                 continue;
 
             $this->getMenuTable()->update(array(
-                'parent_id' => intval($item['parent_id']) != 0 ? intval($item['parent_id']) : null
+                'parent_id' => intval($item['parent_id']) != 0 ? intval($item['parent_id']) : null,
+                'order' => $order++
             ), array(
                 'id' => $item['item_id']
             ));
