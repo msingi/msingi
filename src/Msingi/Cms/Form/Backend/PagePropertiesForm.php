@@ -25,10 +25,10 @@ class PagePropertiesForm extends Form implements InputFilterProviderInterface
             'name' => 'path',
             'type' => 'text',
             'attributes' => array(
-                'class' => 'form-control placeholder-no-fix',
+                'class' => 'form-control input-large',
             ),
             'options' => array(
-                'label' => 'Username'
+                'label' => 'Path'
             ),
         ));
 
@@ -36,14 +36,10 @@ class PagePropertiesForm extends Form implements InputFilterProviderInterface
             'name' => 'template',
             'type' => 'select',
             'attributes' => array(
-                'class' => 'form-control'
+                'class' => 'form-control input-medium'
             ),
             'options' => array(
                 'label' => 'Template',
-                'value_options' => array(
-                    'default' => 'Default',
-                    'homepage' => 'Homepage',
-                )
             ),
         ));
     }

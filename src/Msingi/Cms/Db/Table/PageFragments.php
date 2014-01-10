@@ -3,6 +3,7 @@
 namespace Msingi\Cms\Db\Table;
 
 use Msingi\Db\TableI18n;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 
 class PageFragments extends TableI18n
@@ -13,6 +14,8 @@ class PageFragments extends TableI18n
             'table' => 'cms_page_fragments',
             'object' => 'Msingi\Cms\Model\PageFragment',
             'fields' => array(
+                'page_id' => 'integer',
+                'name' => 'string',
                 'content' => 'string'
             )
         );
@@ -33,13 +36,15 @@ class PageFragments extends TableI18n
         $fragments = $cache->getItem($key);
         if ($fragments == null) {
             $rowset = $this->select(function (Select $select) use ($page_id, $language) {
-                $select->join('cms_page_fragments_i18n', 'cms_page_fragments_i18n.parent_id = cms_page_fragments.id', array('content'), 'left');
-                $select->where(array('page_id' => $page_id, 'language' => $language));
+                $select->join('cms_page_fragments_i18n',
+                    new Expression('cms_page_fragments_i18n.parent_id = cms_page_fragments.id AND language = ?', $language),
+                    array('content'), 'left');
+                $select->where(array('page_id' => $page_id));
             });
 
             $fragments = array();
             foreach ($rowset as $row) {
-                $fragments[$row->name] = $row;
+                $fragments[$row->name] = $row->content;
             }
 
             //$cache->setItem($key, $fragments);

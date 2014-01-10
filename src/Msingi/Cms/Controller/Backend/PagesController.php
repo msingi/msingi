@@ -20,82 +20,121 @@ class PagesController extends AuthenticatedController
         ));
     }
 
+    public function addAction()
+    {
+
+    }
+
     /**
      *
      */
     public function editAction()
     {
-        //
-        $pagesTable = $this->getPagesTable();
-        $templatesTable = $this->getPageTemplatesTable();
-        $pageFragmentsTable = $this->getPageFragmentsTable();
+        $settings = $this->getServiceLocator()->get('Settings');
 
-        //
-        $language = trim($this->params()->fromQuery('language'));
-        $page_id = intval($this->params()->fromQuery('page'));
-
-        //
-        $page = $pagesTable->fetchById($page_id);
+        $page_id = intval($this->params()->fromQuery('id'));
+        $page = $this->getPagesTable()->fetchById($page_id);
         if ($page == null) {
             return $this->redirect()->toRoute('backend/default', array('controller' => 'pages', 'action' => 'index'));
         }
 
         //
-        $template = $templatesTable->fetchByName($page->template);
-
-        $fragmentNames = array_filter(explode(',', $template['fragments']));
-
-        $fragments = $pageFragmentsTable->fetchFragments($page_id, \Locale::getPrimaryLanguage($language));
-
-        //
         return new ViewModel(array(
             'page' => $page,
-            'fragmentNames' => $fragmentNames,
-            'fragments' => $fragments,
-            'language' => $language
+            'languages' => $settings->get('frontend:languages:enabled'),
         ));
     }
 
     /**
      *
      */
-    public function saveAction()
+    public function loadAction()
     {
-        //
-        $pagesTable = $this->getPagesTable();
-        $templatesTable = $this->getPageTemplatesTable();
-        $pageFragmentsTable = $this->getPageFragmentsTable();
-
-        //
-        $language = trim($this->params()->fromPost('language'));
         $page_id = intval($this->params()->fromPost('page'));
+        $language = trim($this->params()->fromPost('language'));
 
-        //
-        $page = $pagesTable->fetchById($page_id);
-        if ($page == null) {
-            return $this->redirect()->toRoute('backend/default', array('controller' => 'pages', 'action' => 'index'));
-        }
+        $page = $this->getPagesTable()->fetchById($page_id);
+        if ($page != null) {
 
-        //
-        $template = $templatesTable->fetchByName($page->template);
+            $contents = $this->getPageFragmentsTable()->fetchFragments($page->id, $language);
 
-        $fragmentNames = array_filter(explode(',', $template['fragments']));
+            $pageTemplate = $this->getPageTemplatesTable()->fetchByName($page->template);
 
-        foreach ($fragmentNames as $fragmentName) {
-            $fragment = $pageFragmentsTable->fetchOrCreate(array(
-                'page_id' => $page_id,
-                'name' => $fragmentName,
+            $fragments = array();
+            foreach (explode(',', $pageTemplate['fragments']) as $fragment) {
+                $fragment = trim($fragment);
+                if ($fragment != '') {
+                    $fragments[$fragment] = isset($contents[$fragment]) ? $contents[$fragment] : '';
+                }
+            }
+
+            // set page data
+            $vm = new ViewModel(array(
+                'language' => $language,
+                'page' => $page,
+                'meta' => $this->getPagesTable()->fetchMeta($page->id, $language),
+                'fragments' => $fragments,
             ));
 
-            // @todo filter content!
-            $fragmentContent = trim($this->params()->fromPost('fragment_' . $fragmentName));
+            // disable layout
+            $vm->setTerminal(true);
 
-            $pageFragmentsTable->update_i18n($fragment->id, $language, array(
-                'content' => $fragmentContent,
+            // render the template
+            $template = 'backend/pages/templates/' . preg_replace('/[^a-z0-9_]+/', '_', $page->template);
+            $resolver = $this->getEvent()->getApplication()->getServiceManager()->get('Zend\View\Resolver\TemplatePathStack');
+            $template = $resolver->resolve($template) ? $template : 'backend/pages/templates/default';
+            $vm->setTemplate($template);
+        }
+
+        return $vm;
+    }
+
+    /**
+     * @return \Zend\Stdlib\ResponseInterface
+     */
+    public function saveMetaAction()
+    {
+        $page_id = $this->params()->fromPost('pk');
+        list($meta, $language) = explode('_', $this->params()->fromPost('name'));
+        $content = $this->params()->fromPost('value');
+
+        if (in_array($meta, array('title', 'keywords', 'description'))) {
+            $page = $this->getPagesTable()->fetchById($page_id);
+            if ($page != null) {
+                $this->getPagesTable()->update_i18n($page->id, $language, array(
+                    $meta => $content
+                ));
+            }
+        }
+
+        return $this->getResponse();
+    }
+
+    /**
+     * @return \Zend\Stdlib\ResponseInterface
+     */
+    public function saveFragmentAction()
+    {
+        $page_id = $this->params()->fromPost('page');
+        $language = $this->params()->fromPost('language');
+        $fragment = trim(str_replace('fragment_', '', $this->params()->fromPost('fragment')));
+        // @todo filter content tags!!!
+        $content = $this->params()->fromPost('content');
+
+        $page = $this->getPagesTable()->fetchById($page_id);
+        if ($page != null) {
+
+            $fragment = $this->getPageFragmentsTable()->fetchOrCreate(array(
+                'page_id' => $page->id,
+                'name' => $fragment
+            ));
+
+            $this->getPageFragmentsTable()->update_i18n($fragment->id, $language, array(
+                'content' => $content
             ));
         }
 
-        return $this->redirect()->toRoute('backend/default', array('controller' => 'pages', 'action' => 'index'));
+        return $this->getResponse();
     }
 
     /**
@@ -106,15 +145,15 @@ class PagesController extends AuthenticatedController
         //
         $settings = $this->getServiceLocator()->get('Settings');
 
-        //
-        $pagesTable = $this->getPagesTable();
-
         $page_id = intval(str_replace('page-', '', $this->params()->fromQuery('page')));
+        $page = $this->getPagesTable()->fetchById($page_id);
+        if ($page == null) {
 
-        $page = $pagesTable->fetchById($page_id);
+        }
 
         //
         $form = new PagePropertiesForm();
+        $form->get('template')->setValueOptions($this->getPageTemplatesTable()->fetchOptions());
 
         $form->bind($page);
 
@@ -128,6 +167,24 @@ class PagesController extends AuthenticatedController
         $vm->setTerminal(true);
 
         return $vm;
+    }
+
+    /**
+     *
+     * @return ViewModel
+     */
+    public function savepropsAction()
+    {
+        $page_id = $this->params()->fromPost('id');
+        $page = $this->getPagesTable()->fetchById($page_id);
+        if ($page != null) {
+            $page->path = $this->params()->fromPost('path');
+            $page->template = $this->params()->fromPost('template');
+
+            $this->getPagesTable()->save($page);
+        }
+
+        return $this->redirect()->toRoute('backend/default', array('controller' => 'pages', 'action' => 'index'));
     }
 
     /**

@@ -2,10 +2,10 @@
 
 namespace Msingi\Cms\Db\Table;
 
-use Msingi\Db\Table;
+use Msingi\Db\TableI18n;
 use Zend\Db\Sql\Select;
 
-class Pages extends Table
+class Pages extends TableI18n
 {
     protected static function getDefinition()
     {
@@ -35,6 +35,16 @@ class Pages extends Table
         });
 
         return $rowset->current();
+    }
+
+    /**
+     * @param $page_id
+     * @param $language
+     * @return array|\ArrayObject|null
+     */
+    public function fetchMeta($page_id, $language)
+    {
+        return $this->fetch_i18n($page_id, $language);
     }
 
     /**

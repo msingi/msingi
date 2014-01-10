@@ -31,4 +31,19 @@ class PageTemplates extends Table
 
         return $resultSet->current();
     }
+
+    /**
+     * Fetch templates list as associative array
+     *
+     * @return array
+     */
+    public function fetchOptions()
+    {
+        $resultSet = $this->select();
+        $result = array();
+        foreach ($resultSet as $row) {
+            $result[$row['name']] = $row['label'];
+        }
+        return $result;
+    }
 }

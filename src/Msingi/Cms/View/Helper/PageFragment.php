@@ -36,6 +36,6 @@ class PageFragment extends AbstractHelper
             $this->fragments = $pageFragmentsTable->fetchFragments($this->page->id, \Locale::getPrimaryLanguage($locale));
         }
 
-        return isset($this->fragments[$name]) ? $this->fragments[$name]->content : '';
+        return isset($this->fragments[$name]) ? $this->fragments[$name] : '';
     }
 }
