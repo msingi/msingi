@@ -9,6 +9,7 @@ class Settings implements ServiceManagerAwareInterface
 {
     protected $serviceManager;
     protected $tableSettings;
+    protected $values;
 
     /**
      * @param $name
@@ -17,18 +18,11 @@ class Settings implements ServiceManagerAwareInterface
      */
     public function get($name, $default = null)
     {
-        $settingsTable = $this->getSettingsTable();
-
-        $rowValue = $settingsTable->fetch($name);
-        if ($rowValue != null) {
-            // try to unserialize value
-            $value = @unserialize($rowValue);
-            $setting = ($value !== false) ? $value : $rowValue;
-        } else {
-            $setting = $default;
+        if ($this->values == null) {
+            $this->loadSettings();
         }
 
-        return $setting;
+        return isset($this->values[$name]) ? $this->values[$name] : $default;
     }
 
     /**
@@ -37,13 +31,18 @@ class Settings implements ServiceManagerAwareInterface
      */
     public function set($name, $value)
     {
-        $settingsTable = $this->getSettingsTable();
-
         if (is_array($value)) {
-            $settingsTable->set($name, serialize($value));
+            $this->getSettingsTable()->set($name, serialize($value));
         } else {
-            $settingsTable->set($name, $value);
+            $this->getSettingsTable()->set($name, $value);
         }
+
+        // update cache
+        $cache = $this->getCache();
+
+        $this->values[$name] = $value;
+
+        $cache->setItem('settings', $this->values);
     }
 
     /**
@@ -52,6 +51,32 @@ class Settings implements ServiceManagerAwareInterface
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
+    }
+
+    /**
+     *
+     */
+    protected function loadSettings()
+    {
+        $cache = $this->getCache();
+
+        $values = $cache->getItem('settings');
+        if ($values != null) {
+            $this->values = $values;
+            return;
+        }
+
+        $this->values = array();
+
+        $rowset = $this->getSettingsTable()->fetchAll();
+        foreach ($rowset as $row) {
+            // try to unserialize value
+            $value = @unserialize($row['value']);
+            $this->values[$row['name']] = ($value !== false) ? $value : $row['value'];
+        }
+
+        // update cache
+        $cache->setItem('settings', $this->values);
     }
 
     /**
@@ -82,7 +107,7 @@ class Settings implements ServiceManagerAwareInterface
      */
     protected function getCache()
     {
-        return $this->serviceLocator->get('Application\Cache');
+        return $this->serviceManager->get('Application\Cache');
     }
 
 }

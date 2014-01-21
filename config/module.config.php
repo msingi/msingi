@@ -68,30 +68,5 @@ return array(
                 ),
             ),
         ),
-        'performance' => array(
-            'label' => 'Performance',
-            'values' => array(
-                'performance:cache_control' => array(
-                    'label' => 'Cache control',
-                    'type' => 'checkbox',
-                    'default' => false
-                ),
-                'performance:cache_lifetime' => array(
-                    'label' => 'Cache lifetime',
-                    'input_class' => 'form-control input-small',
-                    'default' => 300
-                ),
-                'performance:conditional' => array(
-                    'label' => 'Conditional requests',
-                    'type' => 'checkbox',
-                    'default' => false
-                ),
-                'performance:minify_html' => array(
-                    'label' => 'Minify HTML',
-                    'type' => 'checkbox',
-                    'default' => false
-                ),
-            ),
-        ),
     ),
 );

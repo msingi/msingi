@@ -6,6 +6,7 @@ use Msingi\Cms\Model\Backend\AuthStorage;
 use Msingi\Cms\View\Helper\PageFragment;
 use Msingi\Cms\View\Helper\SettingsValue;
 use Msingi\Cms\View\Helper\Url;
+use Msingi\Cms\View\Helper\SegmentRoute;
 use Zend\Authentication\Adapter\DbTable;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
@@ -72,6 +73,13 @@ class Module implements AutoloaderProviderInterface
                         $viewHelper->setServiceLocator($helpers->getServiceLocator());
                         return $viewHelper;
                     },
+                'segmentRoute' => function (ServiceLocatorInterface $helpers) {
+                        $helper = new SegmentRoute();
+                        //
+                        $helper->setRouter($helpers->getServiceLocator()->get('Router'));
+                        //
+                        return $helper;
+                    },
                 'u' => function (ServiceLocatorInterface $helpers) {
                         $helper = new Url();
                         //
@@ -81,7 +89,7 @@ class Module implements AutoloaderProviderInterface
                         $helper->setRouteMatch($match);
                         //
                         return $helper;
-                    }
+                    },
             ),
 
         );

@@ -25,22 +25,13 @@ class Settings extends Table
      */
     public function fetch($name)
     {
-        $key = $this->getCacheKey($name);
+        $rowset = $this->select(array(
+            'name' => $name
+        ));
 
-        $cache = $this->getCache();
-
-        $setting = $cache->getItem($key);
-        if (!$setting) {
-            $rowset = $this->select(array(
-                'name' => $name
-            ));
-
-            $row = $rowset->current();
-            if ($row != null) {
-                $setting = $row['value'];
-
-                $cache->setItem($key, $setting);
-            }
+        $row = $rowset->current();
+        if ($row != null) {
+            $setting = $row['value'];
         }
 
         return $setting;
@@ -71,20 +62,5 @@ class Settings extends Table
                 )
             );
         }
-
-        $key = $this->getCacheKey($name);
-
-        $cache = $this->getCache();
-
-        $cache->setItem($key, $value);
-    }
-
-    /**
-     * @param $name
-     * @return string
-     */
-    protected function getCacheKey($name)
-    {
-        return sprintf('setting_%s', \Msingi\Cms\Model\Settings::formatValueName($name));
     }
 }
