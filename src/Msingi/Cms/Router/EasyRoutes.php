@@ -40,7 +40,7 @@ class EasyRoutes
                 switch ($routeSpec) {
                     case '*':
                         $route['options']['route'] = '/' . $routeName;
-                        $route['options']['may_terminate'] = true;
+//                        $route['options']['may_terminate'] = true;
                         break;
                     case 'action':
                         $route['type'] = 'Segment';
@@ -51,11 +51,12 @@ class EasyRoutes
                         break;
                     default:
                         $route['options']['route'] = $routeSpec;
-                        $route['options']['may_terminate'] = true;
+//                        $route['options']['may_terminate'] = true;
                         break;
                 }
             } else if (is_array($routeSpec)) {
                 $route['options']['route'] = '/' . $routeName;
+                $route['may_terminate'] = true;
                 $route['child_routes'] = EasyRoutes::r($routeSpec, $p . $routeName . '/');
             }
 
