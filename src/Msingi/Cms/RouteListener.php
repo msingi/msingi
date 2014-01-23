@@ -5,7 +5,7 @@ namespace Msingi\Cms;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
-use Zend\Mvc\Router\Http\Literal;
+use Zend\Mvc\Router\RouteMatch;
 
 class RouteListener implements ListenerAggregateInterface
 {
@@ -41,8 +41,10 @@ class RouteListener implements ListenerAggregateInterface
      */
     public function onRoute(MvcEvent $e)
     {
+        /* @var RouteMatch $routeMatch */
         $routeMatch = $e->getRouteMatch();
-        $routeName = $routeMatch->getMatchedRouteName();
+
+        $routeName = $this->formatRouteName($routeMatch);
 
         if (substr($routeName, 0, 9) == 'frontend/') {
             $cms_page = $routeMatch->getParam('cms_page');
@@ -51,10 +53,21 @@ class RouteListener implements ListenerAggregateInterface
 
                 $pagesTable = $serviceManager->get('Msingi\Cms\Db\Table\Pages');
 
-                $cms_page = $pagesTable->fetchOrCreate($routeMatch->getMatchedRouteName());
+                $cms_page = $pagesTable->fetchOrCreate($routeName);
 
                 $routeMatch->setParam('cms_page', $cms_page);
             }
         }
+    }
+
+    /**
+     * @param RouteMatch $routeMatch
+     * @return mixed
+     */
+    protected function formatRouteName(RouteMatch $routeMatch)
+    {
+        $routeName = $routeMatch->getMatchedRouteName();
+
+        return $routeName;
     }
 }

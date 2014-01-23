@@ -73,13 +73,13 @@ class Module implements AutoloaderProviderInterface
                         $viewHelper->setServiceLocator($helpers->getServiceLocator());
                         return $viewHelper;
                     },
-                'segmentRoute' => function (ServiceLocatorInterface $helpers) {
-                        $helper = new SegmentRoute();
-                        //
-                        $helper->setRouter($helpers->getServiceLocator()->get('Router'));
-                        //
-                        return $helper;
-                    },
+//                'segmentRoute' => function (ServiceLocatorInterface $helpers) {
+//                        $helper = new SegmentRoute();
+//                        //
+//                        $helper->setRouter($helpers->getServiceLocator()->get('Router'));
+//                        //
+//                        return $helper;
+//                    },
                 'u' => function (ServiceLocatorInterface $helpers) {
                         $helper = new Url();
                         //
