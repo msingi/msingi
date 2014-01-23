@@ -117,8 +117,8 @@ class Mailer implements ServiceManagerAwareInterface
             $transport = new \Zend\Mail\Transport\File();
             $options = new \Zend\Mail\Transport\FileOptions(array(
                 'path' => $config['mailer']['log_dir'],
-                'callback' => function (\Zend\Mail\Transport\File $transport) {
-                        return 'Message_' . microtime(true) . '_' . mt_rand() . '.txt';
+                'callback' => function (\Zend\Mail\Transport\File $transport) use ($templateName) {
+                        return date('Ymd.His') . '-' . $templateName . '-' . mt_rand() . '.txt';
                     },
             ));
             $transport->setOptions($options);
