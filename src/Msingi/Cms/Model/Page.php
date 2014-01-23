@@ -4,6 +4,10 @@ namespace Msingi\Cms\Model;
 
 use Msingi\Db\TableRow;
 
+/**
+ * Class Page
+ * @package Msingi\Cms\Model
+ */
 class Page extends TableRow
 {
     /**

@@ -5,8 +5,15 @@ namespace Msingi\Cms\Db\Table;
 use Msingi\Db\TableI18n;
 use Zend\Db\Sql\Select;
 
+/**
+ * Class Pages
+ * @package Msingi\Cms\Db\Table
+ */
 class Pages extends TableI18n
 {
+    /**
+     * @return array
+     */
     protected static function getDefinition()
     {
         return array(

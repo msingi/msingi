@@ -133,6 +133,11 @@ class Module implements AutoloaderProviderInterface
                         return new AuthStorage();
                     },
 
+                'Msingi\Cms\Mailer\Mailer' => function ($sm) {
+                        $mailer = new Cms\Mailer\Mailer();
+                        $mailer->setServiceManager($sm);
+                        return $mailer;
+                    }
             ),
             'invokables' => array(
                 'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',

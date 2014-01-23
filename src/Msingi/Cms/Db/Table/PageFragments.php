@@ -47,7 +47,7 @@ class PageFragments extends TableI18n
                 $fragments[$row->name] = $row->content;
             }
 
-            //$cache->setItem($key, $fragments);
+            $cache->setItem($key, $fragments);
         }
 
         return $fragments;

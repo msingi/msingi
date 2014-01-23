@@ -9,6 +9,7 @@ return array(
 
     'models' => array(
         'Msingi\Cms\Model\Backend\User',
+        'Msingi\Cms\Model\MailTemplate',
         'Msingi\Cms\Model\Menu',
         'Msingi\Cms\Model\Page',
         'Msingi\Cms\Model\PageFragment',
@@ -16,6 +17,7 @@ return array(
 
     'tables' => array(
         'Msingi\Cms\Db\Table\BackendUsers',
+        'Msingi\Cms\Db\Table\MailTemplates',
         'Msingi\Cms\Db\Table\Menu',
         'Msingi\Cms\Db\Table\PageFragments',
         'Msingi\Cms\Db\Table\Pages',
@@ -67,6 +69,23 @@ return array(
                     'input_class' => 'form-control input-medium'
                 ),
             ),
+        ),
+    ),
+
+    'controller_plugins' => array(
+        'factories' => array(
+            'SendMailPlugin' => function ($sm) {
+                    $translator = $sm->getServiceLocator()->get('Translator');
+                    $router = $sm->getServiceLocator()->get('Router');
+                    $mailer = $sm->getServiceLocator()->get('Msingi\Cms\Mailer\Mailer');
+
+                    $plugin = new \Msingi\Cms\Controller\Plugin\SendMail();
+                    $plugin->setTranslator($translator);
+                    $plugin->setRouter($router);
+                    $plugin->setMailer($mailer);
+
+                    return $plugin;
+                }
         ),
     ),
 );

@@ -5,9 +5,10 @@ namespace Msingi\Cms\Model;
 use Msingi\Db\TableRow;
 
 /**
- * Class Menu
+ * Class MailTemplate
  * @package Msingi\Cms\Model
  */
-class Menu extends TableRow
+class MailTemplate extends TableRow
 {
+
 }

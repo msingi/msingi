@@ -5,14 +5,29 @@ namespace Msingi\Cms\Model;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 
+/**
+ * Class Settings
+ * @package Msingi\Cms\Model
+ */
 class Settings implements ServiceManagerAwareInterface
 {
+    /**
+     * @var ServiceManager
+     */
     protected $serviceManager;
+
+    /**
+     * @var \Msingi\Cms\Db\Table\Settings
+     */
     protected $tableSettings;
+
+    /**
+     * @var array
+     */
     protected $values;
 
     /**
-     * @param $name
+     * @param string $name
      * @param null $default
      * @return mixed
      */
@@ -26,7 +41,7 @@ class Settings implements ServiceManagerAwareInterface
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @param $value
      */
     public function set($name, $value)
@@ -80,7 +95,7 @@ class Settings implements ServiceManagerAwareInterface
     }
 
     /**
-     * @return mixed
+     * @return \Msingi\Cms\Db\Table\Settings
      */
     protected function getSettingsTable()
     {
@@ -92,8 +107,8 @@ class Settings implements ServiceManagerAwareInterface
     }
 
     /**
-     * @param $valueName
-     * @return mixed
+     * @param string $valueName
+     * @return string
      */
     public static function formatValueName($valueName)
     {
