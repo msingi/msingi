@@ -52,7 +52,6 @@ return array(
                 ),
                 'frontend:languages:enabled' => array(
                     'type' => 'MultiCheckbox',
-                    'label' => 'Enabled languages',
                     'value_options' => $available_languages,
                     'default' => array('en', 'de'),
                 ),
@@ -67,6 +66,26 @@ return array(
                     'value_options' => $available_languages,
                     'default' => 'en',
                     'input_class' => 'form-control input-medium'
+                ),
+            ),
+        ),
+        'mail' => array(
+            'label' => 'Mail',
+            'values' => array(
+                'mail:from' => array(
+                    'label' => 'Mail From email',
+                    'input_class' => 'form-control input-large',
+                    'default' => 'noreply@example.com',
+                ),
+                'mail:log' => array(
+                    'type' => 'checkbox',
+                    'label' => 'Log sent mail',
+                    'default' => false
+                ),
+                'mail:send' => array(
+                    'type' => 'checkbox',
+                    'label' => 'Really send mail',
+                    'default' => false
                 ),
             ),
         ),

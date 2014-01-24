@@ -3,6 +3,7 @@
 namespace Msingi;
 
 use Msingi\Cms\Model\Backend\AuthStorage;
+use Msingi\Cms\View\Helper\CurrentRoute;
 use Msingi\Cms\View\Helper\PageFragment;
 use Msingi\Cms\View\Helper\SettingsValue;
 use Msingi\Cms\View\Helper\Url;
@@ -63,6 +64,11 @@ class Module implements AutoloaderProviderInterface
                 'formElementErrorClass' => 'Msingi\Cms\View\Helper\FormElementErrorClass',
             ),
             'factories' => array(
+                'currentRoute' => function (ServiceLocatorInterface $helpers) {
+                        $viewHelper = new CurrentRoute();
+                        $viewHelper->setServiceLocator($helpers->getServiceLocator());
+                        return $viewHelper;
+                    },
                 'fragment' => function (ServiceLocatorInterface $helpers) {
                         $services = $helpers->getServiceLocator();
                         $app = $services->get('Application');
