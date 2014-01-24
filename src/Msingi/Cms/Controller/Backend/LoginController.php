@@ -73,7 +73,7 @@ class LoginController extends ActionController
                     $this->getAuthService()->getStorage()->write($request->getPost('username'));
                 }
 
-                return $this->redirect()->toRoute('backend/home');
+                return $this->redirect()->toRoute('backend/index');
             }
         }
 
