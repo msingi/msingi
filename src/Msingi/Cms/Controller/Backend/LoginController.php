@@ -38,7 +38,7 @@ class LoginController extends ActionController
     public function indexAction()
     {
         if ($this->getAuthService()->hasIdentity()) {
-            return $this->redirect()->toRoute('backend/home');
+            return $this->redirect()->toRoute('backend/index');
         }
 
         $form = new LoginForm();
