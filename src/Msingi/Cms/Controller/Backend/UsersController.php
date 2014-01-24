@@ -5,6 +5,7 @@ namespace Msingi\Cms\Controller\Backend;
 use Msingi\Cms\Form\Backend\UserForm;
 use Msingi\Util\PasswordGenerator;
 use Zend\Db\Sql\Select;
+use Zend\Paginator\Adapter\DbSelect;
 
 class UsersController extends AbstractEntitiesController
 {
@@ -15,7 +16,7 @@ class UsersController extends AbstractEntitiesController
      *
      * @return \Msingi\Db\Table
      */
-    protected function getTable()
+    protected function getRepository()
     {
         if (!$this->usersTable) {
             $sm = $this->getServiceLocator();
@@ -42,11 +43,11 @@ class UsersController extends AbstractEntitiesController
      * @param $filter
      * @return Select
      */
-    protected function getPaginatorQuery($filter = null)
+    protected function getPaginatorAdapter($filter = null)
     {
-        $select = $this->getTable()->getSql()->select();
+        $select = $this->getRepository()->getSql()->select();
 
-        return $select;
+        return new DbSelect($select, $this->getRepository()->getAdapter(), $this->getRepository()->getResultSetPrototype());;
     }
 
     /**

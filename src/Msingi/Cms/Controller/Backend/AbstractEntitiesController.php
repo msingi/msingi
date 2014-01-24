@@ -12,9 +12,8 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     /**
      * Get storage
      *
-     * @return \Msingi\Db\Table
      */
-    abstract protected function getTable();
+    abstract protected function getRepository();
 
     /**
      * Get edit form, null if add/edit is not required
@@ -30,7 +29,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      * @param $filter
      * @return Select
      */
-    abstract protected function getPaginatorQuery($filter = null);
+    abstract protected function getPaginatorAdapter($filter = null);
 
     /**
      * Get count of items for paginator
@@ -47,12 +46,10 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     public function indexAction()
     {
-        $table = $this->getTable();
-
         // create a new pagination adapter object
-        $paginatorAdapter = new DbSelect($this->getPaginatorQuery(), $table->getAdapter(), $table->getResultSetPrototype());
+        //$paginatorAdapter = new DbSelect($this->getPaginatorQuery(), $table->getAdapter(), $table->getResultSetPrototype());
 
-        $paginator = new Paginator($paginatorAdapter);
+        $paginator = new Paginator($this->getPaginatorAdapter());
         $paginator->setItemCountPerPage($this->getItemsCountPerPage());
         $paginator->setCurrentPageNumber($this->params()->fromQuery('page', 1));
 

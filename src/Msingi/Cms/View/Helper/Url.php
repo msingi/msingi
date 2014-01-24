@@ -25,7 +25,7 @@ class Url extends AbstractHelper
     protected $routeMatch;
 
     /**
-     * @param $route
+     * @param string $route
      * @param null $query
      * @return mixed
      * @throws \Zend\View\Exception\RuntimeException
@@ -36,24 +36,13 @@ class Url extends AbstractHelper
             throw new Exception\RuntimeException('No RouteStackInterface instance provided');
         }
 
-        //
-        $route = explode('/', $route);
-        $params = array(
-            'controller' => $route[0],
-            'action' => $route[1],
-        );
-
-        //
-        $routeName = explode('/', $this->routeMatch->getMatchedRouteName());
-        $routeName = implode('/', array($routeName[0], 'default'));
-
         $options = array(
-            'name' => $routeName,
+            'name' => $route,
             'query' => $query
         );
 
         //
-        return $this->router->assemble($params, $options);
+        return $this->router->assemble(array(), $options);
     }
 
     /**
