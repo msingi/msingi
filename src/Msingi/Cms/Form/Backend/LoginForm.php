@@ -57,7 +57,6 @@ class LoginForm extends Form implements InputFilterProviderInterface
     {
         return array(
             'username' => array(
-                'required' => true,
                 'filters' => array(
                     array('name' => 'Zend\Filter\StringTrim'),
                 ),
