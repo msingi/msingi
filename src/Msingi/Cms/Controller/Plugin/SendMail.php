@@ -45,7 +45,7 @@ class SendMail extends AbstractPlugin
 
         // set root url if not given
         if (!isset($params['root_url']) && $this->router) {
-            $params['root_url'] = $this->router->assemble(array('language' => $params['language']), array('name' => 'frontend/home'));
+            $params['root_url'] = $this->router->assemble(array('language' => $params['language']), array('name' => 'frontend/index'));
         }
 
         //

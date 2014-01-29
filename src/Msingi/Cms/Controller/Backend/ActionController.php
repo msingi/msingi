@@ -21,27 +21,16 @@ class ActionController extends AbstractActionController
     }
 
     /**
-     * @todo solve problem with non-default routes here or in router?
-     *
-     * @param $action
-     * @param array $options
+     * @param $template
+     * @param $to
+     * @param array $params
      * @return mixed
      */
-    protected function getActionUrl($action, array $query = null)
+    protected function sendMail($template, $to, array $params = array())
     {
-        $event = $this->getEvent();
+        $plugin = $this->SendMailPlugin();
 
-        $rm = $event->getRouteMatch();
-
-        $params = $rm->getParams();
-        $params['action'] = $action;
-
-        $options = array(
-            'name' => $rm->getMatchedRouteName(),
-            'query' => $query
-        );
-
-        return $event->getRouter()->assemble($params, $options);
+        return $plugin->sendMail($template, $to, $params);
     }
 
 }

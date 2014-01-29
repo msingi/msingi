@@ -32,6 +32,11 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     abstract protected function getPaginatorAdapter($filter = null);
 
     /**
+     * @return string
+     */
+    abstract protected function getIndexRoute();
+
+    /**
      * Get count of items for paginator
      *
      * @return int
@@ -66,8 +71,9 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     public function addAction()
     {
         $form = $this->getEditForm();
-        if ($form == null)
-            return $this->redirect()->toUrl($this->getActionUrl('index'));
+        if ($form == null) {
+            return $this->redirect()->toRoute($this->getIndexRoute());
+        }
 
         $vm = new ViewModel(array(
             'form' => $form
@@ -85,7 +91,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     {
         $form = $this->getEditForm();
         if ($form == null)
-            return $this->redirect()->toUrl($this->getActionUrl('index'));
+            return $this->redirect()->toRoute($this->getIndexRoute());
 
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -104,36 +110,25 @@ abstract class AbstractEntitiesController extends AuthenticatedController
                 // get form data
                 $values = $form->getData();
 
-                if (intval($values['id']) == 0) {
-                    // create new entity
-                    $entity = $this->getTable()->createRow($values);
+                if (!isset($values['id']) || intval($values['id']) == 0) {
+                    $this->createEntity($values);
                 } else {
-                    // try to fetch existing entity
-                    $entity = $this->getTable()->fetchById($values['id']);
-                    if ($entity == null) {
-                        return $this->redirect()->toUrl($this->getActionUrl('index'));
-                    }
-
-                    // update entity valuess
-                    $entity->setValues($values);
-                    $this->getTable()->save($entity);
+                    $this->updateEntity($values);
                 }
 
-                $this->onEntitySave($entity, $values);
-
                 // redirect back to index action
-                return $this->redirect()->toUrl($this->getActionUrl('index'));
+                return $this->redirect()->toRoute($this->getIndexRoute());
             } else {
                 // try to fetch entity
                 $entity = $this->getTable()->fetchById($this->params()->fromPost('id'));
                 if ($entity == null)
-                    return $this->redirect()->toUrl($this->getActionUrl('index'));
+                    return $this->redirect()->toRoute($this->getIndexRoute());
             }
         } else {
             // try to fetch entity
             $entity = $this->getTable()->fetchById($this->params()->fromQuery('id'));
             if ($entity == null)
-                return $this->redirect()->toUrl($this->getActionUrl('index'));
+                return $this->redirect()->toRoute($this->getIndexRoute());
 
             // set form data
             $form->setData($entity->getArrayCopy());
@@ -159,7 +154,53 @@ abstract class AbstractEntitiesController extends AuthenticatedController
         if ($entity != null) {
             $this->getTable()->delete(array('id' => $entity->id));
         }
-        return $this->redirect()->toUrl($this->getActionUrl('index'));
+
+        return $this->redirect()->toRoute($this->getIndexRoute());
+    }
+
+    /**
+     * @param $values
+     * @return null
+     */
+    protected function createEntity($values)
+    {
+        // create new entity
+        $entity = $this->getTable()->createRow($values);
+        if ($entity == null)
+            return null;
+
+        $this->onEntityCreate($entity, values);
+
+        return $entity;
+    }
+
+    /**
+     * @param $values
+     * @return null
+     */
+    protected function updateEntity($values)
+    {
+        // try to fetch existing entity
+        $entity = $this->getTable()->fetchById($values['id']);
+        if ($entity == null)
+            return null;
+
+        // update entity valuess
+        $entity->setValues($values);
+        $this->getTable()->save($entity);
+
+        $this->onEntityUpdate($entity, $values);
+
+        return $entity;
+    }
+
+    /**
+     *
+     * @param $values
+     * @return $entity
+     */
+    protected function onEntityCreate($entity, $values)
+    {
     }
 
     /**
@@ -169,8 +210,8 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      * @param $entity
      * @param $values
      */
-    protected function onEntitySave($entity, $values)
+    protected function onEntityUpdate($values)
     {
-
     }
+
 }
