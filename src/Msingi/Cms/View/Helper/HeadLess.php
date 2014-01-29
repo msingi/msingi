@@ -7,6 +7,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     protected $_less_js;
     protected $_environment;
     protected $_debug = false;
+    protected $async = false;
 
     /**
      *
@@ -81,8 +82,15 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
         if (getenv('APPLICATION_ENV') != 'production' && $this->_less_js != '') {
             $view = $this->getView();
 
+            $script = array();
             if ($this->_debug) {
-                $view->headScript()->appendScript('less={env:"development"};');
+                $script[] = 'env:"development"';
+            }
+            if ($this->async) {
+                $script[] = 'async:true';
+            }
+            if (!empty($script)) {
+                $view->headScript()->appendScript('less={' . implode(',', $script) . '};');
             }
 
             $view->headScript()->appendFile($this->_less_js);
@@ -116,5 +124,21 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
         }
 
         return '<link href="' . $url . '" rel="' . $rel . '" type="text/css">';
+    }
+
+    /**
+     * @param boolean $async
+     */
+    public function setAsync($async)
+    {
+        $this->async = $async;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isAsync()
+    {
+        return $this->async;
     }
 }
