@@ -110,9 +110,6 @@ class StaticPage implements RouteInterface, ServiceLocatorAwareInterface
      */
     public function getAssembledParams()
     {
-        echo 'getAssembledParams';
-        die;
-
         return array();
     }
 
