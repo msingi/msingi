@@ -63,7 +63,7 @@ class MenuController extends AuthenticatedController
         $page = $this->getPagesTable()->fetchById($this->params()->fromPost('page'));
 
         if ($page->type == 'static') {
-            $route = 'frontend/home/page';
+            $route = 'frontend/index/page';
             $params = 'path=' . $page->path;
         } else {
             $route = $page->path;
