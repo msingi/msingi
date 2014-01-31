@@ -73,6 +73,10 @@ class EasyRoutes
                 $route['type'] = 'Literal';
                 $route['may_terminate'] = true;
                 $route['options']['route'] = '/';
+            } else if ($type == 'StaticPage') {
+                $route['type'] = 'Msingi\Cms\Router\StaticPage';
+                $route['may_terminate'] = true;
+                $route['options']['defaults']['action'] = 'page';
             } else if ($type == 'Literal') {
                 $route['may_terminate'] = true;
                 $route['options']['route'] = '/' . $routePath;

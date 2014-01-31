@@ -16,7 +16,7 @@ class PageController extends AbstractActionController
 
         $cms_page = $this->params('cms_page');
 
-        $vm->setTemplate('frontend/page/' . $cms_page->template . '.phtml');
+        $vm->setTemplate('frontend/page/' . $cms_page->template);
 
         return $vm;
     }

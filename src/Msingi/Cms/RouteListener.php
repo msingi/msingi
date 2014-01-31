@@ -7,6 +7,11 @@ use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
 
+/**
+ * Class RouteListener
+ *
+ * @package Msingi\Cms
+ */
 class RouteListener implements ListenerAggregateInterface
 {
     /**

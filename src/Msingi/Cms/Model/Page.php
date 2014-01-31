@@ -10,6 +10,9 @@ use Msingi\Db\TableRow;
  */
 class Page extends TableRow
 {
+    const TYPE_MVC = 'mvc';
+    const TYPE_STATIC = 'static';
+
     /**
      * @return bool
      */

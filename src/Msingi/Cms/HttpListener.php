@@ -7,6 +7,11 @@ use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Http\PhpEnvironment\Response;
 use Zend\Mvc\MvcEvent;
 
+/**
+ * Class HttpListener
+ *
+ * @package Msingi\Cms
+ */
 class HttpListener implements ListenerAggregateInterface
 {
     /**
@@ -115,5 +120,6 @@ class HttpListener implements ListenerAggregateInterface
      */
     protected function minifyHtml(MvcEvent $e)
     {
+
     }
 }

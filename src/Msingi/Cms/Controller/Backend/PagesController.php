@@ -3,6 +3,7 @@
 namespace Msingi\Cms\Controller\Backend;
 
 use Msingi\Cms\Form\Backend\PagePropertiesForm;
+use Msingi\Cms\Model\Page;
 use Msingi\Util\StripAttributes;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -49,9 +50,19 @@ class PagesController extends AuthenticatedController
         ));
     }
 
+    /**
+     *
+     */
     public function addAction()
     {
+        $page = $this->getPagesTable()->createRow(array(
+            'parent_id' => 1,
+            'type' => Page::TYPE_STATIC,
+            'path' => trim($this->params()->fromPost('path')),
+            'template' => 'default'
+        ));
 
+        return $this->redirect()->toRoute('backend/pages');
     }
 
     /**
@@ -64,7 +75,7 @@ class PagesController extends AuthenticatedController
         $page_id = intval($this->params()->fromQuery('id'));
         $page = $this->getPagesTable()->fetchById($page_id);
         if ($page == null) {
-            return $this->redirect()->toRoute('backend/default', array('controller' => 'pages', 'action' => 'index'));
+            return $this->redirect()->toRoute('backend/pages');
         }
 
         //
@@ -72,6 +83,21 @@ class PagesController extends AuthenticatedController
             'page' => $page,
             'languages' => $settings->get('frontend:languages:enabled'),
         ));
+    }
+
+    /**
+     *
+     */
+    public function deleteAction()
+    {
+        $page_id = intval($this->params()->fromQuery('id'));
+        $page = $this->getPagesTable()->fetchById($page_id);
+
+        if ($page != null) {
+            $this->getPagesTable()->delete(array('id' => $page->id));
+        }
+
+        return $this->redirect()->toRoute('backend/pages');
     }
 
     /**
@@ -233,7 +259,7 @@ class PagesController extends AuthenticatedController
             $this->getPagesTable()->save($page);
         }
 
-        return $this->redirect()->toRoute('backend/default', array('controller' => 'pages', 'action' => 'index'));
+        return $this->redirect()->toRoute('backend/pages');
     }
 
     /**

@@ -7,19 +7,23 @@ use Msingi\Cms\View\Helper\CurrentRoute;
 use Msingi\Cms\View\Helper\PageFragment;
 use Msingi\Cms\View\Helper\SettingsValue;
 use Msingi\Cms\View\Helper\Url;
-use Msingi\Cms\View\Helper\SegmentRoute;
 use Zend\Authentication\Adapter\DbTable;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
+/**
+ * Class Module
+ *
+ * @package Msingi
+ */
 class Module implements AutoloaderProviderInterface
 {
     /**
-     * @param $e
+     * @param MvcEvent $e
      */
-    public function onBootstrap($e)
+    public function onBootstrap(MvcEvent $e)
     {
         $serviceManager = $e->getApplication()->getServiceManager();
 
@@ -30,7 +34,7 @@ class Module implements AutoloaderProviderInterface
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getConfig()
     {
@@ -79,25 +83,14 @@ class Module implements AutoloaderProviderInterface
                         $viewHelper->setServiceLocator($helpers->getServiceLocator());
                         return $viewHelper;
                     },
-//                'segmentRoute' => function (ServiceLocatorInterface $helpers) {
-//                        $helper = new SegmentRoute();
-//                        //
-//                        $helper->setRouter($helpers->getServiceLocator()->get('Router'));
-//                        //
-//                        return $helper;
-//                    },
                 'u' => function (ServiceLocatorInterface $helpers) {
                         $helper = new Url();
-                        //
                         $helper->setRouter($helpers->getServiceLocator()->get('Router'));
-                        //
                         $match = $helpers->getServiceLocator()->get('Application')->getMvcEvent()->getRouteMatch();
                         $helper->setRouteMatch($match);
-                        //
                         return $helper;
                     },
             ),
-
         );
     }
 
@@ -139,6 +132,7 @@ class Module implements AutoloaderProviderInterface
                         return new AuthStorage();
                     },
 
+                //
                 'Msingi\Cms\Mailer\Mailer' => function ($sm) {
                         $mailer = new Cms\Mailer\Mailer();
                         $mailer->setServiceManager($sm);
