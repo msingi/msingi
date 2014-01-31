@@ -14,8 +14,8 @@ class PagesController extends AuthenticatedController
 
     protected $allowedTags = array(
         'div' => array('class'),
-        'p' => array('class', 'style'),
-        'img' => array('src', 'alt', 'title', 'width', 'height', 'style'),
+        'p' => array('class'),
+        'img' => array('src', 'alt', 'title', 'width', 'height'),
         'a' => array('href', 'target', 'name', 'class', 'id'),
         'table' => array('width', 'border', 'cellspacing', 'cellpadding', 'class'),
         'tr' => array('colspan', 'rowspan', 'class'),
@@ -208,6 +208,7 @@ class PagesController extends AuthenticatedController
         $sa = new StripAttributes();
         $sa->exceptions = $this->allowedTags;
         $text = $sa->strip($text);
+
 
         return $text;
     }
