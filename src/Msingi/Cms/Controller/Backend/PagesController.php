@@ -3,12 +3,41 @@
 namespace Msingi\Cms\Controller\Backend;
 
 use Msingi\Cms\Form\Backend\PagePropertiesForm;
+use Msingi\Util\StripAttributes;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 class PagesController extends AuthenticatedController
 {
     protected $pagesTable;
+
+    protected $allowedTags = array(
+        'div' => array('class'),
+        'p' => array('class', 'style'),
+        'img' => array('src', 'alt', 'title', 'width', 'height', 'style'),
+        'a' => array('href', 'target', 'name', 'class', 'id'),
+        'table' => array('width', 'border', 'cellspacing', 'cellpadding', 'class'),
+        'tr' => array('colspan', 'rowspan', 'class'),
+        'td' => array('colspan', 'rowspan', 'class'),
+        'span' => array('class'),
+        'i' => array(),
+        'b' => array(),
+        'u' => array(),
+        'strong' => array(),
+        'em' => array(),
+        'br' => array(),
+        'h1' => array(),
+        'h2' => array(),
+        'h3' => array(),
+        'h4' => array(),
+        'h5' => array(),
+        'h6' => array(),
+        'table' => array(),
+        'ul' => array('class'),
+        'ol' => array('class'),
+        'li' => array()
+    );
+
 
     /**
      * @return array|ViewModel
@@ -94,9 +123,11 @@ class PagesController extends AuthenticatedController
      */
     public function saveMetaAction()
     {
-        $page_id = $this->params()->fromPost('pk');
+        $page_id = intval($this->params()->fromPost('pk'));
         list($meta, $language) = explode('_', $this->params()->fromPost('name'));
-        $content = $this->params()->fromPost('value');
+
+        //
+        $content = trim(strip_tags($this->params()->fromPost('value')));
 
         if (in_array($meta, array('title', 'keywords', 'description'))) {
             $page = $this->getPagesTable()->fetchById($page_id);
@@ -115,11 +146,11 @@ class PagesController extends AuthenticatedController
      */
     public function saveFragmentAction()
     {
-        $page_id = $this->params()->fromPost('page');
-        $language = $this->params()->fromPost('language');
+        $page_id = intval($this->params()->fromPost('page'));
+        $language = trim($this->params()->fromPost('language'));
         $fragment = trim(str_replace('fragment_', '', $this->params()->fromPost('fragment')));
-        // @todo filter content tags!!!
-        $content = $this->params()->fromPost('content');
+
+        $content = $this->filterContent($this->params()->fromPost('content'));
 
         $page = $this->getPagesTable()->fetchById($page_id);
         if ($page != null) {
@@ -135,6 +166,24 @@ class PagesController extends AuthenticatedController
         }
 
         return $this->getResponse();
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    protected function filterContent($text)
+    {
+        // filter tags
+        $tags = '<' . implode('><', array_keys($this->allowedTags)) . '>';
+        $text = strip_tags($text, $tags);
+
+        // filter attributes
+        $sa = new StripAttributes();
+        $sa->exceptions = $this->allowedTags;
+        $text = $sa->strip($text);
+
+        return $text;
     }
 
     /**
@@ -175,11 +224,11 @@ class PagesController extends AuthenticatedController
      */
     public function savepropsAction()
     {
-        $page_id = $this->params()->fromPost('id');
+        $page_id = intval($this->params()->fromPost('id'));
         $page = $this->getPagesTable()->fetchById($page_id);
         if ($page != null) {
-            $page->path = $this->params()->fromPost('path');
-            $page->template = $this->params()->fromPost('template');
+            $page->path = trim($this->params()->fromPost('path'));
+            $page->template = trim($this->params()->fromPost('template'));
 
             $this->getPagesTable()->save($page);
         }
