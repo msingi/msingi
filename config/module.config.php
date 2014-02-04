@@ -93,6 +93,15 @@ return array(
 
     'controller_plugins' => array(
         'factories' => array(
+            '_' => function ($sm) {
+                    $translator = $sm->getServiceLocator()->get('Translator');
+
+                    $plugin = new \Msingi\Cms\Controller\Plugin\Translate();
+
+                    $plugin->setTranslator($translator);
+
+                    return $plugin;
+                },
             'SendMailPlugin' => function ($sm) {
                     $translator = $sm->getServiceLocator()->get('Translator');
                     $router = $sm->getServiceLocator()->get('Router');
