@@ -102,7 +102,7 @@ return array(
 
                     return $plugin;
                 },
-            'SendMailPlugin' => function ($sm) {
+            'SendMail' => function ($sm) {
                     $translator = $sm->getServiceLocator()->get('Translator');
                     $router = $sm->getServiceLocator()->get('Router');
                     $mailer = $sm->getServiceLocator()->get('Msingi\Cms\Mailer\Mailer');

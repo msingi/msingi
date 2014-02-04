@@ -36,7 +36,7 @@ class SendMail extends AbstractPlugin
      * @param array $params
      * @return
      */
-    public function sendMail($templateName, $email, array $params = array())
+    public function __invoke($templateName, $email, array $params = array())
     {
         // set mail language if not given
         if (!isset($params['language']) && $this->translator) {
@@ -45,7 +45,7 @@ class SendMail extends AbstractPlugin
 
         // set root url if not given
         if (!isset($params['root_url']) && $this->router) {
-            $params['root_url'] = $this->router->assemble(array('language' => $params['language']), array('name' => 'frontend/index'));
+            $params['root_url'] = rtrim($this->router->assemble(array('language' => $params['language']), array('name' => 'frontend/index')), '/');
         }
 
         //
