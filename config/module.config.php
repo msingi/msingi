@@ -3,6 +3,7 @@
 $available_languages = array(
     'en' => 'English',
     'de' => 'German',
+    'cs' => 'Czech',
 );
 
 return array(
@@ -53,7 +54,7 @@ return array(
                 'frontend:languages:enabled' => array(
                     'type' => 'MultiCheckbox',
                     'value_options' => $available_languages,
-                    'default' => array('en', 'de'),
+                    'default' => array('en', 'de', 'cs'),
                 ),
             ),
         ),
