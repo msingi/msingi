@@ -28,7 +28,12 @@ class Module implements AutoloaderProviderInterface
         $serviceManager = $e->getApplication()->getServiceManager();
 
         $eventManager = $e->getApplication()->getEventManager();
+        // route matching
         $eventManager->attach($serviceManager->get('Msingi\Cms\RouteListener'));
+        // determine locale
+        $eventManager->attach($serviceManager->get('Msingi\Cms\LocaleListener'));
+        // http processing
+        $eventManager->attach($serviceManager->get('Msingi\Cms\HttpListener'));
 
         $this->initLayouts($e);
     }
@@ -102,7 +107,7 @@ class Module implements AutoloaderProviderInterface
         return array(
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+                    __NAMESPACE__ => __DIR__ . '/src/',
                 ),
             ),
         );
@@ -120,10 +125,6 @@ class Module implements AutoloaderProviderInterface
             ),
             'factories' => array(
                 //
-                'Msingi\Cms\RouteListener' => 'Msingi\Cms\Service\RouteListenerFactory',
-                'Msingi\Cms\HttpListener' => 'Msingi\Cms\Service\HttpListenerFactory',
-
-                //
                 'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManagerFactory',
 
                 //
@@ -140,7 +141,13 @@ class Module implements AutoloaderProviderInterface
                     }
             ),
             'invokables' => array(
+                // Event listeners
+                'Msingi\Cms\RouteListener' => 'Msingi\Cms\RouteListener',
+                'Msingi\Cms\HttpListener' => 'Msingi\Cms\HttpListener',
+                'Msingi\Cms\LocaleListener' => 'Msingi\Cms\LocaleListener',
+                // Settings form
                 'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',
+                //
                 'Settings' => 'Msingi\Cms\Model\Settings',
             ),
         );

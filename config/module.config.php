@@ -26,6 +26,16 @@ return array(
         'Msingi\Cms\Db\Table\Settings',
     ),
 
+    'translator' => array(
+        'translation_file_patterns' => array(
+            array(
+                'type' => 'gettext',
+                'base_dir' => __DIR__ . '/../language',
+                'pattern' => 'msingi_%s.mo',
+            ),
+        ),
+    ),
+
     'settings' => array(
         'general' => array(
             'label' => 'General settings',
