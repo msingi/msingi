@@ -60,7 +60,7 @@ class LocaleListener implements ListenerAggregateInterface
             $settings = $e->getApplication()->getServiceManager()->get('Settings');
 
             // get defaults from settings
-            $multilanguage = boolval($settings->get($module . ':languages:multilanguage'));
+            $multilanguage = (bool)$settings->get($module . ':languages:multilanguage');
             $language_default = $settings->get($module . ':languages:default');
             $languages_enabled = $settings->get($module . ':languages:enabled');
 
