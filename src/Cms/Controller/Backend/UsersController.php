@@ -74,4 +74,12 @@ class UsersController extends AbstractEntitiesController
             ));
         }
     }
+
+    /**
+     * @return string
+     */
+    protected function getIndexRoute()
+    {
+        return 'backend/admins';
+    }
 }
