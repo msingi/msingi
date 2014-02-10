@@ -61,6 +61,8 @@ class Module implements AutoloaderProviderInterface
                 'languageName' => 'Msingi\Cms\View\Helper\LanguageName',
                 'locale' => 'Msingi\Cms\View\Helper\Locale',
 
+                'date' => 'Msingi\Cms\View\Helper\Date',
+
                 'imageAttachment' => 'Msingi\Cms\View\Helper\ImageAttachment',
 
                 'gravatar' => 'Msingi\Cms\View\Helper\Gravatar',
