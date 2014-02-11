@@ -144,7 +144,8 @@ abstract class AbstractEntitiesController extends AuthenticatedController
 
                 if (!isset($values['id']) || intval($values['id']) == 0) {
                     // create new entity
-                    $entity = new $classname();
+                    $entity = $this->getServiceLocator()->get($classname);
+                    $entity->setEntityManager($this->getEntityManager());
                 } else {
                     $entity = $this->getEntityManager()->find($classname, $values['id']);
                 }
@@ -162,10 +163,14 @@ abstract class AbstractEntitiesController extends AuthenticatedController
                 // redirect back to index action
                 return $this->redirect()->toRoute($this->getIndexRoute());
             } else {
-                // try to fetch entity?
-                $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromPost('id'));
-                if ($entity == null)
-                    return $this->redirect()->toRoute($this->getIndexRoute());
+//
+//                var_dump($this->params()->fromPost());
+//
+//                die;
+//                // try to fetch entity?
+//                $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromPost('id'));
+//                if ($entity == null)
+//                    return $this->redirect()->toRoute($this->getIndexRoute());
             }
         } else {
             // try to fetch entity
