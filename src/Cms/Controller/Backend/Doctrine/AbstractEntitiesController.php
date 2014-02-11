@@ -46,6 +46,13 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     abstract protected function getIndexRoute();
 
     /**
+     * @param $entity
+     * @param $values
+     * @return mixed
+     */
+    abstract protected function updateEntity($entity, $form);
+
+    /**
      * Get count of items for paginator
      *
      * @return int
@@ -129,20 +136,34 @@ abstract class AbstractEntitiesController extends AuthenticatedController
             // check if form data is valid
             if ($form->isValid()) {
 
+                //
+                $classname = $this->getEntityClass();
+
                 // get form data
                 $values = $form->getData();
 
                 if (!isset($values['id']) || intval($values['id']) == 0) {
-                    $this->createEntity($values);
+                    // create new entity
+                    $entity = new $classname();
                 } else {
-                    $this->updateEntity($values);
+                    $entity = $this->getEntityManager()->find($classname, $values['id']);
                 }
+
+                // update entity valuess
+                $this->updateEntity($entity, $form);
+
+                //
+                $this->getEntityManager()->persist($entity);
+                $this->getEntityManager()->flush();
+
+                //
+                $this->onEntitySaved($entity, $values);
 
                 // redirect back to index action
                 return $this->redirect()->toRoute($this->getIndexRoute());
             } else {
-                // try to fetch entity
-                $entity = $this->getTable()->fetchById($this->params()->fromPost('id'));
+                // try to fetch entity?
+                $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromPost('id'));
                 if ($entity == null)
                     return $this->redirect()->toRoute($this->getIndexRoute());
             }
@@ -151,6 +172,9 @@ abstract class AbstractEntitiesController extends AuthenticatedController
             $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromQuery('id'));
             if ($entity == null)
                 return $this->redirect()->toRoute($this->getIndexRoute());
+
+            //
+            $form->get('id')->setValue($entity->getId());
 
             // set form data
             $form->setEntity($entity);
@@ -172,68 +196,21 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     public function deleteAction()
     {
-        $entity = $this->getTable()->fetchById($this->params()->fromQuery('id'));
+        $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromQuery('id'));
         if ($entity != null) {
-            $this->getTable()->delete(array('id' => $entity->id));
+            $this->getEntityManager()->remove($entity);
         }
 
         return $this->redirect()->toRoute($this->getIndexRoute());
     }
 
     /**
-     * @param $values
-     * @return null
-     */
-    protected function createEntity($values)
-    {
-        // create new entity
-        $entity = $this->getTable()->createRow($values);
-        if ($entity == null)
-            return null;
-
-        $this->onEntityCreate($entity, values);
-
-        return $entity;
-    }
-
-    /**
-     * @param $values
-     * @return null
-     */
-    protected function updateEntity($values)
-    {
-        // try to fetch existing entity
-        $entity = $this->getTable()->fetchById($values['id']);
-        if ($entity == null)
-            return null;
-
-        // update entity valuess
-        $entity->setValues($values);
-        $this->getTable()->save($entity);
-
-        $this->onEntityUpdate($entity, $values);
-
-        return $entity;
-    }
-
-    /**
-     *
-     * @param $values
-     * @return $entity
-     */
-    protected function onEntityCreate($entity, $values)
-    {
-    }
-
-    /**
-     * Called after the entity is created and saved
-     * Used for processing extra data as depended objects of file attachements
+     * Extra processing of entity values
      *
      * @param $entity
      * @param $values
      */
-    protected function onEntityUpdate($values)
+    protected function onEntitySaved($entity, $values)
     {
     }
-
 }
