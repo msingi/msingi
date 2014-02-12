@@ -116,6 +116,7 @@ class ContentManager
         $storage_dir = $this->getStorageDir($object, $attachment);
 
         $resized_file = $storage_dir . '/' . $attachment . '-' . $size . '.jpg';
+        //echo $resized_file; die;
         if (!is_file($this->getContentDir() . '/' . $resized_file))
             return null;
 
@@ -145,7 +146,12 @@ class ContentManager
         // replace tokens
         if (preg_match_all('/\[([a-z0-9_]+)\]/i', $storage_dir, $matches)) {
             foreach ($matches[1] as $match) {
-                $value = $object->__get($match);
+
+                $method = 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $match)));
+
+                $value = $object->$method();
+
+                //$value = $object->__get($match);
                 $storage_dir = str_replace("[$match]", $value, $storage_dir);
             }
         }
