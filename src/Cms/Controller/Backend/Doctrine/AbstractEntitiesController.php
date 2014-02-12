@@ -5,19 +5,13 @@ namespace Msingi\Cms\Controller\Backend\Doctrine;
 use Msingi\Cms\Controller\Backend\AuthenticatedController;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Zend\Db\Sql\Select;
 use Doctrine\ORM\EntityManager;
+use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 
 abstract class AbstractEntitiesController extends AuthenticatedController
 {
     /** @var \Doctrine\ORM\EntityManager */
     protected $entityManager;
-
-    /**
-     * Get storage
-     *
-     */
-    abstract protected function getRepository();
 
     /**
      * @return string
@@ -32,11 +26,10 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     abstract protected function getEditForm();
 
     /**
-     * Get query for paginator adapter
+     * Get paginator adapter
      *
-     * @param $request
-     * @param $filter
-     * @return Select
+     * @param array|null $filter
+     * @return DoctrinePaginator|Select
      */
     abstract protected function getPaginatorAdapter($filter = null);
 
@@ -73,6 +66,15 @@ abstract class AbstractEntitiesController extends AuthenticatedController
         }
 
         return $this->entityManager;
+    }
+
+    /**
+     * Get storage
+     *
+     */
+    protected function getRepository()
+    {
+        return $this->entityManager->getRepository($this->getEntityClass());
     }
 
     /**
