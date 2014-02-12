@@ -83,7 +83,11 @@ class EasyRoutes
             } else if ($type == 'Action') {
 
             } else if ($type == 'Segment') {
-
+                $route['type'] = 'Segment';
+                $route['may_terminate'] = true;
+                $route['options']['route'] = $routeSpec['route'];
+                $route['options']['constraints'] = $routeSpec['constraints'];
+                $route['options']['defaults'] = array_merge($route['options']['defaults'], $routeSpec['defaults']);
             }
 
             if (isset($routeSpec['actions'])) {
@@ -113,42 +117,6 @@ class EasyRoutes
             }
 
             $routes[$routePath] = $route;
-
-
-//            $route = array(
-//                'type' => 'Literal',
-//                'options' => array(
-//                    'defaults' => array(
-//                        'controller' => EasyRoutes::formatControllerName($parent . $routeName),
-//                        'action' => 'index',
-//                    ),
-//                ),
-//            );
-//
-//            if (is_string($routeSpec)) {
-//                switch ($routeSpec) {
-//                    case '*':
-//                        $route['options']['route'] = '/' . $routeName;
-////                        $route['options']['may_terminate'] = true;
-//                        break;
-//                    case 'action':
-//                        $route['type'] = 'Segment';
-//                        $route['options']['route'] = '[:action]';
-//                        $route['options']['constraints'] = array(
-//                            'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-//                        );
-//                        break;
-//                    default:
-//                        $route['options']['route'] = $routeSpec;
-////                        $route['options']['may_terminate'] = true;
-//                        break;
-//                }
-//            } else if (is_array($routeSpec)) {
-//                $route['options']['route'] = '/' . $routeName;
-//                $route['may_terminate'] = true;
-//                $route['child_routes'] = EasyRoutes::r($routeSpec, $parent . $routeName . '/');
-//            }
-//
         }
 
         return $routes;
