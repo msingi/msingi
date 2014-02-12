@@ -206,6 +206,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
         $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromQuery('id'));
         if ($entity != null) {
             $this->getEntityManager()->remove($entity);
+            $this->getEntityManager()->flush();
         }
 
         return $this->redirect()->toRoute($this->getIndexRoute());
