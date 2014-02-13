@@ -209,7 +209,6 @@ class PagesController extends AuthenticatedController
         $sa->exceptions = $this->allowedTags;
         $text = $sa->strip($text);
 
-
         return $text;
     }
 
