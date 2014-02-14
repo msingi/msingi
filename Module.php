@@ -5,6 +5,7 @@ namespace Msingi;
 use Msingi\Cms\Model\Backend\AuthStorage;
 use Msingi\Cms\View\Helper\CurrentRoute;
 use Msingi\Cms\View\Helper\PageFragment;
+use Msingi\Cms\View\Helper\PageMeta;
 use Msingi\Cms\View\Helper\SettingsValue;
 use Msingi\Cms\View\Helper\Url;
 use Zend\Authentication\Adapter\DbTable;
@@ -85,6 +86,11 @@ class Module implements AutoloaderProviderInterface
                         $services = $helpers->getServiceLocator();
                         $app = $services->get('Application');
                         return new PageFragment($app->getMvcEvent());
+                    },
+                'metaValue' => function (ServiceLocatorInterface $helpers) {
+                        $services = $helpers->getServiceLocator();
+                        $app = $services->get('Application');
+                        return new PageMeta($app->getMvcEvent());
                     },
                 'settingsValue' => function (ServiceLocatorInterface $helpers) {
                         $viewHelper = new SettingsValue();
