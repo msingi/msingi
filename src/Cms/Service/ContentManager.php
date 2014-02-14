@@ -47,6 +47,38 @@ class ContentManager
     }
 
     /**
+     * Attach file
+     *
+     * @param $object
+     * @param string $attachment
+     * @param array $file
+     */
+    public function attachFile($object, $attachment, $file)
+    {
+        // check if attachement definition exists
+        // @todo exception?
+        $class = get_class($object);
+        if (!isset($this->config['attachments'][$class][$attachment]))
+            return false;
+
+        // get storage directory
+        $storage_dir = $this->config['store_dir'] . '/' . $this->getStorageDir($object, $attachment);
+
+        // create storage directory if not exist
+        if (!is_dir($storage_dir)) {
+            if (!mkdir($storage_dir, 0775, true))
+                return false;
+        }
+
+        $source = $file['tmp_name'];
+        $dest = $storage_dir . '/' . $file['name'];
+
+        copy($source, $dest);
+
+        return true;
+    }
+
+    /**
      * Attach image
      *
      * @param $object
@@ -99,9 +131,38 @@ class ContentManager
      * @param $object
      * @param $attachment
      */
+    public function deleteFile($object, $attachment)
+    {
+
+    }
+
+    /**
+     * @param $object
+     * @param $attachment
+     */
     public function deleteImage($object, $attachment)
     {
 
+    }
+
+    /**
+     *
+     * @param $object
+     * @param string $attachment Attachment name
+     * @param string $name
+     * @return string
+     */
+    public function getFile($object, $attachment, $name)
+    {
+        $storage_dir = $this->getStorageDir($object, $attachment);
+
+        $file = $storage_dir . '/' . $name;
+
+        //echo $resized_file; die;
+        if (!is_file($this->getContentDir() . '/' . $file))
+            return null;
+
+        return $file;
     }
 
     /**
