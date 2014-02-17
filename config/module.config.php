@@ -84,7 +84,7 @@ return array(
             'label' => 'Mail',
             'values' => array(
                 'mail:from' => array(
-                    'label' => 'Mail From email',
+                    'label' => 'Email From',
                     'input_class' => 'form-control input-large',
                     'default' => 'noreply@example.com',
                 ),
