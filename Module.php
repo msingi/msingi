@@ -64,6 +64,8 @@ class Module implements AutoloaderProviderInterface
 
                 'date' => 'Msingi\Cms\View\Helper\Date',
 
+                'selectOptions' => 'Msingi\Cms\View\Helper\SelectOptions',
+
                 'imageAttachment' => 'Msingi\Cms\View\Helper\ImageAttachment',
                 'fileAttachment' => 'Msingi\Cms\View\Helper\FileAttachment',
 
