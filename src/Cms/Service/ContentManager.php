@@ -197,6 +197,9 @@ class ContentManager
         $class = get_class($object);
 
         // get class related storage settings
+        if (!isset($this->config['attachments'][$class]) || !isset($this->config['attachments'][$class][$attachment]))
+            return '';
+
         $storage = $this->config['attachments'][$class][$attachment];
         if ($storage == null)
             return '';

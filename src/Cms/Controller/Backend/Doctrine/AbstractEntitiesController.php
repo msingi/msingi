@@ -39,9 +39,14 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     abstract protected function getIndexRoute();
 
     /**
+     * @param \Zend\Form\Form $form
      * @param $entity
-     * @param $values
-     * @return mixed
+     */
+    abstract protected function populateForm($form, $entity);
+
+    /**
+     * @param $entity
+     * @param \Zend\Form\Form $form
      */
     abstract protected function updateEntity($entity, $form);
 
@@ -184,7 +189,8 @@ abstract class AbstractEntitiesController extends AuthenticatedController
             $form->get('id')->setValue($entity->getId());
 
             // set form data
-            $form->setEntity($entity);
+            //$form->setEntity($entity);
+            $this->populateForm($form, $entity);
         }
 
         //
