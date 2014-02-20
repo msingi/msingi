@@ -63,6 +63,7 @@ class Module implements AutoloaderProviderInterface
                 'locale' => 'Msingi\Cms\View\Helper\Locale',
 
                 'date' => 'Msingi\Cms\View\Helper\Date',
+                'relativeDate' => 'Msingi\Cms\View\Helper\RelativeDate',
 
                 'selectOptions' => 'Msingi\Cms\View\Helper\SelectOptions',
 
