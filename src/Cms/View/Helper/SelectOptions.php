@@ -14,12 +14,23 @@ class SelectOptions extends AbstractTranslatorHelper
 
     /**
      * @param array $values
+     * @param boolean $empty
      * @param mixed $selected
      * @return string
      */
-    public function __invoke($values, $selected = null)
+    public function __invoke($values, $empty = false, $selected = null)
     {
         $ret = array();
+
+        if ($empty) {
+            $option = '<option value=""';
+            if ($selected == null) {
+                $option .= ' selected="selected"';
+            }
+            $option .= '></option>';
+
+            $ret[] = $option;
+        }
 
         foreach ($values as $value => $label) {
             $option = '<option';
