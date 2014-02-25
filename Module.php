@@ -77,6 +77,8 @@ class Module implements AutoloaderProviderInterface
 
                 'excerpt' => 'Msingi\Cms\View\Helper\Excerpt',
 
+                'configValue' => 'Msingi\Cms\View\Helper\ConfigValue',
+
                 'formElementErrorClass' => 'Msingi\Cms\View\Helper\FormElementErrorClass',
             ),
             'factories' => array(
