@@ -27,7 +27,7 @@ class SelectOptions extends AbstractTranslatorHelper
             if ($selected == null) {
                 $option .= ' selected="selected"';
             }
-            $option .= '></option>';
+            $option .= '>&nbsp;</option>';
 
             $ret[] = $option;
         }
