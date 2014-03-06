@@ -79,7 +79,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     protected function getRepository()
     {
-        return $this->entityManager->getRepository($this->getEntityClass());
+        return $this->getEntityManager()->getRepository($this->getEntityClass());
     }
 
     /**
@@ -150,15 +150,12 @@ abstract class AbstractEntitiesController extends AuthenticatedController
                 $values = $form->getData();
 
                 if (!isset($values['id']) || intval($values['id']) == 0) {
-                    // create new entity
-                    $entity = $this->getServiceLocator()->get($classname);
-                    $entity->setEntityManager($this->getEntityManager());
+                    $entity = $this->createEntity($values, $form);
                 } else {
                     $entity = $this->getEntityManager()->find($classname, $values['id']);
+                    // update entity valuess
+                    $this->updateEntity($entity, $form);
                 }
-
-                // update entity valuess
-                $this->updateEntity($entity, $form);
 
                 //
                 $this->getEntityManager()->persist($entity);
@@ -219,6 +216,21 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     }
 
     /**
+     * @param $values
+     * @param $form
+     * @return array|object
+     */
+    protected function createEntity($values, $form)
+    {
+        // create new entity
+        $entity = $this->getServiceLocator()->get($this->getEntityClass());
+
+        //$entity->setEntityManager($this->getEntityManager());
+
+        return $entity;
+    }
+
+        /**
      * Extra processing of entity values
      *
      * @param $entity

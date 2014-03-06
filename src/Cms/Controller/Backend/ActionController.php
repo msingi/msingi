@@ -20,17 +20,4 @@ class ActionController extends AbstractActionController
         return $this->authService;
     }
 
-    /**
-     * @param $template
-     * @param $to
-     * @param array $params
-     * @return mixed
-     */
-    protected function sendMail($template, $to, array $params = array())
-    {
-        $plugin = $this->SendMailPlugin();
-
-        return $plugin->sendMail($template, $to, $params);
-    }
-
 }
