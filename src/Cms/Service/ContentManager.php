@@ -109,19 +109,30 @@ class ContentManager
 
         // store all sizes
         foreach ($storage['sizes'] as $size => $spec) {
-            // parse params
-            $params = explode(',', $spec);
+            if ($spec == 'original') {
+                //
+                $size = getimagesize($image_file);
 
-            // get width and height
-            list($width, $height) = explode('x', $params[0]);
+                // name of resized file
+                $resized_file = $storage_dir . '/' . $attachment . '-' . $size . '.jpg';
 
-            // crop
-            $crop = in_array('crop', $params);
+                ImageResizer::resize($image_file, $resized_file, $size[0], $size[1], false);
 
-            // name of resized file
-            $resized_file = $storage_dir . '/' . $attachment . '-' . $size . '.jpg';
+            } else {
+                // parse params
+                $params = explode(',', $spec);
 
-            ImageResizer::resize($image_file, $resized_file, $width, $height, $crop);
+                // get width and height
+                list($width, $height) = explode('x', $params[0]);
+
+                // crop
+                $crop = in_array('crop', $params);
+
+                // name of resized file
+                $resized_file = $storage_dir . '/' . $attachment . '-' . $size . '.jpg';
+
+                ImageResizer::resize($image_file, $resized_file, $width, $height, $crop);
+            }
         }
 
         return true;
