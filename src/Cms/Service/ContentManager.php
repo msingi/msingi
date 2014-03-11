@@ -41,7 +41,7 @@ class ContentManager
     {
         $dir = $this->config['store_dir'];
         if ($file != '') {
-            $dir .= '/' . ltri($file, '/');
+            $dir .= '/' . ltrim($file, '/');
         }
         return $dir;
     }
@@ -114,7 +114,7 @@ class ContentManager
                 $size = getimagesize($image_file);
 
                 // name of resized file
-                $resized_file = $storage_dir . '/' . $attachment . '-' . $size . '.jpg';
+                $resized_file = $storage_dir . '/' . $attachment . '-original.jpg';
 
                 ImageResizer::resize($image_file, $resized_file, $size[0], $size[1], false);
 
