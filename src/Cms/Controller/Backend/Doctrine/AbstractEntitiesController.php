@@ -150,12 +150,18 @@ abstract class AbstractEntitiesController extends AuthenticatedController
                 $values = $form->getData();
 
                 if (!isset($values['id']) || intval($values['id']) == 0) {
+                    // create new entity
                     $entity = $this->createEntity($values, $form);
                 } else {
+                    // load the entity
                     $entity = $this->getEntityManager()->find($classname, $values['id']);
-                    // update entity valuess
-                    $this->updateEntity($entity, $form);
+                    if ($entity == null) {
+                        return $this->redirect()->toRoute($this->getIndexRoute());
+                    }
                 }
+
+                // update entity values
+                $this->updateEntity($entity, $form);
 
                 //
                 $this->getEntityManager()->persist($entity);
@@ -230,7 +236,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
         return $entity;
     }
 
-        /**
+    /**
      * Extra processing of entity values
      *
      * @param $entity
