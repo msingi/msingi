@@ -12,13 +12,12 @@ class Date extends AbstractTranslatorHelper
 {
     /**
      * @param \DateTime $date
-     * @param null $format
      */
-    public function __invoke($date, $format = null)
+    public function __invoke($date, $datetype = \IntlDateFormatter::MEDIUM, $timetype = \IntlDateFormatter::NONE)
     {
         $translator = $this->getTranslator();
 
-        $df = new \IntlDateFormatter($translator->getLocale(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE);
+        $df = new \IntlDateFormatter($translator->getLocale(), $datetype, $timetype);
 
         return $df->format($date);
     }
