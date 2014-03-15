@@ -1,9 +1,10 @@
 <?php
 
 $available_languages = array(
-    'en' => 'English',
-    'de' => 'German',
-    'cs' => 'Czech',
+    'en' => _('English'),
+    'de' => _('German'),
+    'cs' => _('Czech'),
+    'ru' => _('Russian'),
 );
 
 return array(
@@ -125,6 +126,24 @@ return array(
 
                     return $plugin;
                 }
+        ),
+    ),
+
+    'doctrine' => array(
+        'driver' => array(
+            'application_entities' => array(
+                'paths' => array(__DIR__ . '/../src/Cms/Entity')
+            ),
+
+            'orm_default' => array(
+                'drivers' => array(
+                    'Msingi\Cms\Entity' => 'application_entities'
+                ),
+            ),
+        ),
+
+        'enums' => array(
+            'page_type' => 'Msingi\Cms\Entity\Enum\PageType',
         ),
     ),
 );

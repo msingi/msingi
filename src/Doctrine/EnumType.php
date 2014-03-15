@@ -1,13 +1,14 @@
 <?php
 
-namespace Application\DBAL;
+namespace Msingi\Doctrine;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 
 /**
  * Class EnumType
- * @package Application\DBAL
+ *
+ * @package Msingi\Doctrine
  */
 abstract class EnumType extends Type
 {

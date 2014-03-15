@@ -2,7 +2,7 @@
 
 namespace Msingi;
 
-use Msingi\Cms\Model\Backend\AuthStorage;
+use Doctrine\DBAL\Types\Type;
 use Msingi\Cms\View\Helper\CurrentRoute;
 use Msingi\Cms\View\Helper\PageFragment;
 use Msingi\Cms\View\Helper\PageMeta;
@@ -28,6 +28,9 @@ class Module implements AutoloaderProviderInterface
     {
         $serviceManager = $e->getApplication()->getServiceManager();
 
+        $config = $serviceManager->get('Config');
+
+        //
         $eventManager = $e->getApplication()->getEventManager();
         // route matching
         $eventManager->attach($serviceManager->get('Msingi\Cms\RouteListener'));
@@ -37,6 +40,24 @@ class Module implements AutoloaderProviderInterface
         $eventManager->attach($serviceManager->get('Msingi\Cms\HttpListener'));
 
         $this->initLayouts($e);
+
+        // Enable using of enum fields with Doctrine ORM
+        /** @var \Doctrine\ORM\EntityManager $entityManager */
+        $entityManager = $serviceManager->get('Doctrine\ORM\EntityManager');
+
+        $platform = $entityManager->getConnection()->getDatabasePlatform();
+        $platform->registerDoctrineTypeMapping('enum', 'string');
+
+        // Register enum types
+        if (isset($config['doctrine']['enums'])) {
+            foreach ($config['doctrine']['enums'] as $enum => $className) {
+                Type::addType($enum, $className);
+            }
+        }
+
+        //
+//        $eventManager = $entityManager->getEventManager();
+//        $eventManager->addEventListener(array(\Doctrine\ORM\Events::postLoad), new InjectListener($serviceManager));
     }
 
     /**

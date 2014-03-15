@@ -6,6 +6,7 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
+use Doctrine\ORM\EntityManager;
 
 /**
  * Class RouteListener
@@ -56,9 +57,12 @@ class RouteListener implements ListenerAggregateInterface
             if ($cms_page == null) {
                 $serviceManager = $e->getApplication()->getServiceManager();
 
-                $pagesTable = $serviceManager->get('Msingi\Cms\Db\Table\Pages');
+                /** @var \Doctrine\ORM\EntityManager $entityManager */
+                $entityManager = $serviceManager->get('Doctrine\ORM\EntityManager');
 
-                $cms_page = $pagesTable->fetchOrCreate($routeName);
+                $pagesRepository = $entityManager->getRepository('Msingi\Cms\Entity\Page');
+
+                $cms_page = $pagesRepository->fetchOrCreate($routeName);
 
                 $routeMatch->setParam('cms_page', $cms_page);
             }
