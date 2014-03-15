@@ -6,7 +6,6 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\RouteMatch;
-use Doctrine\ORM\EntityManager;
 
 /**
  * Class RouteListener
@@ -77,6 +76,7 @@ class RouteListener implements ListenerAggregateInterface
                     $cms_page = $pagesRepository->fetchOrCreate($routeName);
                 }
 
+                // store page in cache
                 if ($cache) {
                     $cache->setItem($cacheKey, $cms_page);
                 }

@@ -26,7 +26,7 @@ abstract class AbstractNavigationFactory extends \Zend\Navigation\Service\Abstra
             // try to get menu from cache
             $cache = $serviceLocator->get('Application\Cache');
             if ($cache) {
-                $cacheKey = sprintf('menu_%s_%s', $this->getName(), $language);
+                $cacheKey = sprintf('menu-%s-%s', $this->getName(), $language);
                 $pages = $cache->getItem($cacheKey);
             }
 

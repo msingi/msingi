@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * Available languages
  */
 $available_languages = array(
     'en' => _('English'),
@@ -12,6 +12,9 @@ $available_languages = array(
     'es' => _('Spanish')
 );
 
+/**
+ * Default application settings
+ */
 $default_settings = array(
     'general' => array(
         'label' => _('General settings'),
@@ -78,6 +81,9 @@ $default_settings = array(
     ),
 );
 
+/**
+ * Config
+ */
 return array(
 
     'translator' => array(

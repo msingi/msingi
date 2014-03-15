@@ -57,7 +57,7 @@ class PageFragment extends AbstractHelper
             // try to get fragments from cache
             $cache = $serviceManager->get('Application\Cache');
             if ($cache) {
-                $cacheKey = sprintf('page_fragments_%s_%s', $this->page->getId(), $language);
+                $cacheKey = sprintf('page-fragments-%s-%s', $this->page->getId(), $language);
                 $page_fragments = $cache->getItem($cacheKey);
             }
 

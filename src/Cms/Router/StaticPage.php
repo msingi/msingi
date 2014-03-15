@@ -76,9 +76,8 @@ class StaticPage implements RouteInterface, ServiceLocatorAwareInterface
 
         $cache = $serviceLocator->get('Application\Cache');
         if ($cache) {
-            $path = preg_replace('/^[a-z0-9_]/', '_', $path);
-            $path = preg_replace('/[_]+/', '_', $path);
-            $cacheKey = 'page_' . $path;
+            $cacheKey = 'page-' . preg_replace('/[^a-z0-9\-]/', '-', $path);
+            $cacheKey = preg_replace('/\-+/', '-', $cacheKey);
             $page = $cache->getItem($cacheKey);
         }
 
