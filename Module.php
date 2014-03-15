@@ -139,22 +139,16 @@ class Module implements AutoloaderProviderInterface
      */
     public function getAutoloaderConfig()
     {
-        if (is_file(__DIR__ . '/autoload_classmap.php')) {
-            return array(
-                'Zend\Loader\ClassMapAutoloader' => array(
-                    __DIR__ . '/autoload_classmap.php',
-                ),
-            );
-        } else {
-            return array(
-                'Zend\Loader\StandardAutoloader' => array(
-                    'namespaces' => array(
-                        __NAMESPACE__ => __DIR__ . '/src',
-                    ),
-                ),
-            );
-        }
-
+        return array(
+            'Zend\Loader\ClassMapAutoloader' => array(
+                __DIR__ . '/autoload_classmap.php',
+            ),
+            'Zend\Loader\StandardAutoloader' => array(
+                'namespaces' => array(
+                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__
+                )
+            )
+        );
     }
 
     /**
