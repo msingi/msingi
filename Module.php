@@ -154,10 +154,6 @@ class Module implements AutoloaderProviderInterface
     public function getServiceConfig()
     {
         return array(
-            'abstract_factories' => array(
-                'Msingi\Service\TableGatewayFactory',
-                'Msingi\Service\TableRowFactory',
-            ),
             'factories' => array(
                 //
                 'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManagerFactory',
@@ -183,7 +179,7 @@ class Module implements AutoloaderProviderInterface
                 // Settings form
                 'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',
                 //
-                'Settings' => 'Msingi\Cms\Model\Settings',
+                'Settings' => 'Msingi\Cms\Settings',
             ),
         );
     }

@@ -1,31 +1,84 @@
 <?php
 
+/**
+ *
+ */
 $available_languages = array(
     'en' => _('English'),
     'de' => _('German'),
     'cs' => _('Czech'),
     'ru' => _('Russian'),
+    'fr' => _('French'),
+    'es' => _('Spanish')
+);
+
+$default_settings = array(
+    'general' => array(
+        'label' => _('General settings'),
+        'values' => array(
+            'application:name' => array(
+                'label' => _('Application name'),
+                'input_class' => 'form-control input-large'
+            ),
+        ),
+    ),
+    'frontend' => array(
+        'label' => _('Frontend'),
+        'values' => array(
+            'frontend:languages:default' => array(
+                'type' => 'select',
+                'label' => _('Default language'),
+                'value_options' => $available_languages,
+                'default' => 'en',
+                'input_class' => 'form-control input-medium'
+            ),
+            'frontend:languages:multilanguage' => array(
+                'type' => 'checkbox',
+                'label' => _('Multilanguage enabled'),
+                'default' => false
+            ),
+            'frontend:languages:enabled' => array(
+                'type' => 'MultiCheckbox',
+                'value_options' => $available_languages,
+                'default' => array_keys($available_languages),
+            ),
+        ),
+    ),
+    'backend' => array(
+        'label' => _('Backend'),
+        'values' => array(
+            'backend:languages:default' => array(
+                'type' => 'Select',
+                'label' => _('Default language'),
+                'value_options' => $available_languages,
+                'default' => 'en',
+                'input_class' => 'form-control input-medium'
+            ),
+        ),
+    ),
+    'mail' => array(
+        'label' => _('Mail'),
+        'values' => array(
+            'mail:from' => array(
+                'label' => _('Email From'),
+                'input_class' => 'form-control input-large',
+                'default' => 'noreply@example.com',
+            ),
+            'mail:log' => array(
+                'type' => 'checkbox',
+                'label' => _('Log sent mail'),
+                'default' => false
+            ),
+            'mail:send' => array(
+                'type' => 'checkbox',
+                'label' => _('Really send mail'),
+                'default' => false
+            ),
+        ),
+    ),
 );
 
 return array(
-
-    'models' => array(
-        'Msingi\Cms\Model\Backend\User',
-        'Msingi\Cms\Model\MailTemplate',
-        'Msingi\Cms\Model\Menu',
-        'Msingi\Cms\Model\Page',
-        'Msingi\Cms\Model\PageFragment',
-    ),
-
-    'tables' => array(
-        'Msingi\Cms\Db\Table\BackendUsers',
-        'Msingi\Cms\Db\Table\MailTemplates',
-        'Msingi\Cms\Db\Table\Menu',
-        'Msingi\Cms\Db\Table\PageFragments',
-        'Msingi\Cms\Db\Table\Pages',
-        'Msingi\Cms\Db\Table\PageTemplates',
-        'Msingi\Cms\Db\Table\Settings',
-    ),
 
     'translator' => array(
         'translation_file_patterns' => array(
@@ -37,81 +90,14 @@ return array(
         ),
     ),
 
-    'settings' => array(
-        'general' => array(
-            'label' => 'General settings',
-            'values' => array(
-                'application:name' => array(
-                    'label' => 'Application name',
-                    'input_class' => 'form-control input-large'
-                ),
-            ),
-        ),
-        'frontend' => array(
-            'label' => 'Frontend',
-            'values' => array(
-                'frontend:languages:default' => array(
-                    'type' => 'select',
-                    'label' => 'Default language',
-                    'value_options' => $available_languages,
-                    'default' => 'en',
-                    'input_class' => 'form-control input-medium'
-                ),
-                'frontend:languages:multilanguage' => array(
-                    'type' => 'checkbox',
-                    'label' => 'Multilanguage enabled',
-                    'default' => false
-                ),
-                'frontend:languages:enabled' => array(
-                    'type' => 'MultiCheckbox',
-                    'value_options' => $available_languages,
-                    'default' => array('en', 'de', 'cs'),
-                ),
-            ),
-        ),
-        'backend' => array(
-            'label' => 'Backend',
-            'values' => array(
-                'backend:languages:default' => array(
-                    'type' => 'select',
-                    'label' => 'Default language',
-                    'value_options' => $available_languages,
-                    'default' => 'en',
-                    'input_class' => 'form-control input-medium'
-                ),
-            ),
-        ),
-        'mail' => array(
-            'label' => 'Mail',
-            'values' => array(
-                'mail:from' => array(
-                    'label' => 'Email From',
-                    'input_class' => 'form-control input-large',
-                    'default' => 'noreply@example.com',
-                ),
-                'mail:log' => array(
-                    'type' => 'checkbox',
-                    'label' => 'Log sent mail',
-                    'default' => false
-                ),
-                'mail:send' => array(
-                    'type' => 'checkbox',
-                    'label' => 'Really send mail',
-                    'default' => false
-                ),
-            ),
-        ),
-    ),
+    'settings' => $default_settings,
 
     'controller_plugins' => array(
         'factories' => array(
             '_' => function ($sm) {
                     $translator = $sm->getServiceLocator()->get('Translator');
-
                     $plugin = new \Msingi\Cms\Controller\Plugin\Translate();
-
                     $plugin->setTranslator($translator);
-
                     return $plugin;
                 },
             'SendMail' => function ($sm) {

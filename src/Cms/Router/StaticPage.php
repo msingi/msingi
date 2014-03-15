@@ -34,7 +34,7 @@ class StaticPage implements RouteInterface, ServiceLocatorAwareInterface
     public function __construct(array $defaults = array())
     {
         $this->defaults = array_merge(array(
-            'controller' => 'frontend-page',
+            'controller' => 'frontend-index-page',
             'action' => 'page'
         ), $defaults);
     }
@@ -51,7 +51,7 @@ class StaticPage implements RouteInterface, ServiceLocatorAwareInterface
         /** @var string $path */
         $path = trim(substr($request->getUri()->getPath(), $pathOffset), '/');
 
-        /** @var \Msingi\Cms\Model\Page $page */
+        /** @var \Msingi\Cms\Entity\Page $page */
         $page = $this->loadPage($path);
         if ($page == null)
             return null;
@@ -61,31 +61,48 @@ class StaticPage implements RouteInterface, ServiceLocatorAwareInterface
             'cms_page' => $page
         ));
 
-        $routeMatch = new RouteMatch($routeParams, strlen($page->path));
+        $routeMatch = new RouteMatch($routeParams, strlen($page->getPath()));
 
         return $routeMatch;
     }
 
     /**
      * @param $path
-     * @return \Msingi\Cms\Model\Page
+     * @return \Msingi\Cms\Entity\Page
      */
     protected function loadPage($path)
     {
         $serviceLocator = $this->routePluginManager->getServiceLocator();
 
-        /** @var \Msingi\Cms\Db\Table\Pages $pagesTable */
-        $pagesTable = $serviceLocator->get('Msingi\Cms\Db\Table\Pages');
+        $cache = $serviceLocator->get('Application\Cache');
+        if ($cache) {
+            $path = preg_replace('/^[a-z0-9_]/', '_', $path);
+            $path = preg_replace('/[_]+/', '_', $path);
+            $cacheKey = 'page_' . $path;
+            $page = $cache->getItem($cacheKey);
+        }
 
-        // 1 is root page always
-        $parent_id = 1;
-        foreach (explode('/', $path) as $slug) {
-            /** @var \Msingi\Cms\Model\Page $page */
-            $page = $pagesTable->fetchPage($slug, $parent_id);
-            if ($page == null) {
-                return null;
+        if (!$page) {
+            /** @var \Doctrine\ORM\EntityManager $entityManager */
+            $entityManager = $serviceLocator->get('Doctrine\ORM\EntityManager');
+
+            /** @var \Msingi\Cms\Repository\Pages $pages */
+            $pages = $entityManager->getRepository('Msingi\Cms\Entity\Page');
+
+            // 1 is root page always
+            $parent = $pages->find(1);
+            foreach (explode('/', $path) as $slug) {
+                /** @var \Msingi\Cms\Entity\Page $page */
+                $page = $pages->fetchPage($slug, $parent);
+                if ($page == null) {
+                    return null;
+                }
+                $parent = $page;
             }
-            $parent_id = $page->id;
+        }
+
+        if ($cache) {
+            $cache->setItem($cacheKey, $page);
         }
 
         return $page;

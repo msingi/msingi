@@ -2,6 +2,11 @@
 
 namespace Msingi\Util;
 
+/**
+ * Class ImageResizer
+ *
+ * @package Msingi\Util
+ */
 class ImageResizer
 {
     /**

@@ -1,9 +1,11 @@
 <?php
-namespace Application\DBAL;
+
+namespace Msingi\Doctrine;
 
 /**
  * Class InjectListener
- * @package Application\DBAL
+ *
+ * @package Msingi\Doctrine
  */
 class InjectListener
 {
@@ -36,7 +38,7 @@ class InjectListener
      */
     protected function getEntityManager()
     {
-        if($this->entityManager == null) {
+        if ($this->entityManager == null) {
             $this->entityManager = $this->serviceLocator->get('Doctrine\ORM\EntityManager');
         }
 
