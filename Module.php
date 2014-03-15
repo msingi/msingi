@@ -139,13 +139,22 @@ class Module implements AutoloaderProviderInterface
      */
     public function getAutoloaderConfig()
     {
-        return array(
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/src/',
+        if (is_file(__DIR__ . '/autoload_classmap.php')) {
+            return array(
+                'Zend\Loader\ClassMapAutoloader' => array(
+                    __DIR__ . '/autoload_classmap.php',
                 ),
-            ),
-        );
+            );
+        } else {
+            return array(
+                'Zend\Loader\StandardAutoloader' => array(
+                    'namespaces' => array(
+                        __NAMESPACE__ => __DIR__ . '/src',
+                    ),
+                ),
+            );
+        }
+
     }
 
     /**
@@ -199,7 +208,7 @@ class Module implements AutoloaderProviderInterface
             if (isset($config['module_layouts'][$moduleNamespace])) {
                 $controller->layout($config['module_layouts'][$moduleNamespace]);
             } else {
-                $controller->layout('layout/' . strtolower($moduleNamespace) . '.phtml');
+                $controller->layout('layout/' . strtolower($moduleNamespace));
             }
         }, 100);
 
