@@ -26,7 +26,7 @@ class LoginController extends ActionController
     public function getSessionStorage()
     {
         if (!$this->storage) {
-            $this->storage = $this->getServiceLocator()->get('Msingi\Cms\Model\Backend\AuthStorage');
+            $this->storage = $this->getServiceLocator()->get('Msingi\Cms\Service\Backend\AuthStorage');
         }
 
         return $this->storage;
@@ -70,7 +70,7 @@ class LoginController extends ActionController
                         $this->getAuthService()->setStorage($this->getSessionStorage());
                     }
 
-                    $this->getAuthService()->getStorage()->write($request->getPost('username'));
+                    $this->getAuthService()->getStorage()->write($result->getIdentity());
                 }
 
                 return $this->redirect()->toRoute('backend/index');

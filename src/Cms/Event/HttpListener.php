@@ -1,6 +1,6 @@
 <?php
 
-namespace Msingi\Cms;
+namespace Msingi\Cms\Event;
 
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
@@ -10,7 +10,7 @@ use Zend\Mvc\MvcEvent;
 /**
  * Class HttpListener
  *
- * @package Msingi\Cms
+ * @package Msingi\Cms\Event
  */
 class HttpListener implements ListenerAggregateInterface
 {

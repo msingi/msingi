@@ -4,27 +4,35 @@ namespace Msingi\Cms\View\Helper\Backend;
 
 use Msingi\Cms\View\AbstractHelper;
 
+/**
+ * Class CurrentUser
+ * @package Msingi\Cms\View\Helper\Backend
+ */
 class CurrentUser extends AbstractHelper
 {
     protected $currentUser;
 
     /**
-     * @return string
+     * @return \Msingi\Cms\Entity\BackendUser
      */
     public function __invoke()
     {
-        $sl = $this->getServiceLocator()->getServiceLocator();
-
-        $authService = $sl->get('BackendAuthService');
-
         if ($this->currentUser == null) {
-            $username = $authService->getStorage()->read('username');
-
-            $usersTable = $sl->get('Msingi\Cms\Db\Table\BackendUsers');
-
-            $this->currentUser = $usersTable->fetchByUsername($username);
+            $this->currentUser = $this->fetchCurrentUser();
         }
 
         return $this->currentUser;
+    }
+
+    /**
+     * @return \Msingi\Cms\Entity\BackendUser
+     */
+    protected function fetchCurrentUser()
+    {
+        $sl = $this->getServiceLocator()->getServiceLocator();
+
+        $authService = $sl->get('Msingi\Cms\Service\Backend\AuthService');
+
+        return $authService->getIdentity();
     }
 }

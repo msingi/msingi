@@ -98,6 +98,21 @@ return array(
 
     'settings' => $default_settings,
 
+    'service_manager' => array(
+        'invokables' => array(
+            // Event listeners
+            'Msingi\Cms\Event\RouteListener' => 'Msingi\Cms\Event\RouteListener',
+            'Msingi\Cms\Event\LocaleListener' => 'Msingi\Cms\Event\LocaleListener',
+            'Msingi\Cms\Event\HttpListener' => 'Msingi\Cms\Event\HttpListener',
+            // Settings form
+            'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',
+            //
+            'Settings' => 'Msingi\Cms\Settings',
+            //
+            'Msingi\Cms\Service\Backend\AuthAdapter' => 'Msingi\Cms\Service\Backend\AuthAdapter',
+        ),
+    ),
+
     'controller_plugins' => array(
         'factories' => array(
             '_' => function ($sm) {
@@ -118,6 +133,37 @@ return array(
 
                     return $plugin;
                 }
+        ),
+    ),
+
+    'view_helpers' => array(
+        'invokables' => array(
+            'assets' => 'Msingi\Cms\View\Helper\Assets',
+            'headLess' => 'Msingi\Cms\View\Helper\HeadLess',
+            'deferJs' => 'Msingi\Cms\View\Helper\DeferJs',
+
+            'language' => 'Msingi\Cms\View\Helper\Language',
+            'languageName' => 'Msingi\Cms\View\Helper\LanguageName',
+            'locale' => 'Msingi\Cms\View\Helper\Locale',
+
+            'date' => 'Msingi\Cms\View\Helper\Date',
+            'relativeDate' => 'Msingi\Cms\View\Helper\RelativeDate',
+
+            'selectOptions' => 'Msingi\Cms\View\Helper\SelectOptions',
+
+            'imageAttachment' => 'Msingi\Cms\View\Helper\ImageAttachment',
+            'fileAttachment' => 'Msingi\Cms\View\Helper\FileAttachment',
+
+            'gravatar' => 'Msingi\Cms\View\Helper\Gravatar',
+
+            '_' => 'Zend\I18n\View\Helper\Translate',
+            '_p' => 'Zend\I18n\View\Helper\TranslatePlural',
+
+            'excerpt' => 'Msingi\Cms\View\Helper\Excerpt',
+
+            'configValue' => 'Msingi\Cms\View\Helper\ConfigValue',
+
+            'formElementErrorClass' => 'Msingi\Cms\View\Helper\FormElementErrorClass',
         ),
     ),
 
