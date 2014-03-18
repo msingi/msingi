@@ -3,12 +3,12 @@
 namespace Msingi;
 
 use Doctrine\DBAL\Types\Type;
-use Msingi\Cms\Router\EasyRoutes;
 use Msingi\Cms\View\Helper\CurrentRoute;
 use Msingi\Cms\View\Helper\PageFragment;
 use Msingi\Cms\View\Helper\PageMeta;
 use Msingi\Cms\View\Helper\SettingsValue;
 use Msingi\Cms\View\Helper\Url;
+use Msingi\Doctrine\InjectListener;
 use Zend\Authentication\Adapter\DbTable;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
@@ -41,7 +41,7 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
         // route matching
         $eventManager->attach($serviceManager->get('Msingi\Cms\Event\RouteListener'));
         // determine locale
-        $eventManager->attach($serviceManager->get('Msingi\Cms\Event\LocaleListener'));
+        //$eventManager->attach($serviceManager->get('Msingi\Cms\Event\LocaleListener'));
         // http processing
         $eventManager->attach($serviceManager->get('Msingi\Cms\Event\HttpListener'));
 
@@ -62,8 +62,8 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
         }
 
         //
-//        $eventManager = $entityManager->getEventManager();
-//        $eventManager->addEventListener(array(\Doctrine\ORM\Events::postLoad), new InjectListener($serviceManager));
+        $eventManager = $entityManager->getEventManager();
+        $eventManager->addEventListener(array(\Doctrine\ORM\Events::postLoad), new InjectListener($serviceManager));
     }
 
     /**

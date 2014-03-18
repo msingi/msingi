@@ -30,6 +30,8 @@ class Menus extends EntityRepository
 
         $qb->setParameters(array('name' => $name, 'language' => $language));
 
+        $qb->getQuery()->useResultCache(true);
+
         $pages = array();
         foreach ($qb->getQuery()->getResult() as $row) {
             $page = array(

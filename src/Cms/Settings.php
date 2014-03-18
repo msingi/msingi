@@ -2,17 +2,21 @@
 namespace Msingi\Cms;
 
 use Doctrine\ORM\EntityManager;
-use Msingi\Doctrine\EntityManagerAwareInterface;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Class Settings
  *
  * @package Msingi\Cms
  */
-class Settings implements EntityManagerAwareInterface
+class Settings implements ServiceLocatorAwareInterface
 {
     /** @var EntityManager */
     protected $entityManager = null;
+
+    /** @var ServiceLocatorInterface */
+    protected $serviceLocator = null;
 
     /** @var array */
     protected $values = null;
@@ -32,18 +36,14 @@ class Settings implements EntityManagerAwareInterface
     }
 
     /**
-     * @param EntityManager $entityManager
-     */
-    public function setEntityManager(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
-    /**
      * @return EntityManager
      */
     public function getEntityManager()
     {
+        if ($this->entityManager == null) {
+            $this->entityManager = $this->serviceLocator->get('Doctrine\ORM\EntityManager');
+        }
+
         return $this->entityManager;
     }
 
@@ -52,7 +52,46 @@ class Settings implements EntityManagerAwareInterface
      */
     protected function loadSettings()
     {
+        // try to get fragments from cache
+        $cache = $this->getServiceLocator()->get('Application\Cache');
+        if ($cache) {
+            $cacheKey = sprintf('settings');
+            $values = $cache->getItem($cacheKey);
+        }
 
+        // fetch from the DB
+        if ($values == null) {
+            /** @var \Msingi\Cms\Repository\Settings $settings */
+            $settings = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Setting');
+
+            $values = $settings->fetchArray();
+        }
+
+        // store to cache
+        if ($cache) {
+            $cache->setItem($cacheKey, $values);
+        }
+
+        return $values;
     }
 
+    /**
+     * Set service locator
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+    }
+
+    /**
+     * Get service locator
+     *
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
+    }
 }
