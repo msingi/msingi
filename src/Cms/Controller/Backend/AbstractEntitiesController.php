@@ -4,16 +4,24 @@ namespace Msingi\Cms\Controller\Backend;
 
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Zend\Paginator\Adapter\DbSelect;
-use Zend\Db\Sql\Select;
+use Doctrine\ORM\EntityManager;
+use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 
+/**
+ * Class AbstractEntitiesController
+ * @package Msingi\Cms\Controller\Backend
+ */
 abstract class AbstractEntitiesController extends AuthenticatedController
 {
+    /** @var \Doctrine\ORM\EntityManager */
+    protected $entityManager;
+
     /**
-     * Get storage
+     * Return class name of managed entities
      *
+     * @return string
      */
-    abstract protected function getRepository();
+    abstract protected function getEntityClass();
 
     /**
      * Get edit form, null if add/edit is not required
@@ -23,15 +31,17 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     abstract protected function getEditForm();
 
     /**
-     * Get query for paginator adapter
+     * Get paginator adapter
      *
-     * @param $request
-     * @param $filter
-     * @return Select
+     * @param array|null $filter
+     * @return DoctrinePaginator|Select
      */
     abstract protected function getPaginatorAdapter($filter = null);
 
     /**
+     * Get name of index route for this controllers
+     *
+     * @todo may be we can get rid of this function?
      * @return string
      */
     abstract protected function getIndexRoute();
@@ -47,13 +57,30 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     }
 
     /**
+     * @return \Doctrine\ORM\EntityManager
+     */
+    public function getEntityManager()
+    {
+        if (null === $this->entityManager) {
+            $this->entityManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
+        }
+
+        return $this->entityManager;
+    }
+
+    /**
+     * @return \Doctrine\ORM\EntityRepository
+     */
+    protected function getRepository()
+    {
+        return $this->getEntityManager()->getRepository($this->getEntityClass());
+    }
+
+    /**
      * @return array|ViewModel|void
      */
     public function indexAction()
     {
-        // create a new pagination adapter object
-        //$paginatorAdapter = new DbSelect($this->getPaginatorQuery(), $table->getAdapter(), $table->getResultSetPrototype());
-
         $paginator = new Paginator($this->getPaginatorAdapter());
         $paginator->setItemCountPerPage($this->getItemsCountPerPage());
         $paginator->setCurrentPageNumber($this->params()->fromQuery('page', 1));
@@ -107,31 +134,54 @@ abstract class AbstractEntitiesController extends AuthenticatedController
             // check if form data is valid
             if ($form->isValid()) {
 
+                //
+                $classname = $this->getEntityClass();
+
                 // get form data
                 $values = $form->getData();
 
                 if (!isset($values['id']) || intval($values['id']) == 0) {
-                    $this->createEntity($values);
+                    // create new entity
+                    $entity = $this->createEntity($values, $form);
                 } else {
-                    $this->updateEntity($values);
+                    // load the entity
+                    $entity = $this->getEntityManager()->find($classname, $values['id']);
+                    if ($entity == null) {
+                        return $this->redirect()->toRoute($this->getIndexRoute());
+                    }
                 }
+
+                // update entity values
+                $this->updateEntity($entity, $form);
+
+                //
+                $this->getEntityManager()->persist($entity);
+                $this->getEntityManager()->flush();
+
+                //
+                $this->onEntitySaved($entity, $values);
 
                 // redirect back to index action
                 return $this->redirect()->toRoute($this->getIndexRoute());
             } else {
-                // try to fetch entity
-                $entity = $this->getTable()->fetchById($this->params()->fromPost('id'));
-                if ($entity == null)
-                    return $this->redirect()->toRoute($this->getIndexRoute());
+//
+//                var_dump($this->params()->fromPost());
+//
+//                die;
+//                // try to fetch entity?
+//                $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromPost('id'));
+//                if ($entity == null)
+//                    return $this->redirect()->toRoute($this->getIndexRoute());
             }
         } else {
             // try to fetch entity
-            $entity = $this->getTable()->fetchById($this->params()->fromQuery('id'));
+            $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromQuery('id'));
             if ($entity == null)
                 return $this->redirect()->toRoute($this->getIndexRoute());
 
             // set form data
-            $form->setData($entity->getArrayCopy());
+            //$form->setEntity($entity);
+            $this->populateForm($form, $entity);
         }
 
         //
@@ -144,15 +194,16 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     }
 
     /**
-     * Delete entity by id
+     * Delete entity
      *
      * @return array|ViewModel|void
      */
     public function deleteAction()
     {
-        $entity = $this->getTable()->fetchById($this->params()->fromQuery('id'));
+        $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromQuery('id'));
         if ($entity != null) {
-            $this->getTable()->delete(array('id' => $entity->id));
+            $this->getEntityManager()->remove($entity);
+            $this->getEntityManager()->flush();
         }
 
         return $this->redirect()->toRoute($this->getIndexRoute());
@@ -160,57 +211,46 @@ abstract class AbstractEntitiesController extends AuthenticatedController
 
     /**
      * @param $values
-     * @return null
+     * @param $form
+     * @return array|object
      */
-    protected function createEntity($values)
+    protected function createEntity($values, $form)
     {
         // create new entity
-        $entity = $this->getTable()->createRow($values);
-        if ($entity == null)
-            return null;
-
-        $this->onEntityCreate($entity, values);
+        $entity = $this->getServiceLocator()->get($this->getEntityClass());
 
         return $entity;
     }
 
     /**
-     * @param $values
-     * @return null
-     */
-    protected function updateEntity($values)
-    {
-        // try to fetch existing entity
-        $entity = $this->getTable()->fetchById($values['id']);
-        if ($entity == null)
-            return null;
-
-        // update entity valuess
-        $entity->setValues($values);
-        $this->getTable()->save($entity);
-
-        $this->onEntityUpdate($entity, $values);
-
-        return $entity;
-    }
-
-    /**
+     * Fill form with the data
      *
-     * @param $values
-     * @return $entity
+     * @param \Zend\Form\Form $form
+     * @param $entity
      */
-    protected function onEntityCreate($entity, $values)
+    protected function populateForm($form, $entity)
+    {
+        //
+        $form->get('id')->setValue($entity->getId());
+    }
+
+    /**
+     * Update entity from the form data
+     *
+     * @param $entity
+     * @param \Zend\Form\Form $form
+     */
+    protected function updateEntity($entity, $form)
     {
     }
 
     /**
-     * Called after the entity is created and saved
-     * Used for processing extra data as depended objects of file attachements
+     * Extra processing of entity values
      *
      * @param $entity
      * @param $values
      */
-    protected function onEntityUpdate($values)
+    protected function onEntitySaved($entity, $values)
     {
     }
 

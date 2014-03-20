@@ -16,7 +16,6 @@ use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
-use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -27,7 +26,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface, BootstrapListenerInterface, ServiceProviderInterface
 {
     /**
-     * @param MvcEvent $e
+     * @param EventInterface $e
      */
     public function onBootstrap(EventInterface $e)
     {
@@ -117,16 +116,23 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
      */
     public function getAutoloaderConfig()
     {
-        return array(
-//            'Zend\Loader\ClassMapAutoloader' => array(
-//                __DIR__ . '/autoload_classmap.php',
-//            ),
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/src/'
+        if (getenv('APPLICATION_ENV') != 'production') {
+            // use standard autoloader
+            return array(
+                'Zend\Loader\StandardAutoloader' => array(
+                    'namespaces' => array(
+                        __NAMESPACE__ => __DIR__ . '/src/'
+                    )
                 )
-            )
-        );
+            );
+        } else {
+            // use classmap autoloader
+            return array(
+                'Zend\Loader\ClassMapAutoloader' => array(
+                    __DIR__ . '/autoload_classmap.php',
+                ),
+            );
+        }
     }
 
     /**
@@ -156,9 +162,10 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
     }
 
     /**
-     * @param MvcEvent $e
+     * @todo check this code
+     * @param EventInterface $e
      */
-    protected function initLayouts(MvcEvent $e)
+    protected function initLayouts(EventInterface $e)
     {
         $eventManager = $e->getApplication()->getEventManager();
 

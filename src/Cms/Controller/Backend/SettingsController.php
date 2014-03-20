@@ -2,9 +2,14 @@
 
 namespace Msingi\Cms\Controller\Backend;
 
-use Msingi\Cms\Model\Settings;
+use Msingi\Cms\Settings;
 use Zend\View\Model\ViewModel;
 
+/**
+ * Class SettingsController
+ *
+ * @package Msingi\Cms\Controller\Backend
+ */
 class SettingsController extends AuthenticatedController
 {
     /**

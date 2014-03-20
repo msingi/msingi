@@ -76,6 +76,18 @@ class Settings implements ServiceLocatorAwareInterface
     }
 
     /**
+     * @param string $valueName
+     * @return string
+     */
+    public static function formatValueName($valueName)
+    {
+        $valueName = preg_replace('/[^a-z0-9_]/i', '_', $valueName);
+        $valueName = preg_replace('/[_]+/', '_', $valueName);
+
+        return $valueName;
+    }
+
+    /**
      * Set service locator
      *
      * @param ServiceLocatorInterface $serviceLocator
