@@ -23,11 +23,30 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     protected $indexRoute;
 
     /**
+     * @return string
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIndexRoute()
+    {
+        return $this->indexRoute;
+    }
+
+    /**
      * Get edit form, null if add/edit is not required
      *
      * @return \Zend\Form\Form|null
      */
-    abstract protected function getEditForm();
+    protected function getEditForm()
+    {
+        return null;
+    }
 
     /**
      * Get count of items for paginator
