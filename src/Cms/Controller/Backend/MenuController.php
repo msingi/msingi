@@ -4,11 +4,12 @@ namespace Msingi\Cms\Controller\Backend;
 
 use Zend\View\Model\ViewModel;
 
+/**
+ * Class MenuController
+ * @package Msingi\Cms\Controller\Backend
+ */
 class MenuController extends AuthenticatedController
 {
-    protected $pagesTable;
-    protected $menuTable;
-
     /**
      *
      * @return array|ViewModel
@@ -123,29 +124,5 @@ class MenuController extends AuthenticatedController
         $this->getMenuTable()->setLabel($item, $language, $label);
 
         return $this->getResponse();
-    }
-
-    /**
-     * @return \Msingi\Cms\Db\Table\Pages
-     */
-    protected function getPagesTable()
-    {
-        if ($this->pagesTable == null) {
-            $this->pagesTable = $this->getServiceLocator()->get('Msingi\Cms\Db\Table\Pages');
-        }
-
-        return $this->pagesTable;
-    }
-
-    /**
-     * @return \Msingi\Cms\Db\Table\Menu
-     */
-    protected function getMenuTable()
-    {
-        if ($this->menuTable == null) {
-            $this->menuTable = $this->getServiceLocator()->get('Msingi\Cms\Db\Table\Menu');
-        }
-
-        return $this->menuTable;
     }
 }

@@ -5,6 +5,11 @@ namespace Msingi\Cms\Controller\Backend;
 use Msingi\Cms\Form\Backend\LoginForm;
 use Zend\Mvc\MvcEvent;
 
+/**
+ * Class LoginController
+ *
+ * @package Msingi\Cms\Controller\Backend
+ */
 class LoginController extends ActionController
 {
     protected $storage;

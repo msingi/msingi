@@ -2,22 +2,18 @@
 
 namespace Msingi\Cms\Controller\Backend;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 use Msingi\Cms\Form\Backend\UserForm;
 use Msingi\Util\PasswordGenerator;
 
+/**
+ * Class UsersController - manage backend users
+ *
+ * @package Msingi\Cms\Controller\Backend
+ */
 class UsersController extends AbstractEntitiesController
 {
-    /**
-     * Return class name of managed entities
-     *
-     * @return string
-     */
-    protected function getEntityClass()
-    {
-        return 'Msingi\Cms\Entity\BackendUser';
-    }
+    protected $entityClass = 'Msingi\Cms\Entity\BackendUser';
+    protected $indexRoute = 'backend/admins';
 
     /**
      * Get edit form, null if add/edit is not required
@@ -27,21 +23,6 @@ class UsersController extends AbstractEntitiesController
     protected function getEditForm()
     {
         return new UserForm();
-    }
-
-    /**
-     * Get query for paginator adapter
-     *
-     * @param $request
-     * @param $filter
-     * @return DoctrinePaginator
-     */
-    protected function getPaginatorAdapter($filter = null)
-    {
-        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
-        $queryBuilder->select('b')->from($this->getEntityClass(), 'b');
-
-        return new DoctrinePaginator(new Paginator($queryBuilder->getQuery()));
     }
 
     /**
@@ -67,13 +48,5 @@ class UsersController extends AbstractEntitiesController
                 'id' => $values['id']
             ));
         }
-    }
-
-    /**
-     * @return string
-     */
-    protected function getIndexRoute()
-    {
-        return 'backend/admins';
     }
 }

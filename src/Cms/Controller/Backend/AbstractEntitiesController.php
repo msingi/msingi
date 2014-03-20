@@ -16,12 +16,11 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     /** @var \Doctrine\ORM\EntityManager */
     protected $entityManager;
 
-    /**
-     * Return class name of managed entities
-     *
-     * @return string
-     */
-    abstract protected function getEntityClass();
+    /** @var string */
+    protected $entityClass;
+
+    /** @var string */
+    protected $indexRoute;
 
     /**
      * Get edit form, null if add/edit is not required
@@ -29,22 +28,6 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      * @return \Zend\Form\Form|null
      */
     abstract protected function getEditForm();
-
-    /**
-     * Get paginator adapter
-     *
-     * @param array|null $filter
-     * @return DoctrinePaginator|Select
-     */
-    abstract protected function getPaginatorAdapter($filter = null);
-
-    /**
-     * Get name of index route for this controllers
-     *
-     * @todo may be we can get rid of this function?
-     * @return string
-     */
-    abstract protected function getIndexRoute();
 
     /**
      * Get count of items for paginator
@@ -73,7 +56,20 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     protected function getRepository()
     {
-        return $this->getEntityManager()->getRepository($this->getEntityClass());
+        return $this->getEntityManager()->getRepository($this->entityClass);
+    }
+
+    /**
+     * Get paginator adapter
+     *
+     * @param array|null $filter
+     * @return \Doctrine\ORM\Query
+     */
+    protected function getPaginatorQuery($filter = null)
+    {
+        $queryBuilder = $this->getRepository()->createQueryBuilder('e');
+
+        return $queryBuilder->select()->getQuery();
     }
 
     /**
@@ -81,7 +77,9 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     public function indexAction()
     {
-        $paginator = new Paginator($this->getPaginatorAdapter());
+        $query = $this->getPaginatorQuery();
+
+        $paginator = new Paginator(new DoctrinePaginator(new \Doctrine\ORM\Tools\Pagination\Paginator($query)));
         $paginator->setItemCountPerPage($this->getItemsCountPerPage());
         $paginator->setCurrentPageNumber($this->params()->fromQuery('page', 1));
 
@@ -99,7 +97,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     {
         $form = $this->getEditForm();
         if ($form == null) {
-            return $this->redirect()->toRoute($this->getIndexRoute());
+            return $this->redirect()->toRoute($this->indexRoute);
         }
 
         $vm = new ViewModel(array(
@@ -118,7 +116,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     {
         $form = $this->getEditForm();
         if ($form == null)
-            return $this->redirect()->toRoute($this->getIndexRoute());
+            return $this->redirect()->toRoute($this->indexRoute);
 
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -134,9 +132,6 @@ abstract class AbstractEntitiesController extends AuthenticatedController
             // check if form data is valid
             if ($form->isValid()) {
 
-                //
-                $classname = $this->getEntityClass();
-
                 // get form data
                 $values = $form->getData();
 
@@ -145,9 +140,9 @@ abstract class AbstractEntitiesController extends AuthenticatedController
                     $entity = $this->createEntity($values, $form);
                 } else {
                     // load the entity
-                    $entity = $this->getEntityManager()->find($classname, $values['id']);
+                    $entity = $this->getRepository()->find($values['id']);
                     if ($entity == null) {
-                        return $this->redirect()->toRoute($this->getIndexRoute());
+                        return $this->redirect()->toRoute($this->indexRoute);
                     }
                 }
 
@@ -162,7 +157,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
                 $this->onEntitySaved($entity, $values);
 
                 // redirect back to index action
-                return $this->redirect()->toRoute($this->getIndexRoute());
+                return $this->redirect()->toRoute($this->indexRoute);
             } else {
 //
 //                var_dump($this->params()->fromPost());
@@ -175,9 +170,9 @@ abstract class AbstractEntitiesController extends AuthenticatedController
             }
         } else {
             // try to fetch entity
-            $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromQuery('id'));
+            $entity = $this->getRepository()->find($this->params()->fromQuery('id'));
             if ($entity == null)
-                return $this->redirect()->toRoute($this->getIndexRoute());
+                return $this->redirect()->toRoute($this->indexRoute);
 
             // set form data
             //$form->setEntity($entity);
@@ -200,13 +195,13 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     public function deleteAction()
     {
-        $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromQuery('id'));
+        $entity = $this->getRepository()->find($this->params()->fromQuery('id'));
         if ($entity != null) {
             $this->getEntityManager()->remove($entity);
             $this->getEntityManager()->flush();
         }
 
-        return $this->redirect()->toRoute($this->getIndexRoute());
+        return $this->redirect()->toRoute($this->indexRoute);
     }
 
     /**
@@ -217,7 +212,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     protected function createEntity($values, $form)
     {
         // create new entity
-        $entity = $this->getServiceLocator()->get($this->getEntityClass());
+        $entity = $this->getServiceLocator()->get($this->entityClass);
 
         return $entity;
     }
@@ -253,5 +248,4 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     protected function onEntitySaved($entity, $values)
     {
     }
-
 }
