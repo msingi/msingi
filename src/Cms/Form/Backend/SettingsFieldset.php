@@ -2,10 +2,15 @@
 
 namespace Msingi\Cms\Form\Backend;
 
-use Msingi\Cms\Model\Settings;
+use Msingi\Cms\Settings;
 use Zend\Form\Fieldset;
 use Zend\InputFilter\InputFilterProviderInterface;
 
+/**
+ * Class SettingsFieldset
+ *
+ * @package Msingi\Cms\Form\Backend
+ */
 class SettingsFieldset extends Fieldset implements InputFilterProviderInterface
 {
     protected $inputFilter = array();
@@ -31,7 +36,7 @@ class SettingsFieldset extends Fieldset implements InputFilterProviderInterface
             $options = array(
                 'name' => $name,
                 'options' => array(
-                    'label' => $valueSpec['label']
+                    'label' => isset($valueSpec['label']) ? $valueSpec['label'] : '',
                 ),
                 'attributes' => array(
                     'class' => isset($valueSpec['input_class']) ? $valueSpec['input_class'] : 'form-control',

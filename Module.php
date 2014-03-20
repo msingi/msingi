@@ -2,16 +2,20 @@
 
 namespace Msingi;
 
-use Msingi\Cms\Model\Backend\AuthStorage;
+use Doctrine\DBAL\Types\Type;
 use Msingi\Cms\View\Helper\CurrentRoute;
 use Msingi\Cms\View\Helper\PageFragment;
 use Msingi\Cms\View\Helper\PageMeta;
 use Msingi\Cms\View\Helper\SettingsValue;
 use Msingi\Cms\View\Helper\Url;
+use Msingi\Doctrine\InjectListener;
 use Zend\Authentication\Adapter\DbTable;
+use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\BootstrapListenerInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
-use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -19,24 +23,46 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  *
  * @package Msingi
  */
-class Module implements AutoloaderProviderInterface
+class Module implements AutoloaderProviderInterface, ConfigProviderInterface, BootstrapListenerInterface, ServiceProviderInterface
 {
     /**
-     * @param MvcEvent $e
+     * @param EventInterface $e
      */
-    public function onBootstrap(MvcEvent $e)
+    public function onBootstrap(EventInterface $e)
     {
         $serviceManager = $e->getApplication()->getServiceManager();
 
+        $config = $serviceManager->get('Config');
+
+        //
         $eventManager = $e->getApplication()->getEventManager();
+
         // route matching
-        $eventManager->attach($serviceManager->get('Msingi\Cms\RouteListener'));
+        $eventManager->attach($serviceManager->get('Msingi\Cms\Event\RouteListener'));
         // determine locale
-        $eventManager->attach($serviceManager->get('Msingi\Cms\LocaleListener'));
+        //$eventManager->attach($serviceManager->get('Msingi\Cms\Event\LocaleListener'));
         // http processing
-        $eventManager->attach($serviceManager->get('Msingi\Cms\HttpListener'));
+        $eventManager->attach($serviceManager->get('Msingi\Cms\Event\HttpListener'));
 
         $this->initLayouts($e);
+
+        // Enable using of enum fields with Doctrine ORM
+        /** @var \Doctrine\ORM\EntityManager $entityManager */
+        $entityManager = $serviceManager->get('Doctrine\ORM\EntityManager');
+
+        $platform = $entityManager->getConnection()->getDatabasePlatform();
+        $platform->registerDoctrineTypeMapping('enum', 'string');
+
+        // Register enum types
+        if (isset($config['doctrine']['enums'])) {
+            foreach ($config['doctrine']['enums'] as $enum => $className) {
+                Type::addType($enum, $className);
+            }
+        }
+
+        //
+        $eventManager = $entityManager->getEventManager();
+        $eventManager->addEventListener(array(\Doctrine\ORM\Events::postLoad), new InjectListener($serviceManager));
     }
 
     /**
@@ -53,34 +79,6 @@ class Module implements AutoloaderProviderInterface
     public function getViewHelperConfig()
     {
         return array(
-            'invokables' => array(
-                'assets' => 'Msingi\Cms\View\Helper\Assets',
-                'headLess' => 'Msingi\Cms\View\Helper\HeadLess',
-                'deferJs' => 'Msingi\Cms\View\Helper\DeferJs',
-
-                'language' => 'Msingi\Cms\View\Helper\Language',
-                'languageName' => 'Msingi\Cms\View\Helper\LanguageName',
-                'locale' => 'Msingi\Cms\View\Helper\Locale',
-
-                'date' => 'Msingi\Cms\View\Helper\Date',
-                'relativeDate' => 'Msingi\Cms\View\Helper\RelativeDate',
-
-                'selectOptions' => 'Msingi\Cms\View\Helper\SelectOptions',
-
-                'imageAttachment' => 'Msingi\Cms\View\Helper\ImageAttachment',
-                'fileAttachment' => 'Msingi\Cms\View\Helper\FileAttachment',
-
-                'gravatar' => 'Msingi\Cms\View\Helper\Gravatar',
-
-                '_' => 'Zend\I18n\View\Helper\Translate',
-                '_p' => 'Zend\I18n\View\Helper\TranslatePlural',
-
-                'excerpt' => 'Msingi\Cms\View\Helper\Excerpt',
-
-                'configValue' => 'Msingi\Cms\View\Helper\ConfigValue',
-
-                'formElementErrorClass' => 'Msingi\Cms\View\Helper\FormElementErrorClass',
-            ),
             'factories' => array(
                 'currentRoute' => function (ServiceLocatorInterface $helpers) {
                         $viewHelper = new CurrentRoute();
@@ -118,13 +116,23 @@ class Module implements AutoloaderProviderInterface
      */
     public function getAutoloaderConfig()
     {
-        return array(
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/src/',
+        if (getenv('APPLICATION_ENV') != 'production') {
+            // use standard autoloader
+            return array(
+                'Zend\Loader\StandardAutoloader' => array(
+                    'namespaces' => array(
+                        __NAMESPACE__ => __DIR__ . '/src/'
+                    )
+                )
+            );
+        } else {
+            // use classmap autoloader
+            return array(
+                'Zend\Loader\ClassMapAutoloader' => array(
+                    __DIR__ . '/autoload_classmap.php',
                 ),
-            ),
-        );
+            );
+        }
     }
 
     /**
@@ -133,44 +141,31 @@ class Module implements AutoloaderProviderInterface
     public function getServiceConfig()
     {
         return array(
-            'abstract_factories' => array(
-                'Msingi\Service\TableGatewayFactory',
-                'Msingi\Service\TableRowFactory',
-            ),
             'factories' => array(
-                //
+                // content manager
                 'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManagerFactory',
 
-                //
-                'BackendAuthService' => 'Msingi\Cms\Service\Factory\BackendAuthService',
-                'Msingi\Cms\Model\BackendAuthStorage' => function ($sm) {
-                        return new AuthStorage();
+                // backend authentication
+                'Msingi\Cms\Service\Backend\AuthStorage' => function ($sm) {
+                        return new \Msingi\Cms\Service\AuthStorage('Msingi\Cms\Backend\AuthStorage');
                     },
+                'Msingi\Cms\Service\Backend\AuthService' => 'Msingi\Cms\Service\Backend\AuthServiceFactory',
 
-                //
+                // mailer
                 'Msingi\Cms\Mailer\Mailer' => function ($sm) {
                         $mailer = new Cms\Mailer\Mailer();
                         $mailer->setServiceManager($sm);
                         return $mailer;
                     }
             ),
-            'invokables' => array(
-                // Event listeners
-                'Msingi\Cms\RouteListener' => 'Msingi\Cms\RouteListener',
-                'Msingi\Cms\HttpListener' => 'Msingi\Cms\HttpListener',
-                'Msingi\Cms\LocaleListener' => 'Msingi\Cms\LocaleListener',
-                // Settings form
-                'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',
-                //
-                'Settings' => 'Msingi\Cms\Model\Settings',
-            ),
         );
     }
 
     /**
-     * @param MvcEvent $e
+     * @todo check this code
+     * @param EventInterface $e
      */
-    protected function initLayouts(MvcEvent $e)
+    protected function initLayouts(EventInterface $e)
     {
         $eventManager = $e->getApplication()->getEventManager();
 
@@ -182,7 +177,7 @@ class Module implements AutoloaderProviderInterface
             if (isset($config['module_layouts'][$moduleNamespace])) {
                 $controller->layout($config['module_layouts'][$moduleNamespace]);
             } else {
-                $controller->layout('layout/' . strtolower($moduleNamespace) . '.phtml');
+                $controller->layout('layout/' . strtolower($moduleNamespace));
             }
         }, 100);
 

@@ -2,28 +2,21 @@
 
 namespace Msingi\Cms\Controller\Backend;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 use Msingi\Cms\Form\Backend\UserForm;
 use Msingi\Util\PasswordGenerator;
-use Zend\Db\Sql\Select;
-use Zend\Paginator\Adapter\DbSelect;
 
 class UsersController extends AbstractEntitiesController
 {
-    protected $usersTable;
-
     /**
-     * Get storage
+     * Return class name of managed entities
      *
-     * @return \Msingi\Db\Table
+     * @return string
      */
-    protected function getRepository()
+    protected function getEntityClass()
     {
-        if (!$this->usersTable) {
-            $sm = $this->getServiceLocator();
-            $this->usersTable = $sm->get('Msingi\Cms\Db\Table\BackendUsers');
-        }
-
-        return $this->usersTable;
+        return 'Msingi\Cms\Entity\BackendUser';
     }
 
     /**
@@ -41,13 +34,14 @@ class UsersController extends AbstractEntitiesController
      *
      * @param $request
      * @param $filter
-     * @return Select
+     * @return DoctrinePaginator
      */
     protected function getPaginatorAdapter($filter = null)
     {
-        $select = $this->getRepository()->getSql()->select();
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select('b')->from($this->getEntityClass(), 'b');
 
-        return new DbSelect($select, $this->getRepository()->getAdapter(), $this->getRepository()->getResultSetPrototype());;
+        return new DoctrinePaginator(new Paginator($queryBuilder->getQuery()));
     }
 
     /**

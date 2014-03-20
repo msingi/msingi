@@ -134,6 +134,4 @@ class EasyRoutes
 
         return $controllerName;
     }
-
-
 }

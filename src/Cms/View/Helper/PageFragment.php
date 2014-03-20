@@ -5,16 +5,38 @@ namespace Msingi\Cms\View\Helper;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Helper\AbstractHelper;
 
+/**
+ * Class PageFragment
+ *
+ * @package Msingi\Cms\View\Helper
+ */
 class PageFragment extends AbstractHelper
 {
-    protected $page;
-    protected $fragments;
-    protected $event;
+    /**
+     * @var \Msingi\Cms\Entity\Page|null
+     */
+    protected $page = null;
 
+    /**
+     * @var array
+     */
+    protected $fragments = null;
+
+    /**
+     * @var \Zend\Mvc\MvcEvent
+     */
+    protected $event = null;
+
+    /**
+     * @param MvcEvent $event
+     */
     public function __construct(MvcEvent $event)
     {
         $this->event = $event;
         $this->page = $event->getRouteMatch()->getParam('cms_page');
+        if (!$this->page) {
+            $this->fragments = array();
+        }
     }
 
     /**
@@ -24,16 +46,37 @@ class PageFragment extends AbstractHelper
     public function __invoke($name)
     {
         if ($this->fragments == null) {
-
+            //
             $serviceManager = $this->event->getApplication()->getServiceManager();
 
-            $pageFragmentsTable = $serviceManager->get('Msingi\Cms\Db\Table\PageFragments');
-
+            // get translator
             $translator = $serviceManager->get('Translator');
-
             $locale = $translator->getLocale();
+            $language = \Locale::getPrimaryLanguage($locale);
 
-            $this->fragments = $pageFragmentsTable->fetchFragments($this->page->id, \Locale::getPrimaryLanguage($locale));
+            // try to get fragments from cache
+            $cache = $serviceManager->get('Application\Cache');
+            if ($cache) {
+                $cacheKey = sprintf('page-fragments-%s-%s', $this->page->getId(), $language);
+                $page_fragments = $cache->getItem($cacheKey);
+            }
+
+            // fetch from the DB
+            if ($page_fragments == null) {
+                /** @var \Doctrine\ORM\EntityManager $entity_manager */
+                $entity_manager = $serviceManager->get('Doctrine\ORM\EntityManager');
+
+                $page_fragments_repository = $entity_manager->getRepository('Msingi\Cms\Entity\PageFragment');
+
+                $page_fragments = $page_fragments_repository->fetchFragmentsArray($this->page->getId(), $language);
+            }
+
+            // store to cache
+            if ($cache) {
+                $cache->setItem($cacheKey, $page_fragments);
+            }
+
+            $this->fragments = $page_fragments;
         }
 
         return isset($this->fragments[$name]) ? $this->fragments[$name] : '';

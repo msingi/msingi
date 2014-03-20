@@ -14,9 +14,10 @@ class PageController extends AbstractActionController
     {
         $vm = new ViewModel(array());
 
+        /** @var \Msingi\Cms\Entity\Page $cms_page */
         $cms_page = $this->params('cms_page');
 
-        $vm->setTemplate('frontend/page/' . $cms_page->template);
+        $vm->setTemplate('frontend/page/' . $cms_page->getTemplate());
 
         return $vm;
     }

@@ -5,6 +5,10 @@ namespace Msingi\Cms\Service;
 use Zend\Navigation\Service;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
+/**
+ * Class AbstractNavigationFactory
+ * @package Msingi\Cms\Service
+ */
 abstract class AbstractNavigationFactory extends \Zend\Navigation\Service\AbstractNavigationFactory
 {
     /**
@@ -14,18 +18,43 @@ abstract class AbstractNavigationFactory extends \Zend\Navigation\Service\Abstra
     protected function getPages(ServiceLocatorInterface $serviceLocator)
     {
         if (null === $this->pages) {
-
-            $menuTable = $serviceLocator->get('Msingi\Cms\Db\Table\Menu');
-
+            // get translator
             $translator = $serviceLocator->get('Translator');
-
             $locale = $translator->getLocale();
+            $language = \Locale::getPrimaryLanguage($locale);
 
-            $pages = $menuTable->fetchMenu($this->getName(), \Locale::getPrimaryLanguage($locale));
+            // try to get menu from cache
+            $cache = $serviceLocator->get('Application\Cache');
+            if ($cache) {
+                $cacheKey = sprintf('menu-%s-%s', $this->getName(), $language);
+                $pages = $cache->getItem($cacheKey);
+            }
+
+            if (!$pages) {
+                $pages = $this->fetchPages($serviceLocator, $language);
+            }
+
+            if ($cache) {
+                $cache->setItem($cacheKey, $pages);
+            }
 
             $this->pages = $this->preparePages($serviceLocator, $pages);
         }
 
         return $this->pages;
+    }
+
+    /**
+     *
+     */
+    protected function fetchPages(ServiceLocatorInterface $serviceLocator, $language)
+    {
+        /** @var \Doctrine\ORM\EntityManager $entityManager */
+        $entityManager = $serviceLocator->get('Doctrine\ORM\EntityManager');
+
+        /** @var \Msingi\Cms\Repository\Menus $menus */
+        $menus = $entityManager->getRepository('Msingi\Cms\Entity\Menu');
+
+        return $menus->fetchMenuArray($this->getName(), $language);
     }
 }

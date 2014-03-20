@@ -17,6 +17,7 @@ class SettingsValue extends AbstractHelper implements ServiceLocatorAwareInterfa
      */
     public function __invoke($valueName, $default = null)
     {
+        /** @var \Msingi\Cms\Settings $settings */
         $settings = $this->serviceLocator->getServiceLocator()->get('Settings');
 
         return $settings->get($valueName, $default);
