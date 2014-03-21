@@ -32,6 +32,8 @@ return array(
             'Msingi\Cms\Entity\Page' => 'Msingi\Cms\Entity\Page',
         ),
         'factories' => array(
+            // memcached caching for doctrine
+            'doctrine.cache.memcached' => 'Msingi\Doctrine\MemcacheFactory',
             // content manager
             'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManagerFactory',
             // backend authentication
