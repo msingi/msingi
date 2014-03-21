@@ -41,4 +41,70 @@ class PageTemplate
      * @var string
      */
     protected $fragments = '';
+
+    /**
+     * @param string $fragments
+     */
+    public function setFragments($fragments)
+    {
+        $this->fragments = $fragments;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFragments()
+    {
+        return $this->fragments;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $label
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+
 }

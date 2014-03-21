@@ -17,16 +17,26 @@ return array(
 
     'service_manager' => array(
         'invokables' => array(
+            //
+            'Settings' => 'Msingi\Cms\Settings',
+            // mailer
+            'Msingi\Cms\Mailer\Mailer' => 'Msingi\Cms\Mailer\Mailer',
             // Event listeners
             'Msingi\Cms\Event\RouteListener' => 'Msingi\Cms\Event\RouteListener',
             'Msingi\Cms\Event\LocaleListener' => 'Msingi\Cms\Event\LocaleListener',
             'Msingi\Cms\Event\HttpListener' => 'Msingi\Cms\Event\HttpListener',
-            // Settings form
-            'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',
-            //
-            'Settings' => 'Msingi\Cms\Settings',
             //
             'Msingi\Cms\Service\Backend\AuthAdapter' => 'Msingi\Cms\Service\Backend\AuthAdapter',
+            'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',
+            //
+            'Msingi\Cms\Entity\Page' => 'Msingi\Cms\Entity\Page',
+        ),
+        'factories' => array(
+            // content manager
+            'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManagerFactory',
+            // backend authentication
+            'Msingi\Cms\Service\Backend\AuthStorage' => 'Msingi\Cms\Service\Backend\AuthStorageFactory',
+            'Msingi\Cms\Service\Backend\AuthService' => 'Msingi\Cms\Service\Backend\AuthServiceFactory',
         ),
     ),
 

@@ -2,8 +2,8 @@
 
 namespace Msingi\Cms\Mailer;
 
-use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
 use Msingi\Util\HTML2Text;
@@ -16,12 +16,10 @@ use Zend\Mail\Transport\Sendmail;
  *
  * @package Msingi\Cms\Mailer
  */
-class Mailer implements ServiceManagerAwareInterface
+class Mailer implements ServiceLocatorAwareInterface
 {
-    /**
-     * @var ServiceManager
-     */
-    protected $serviceManager;
+    /** @var ServiceLocatorInterface */
+    protected $serviceLocator;
 
     /**
      * @param string $templateName
@@ -31,8 +29,8 @@ class Mailer implements ServiceManagerAwareInterface
      */
     public function sendMail($templateName, $email, array $params = array())
     {
-        $config = $this->serviceManager->get('Config');
-        $settings = $this->serviceManager->get('Settings');
+        $config = $this->getServiceLocator()->get('Config');
+        $settings = $this->getServiceLocator()->get('Settings');
 
         if (!isset($config['mailer']['templates_path'])) {
             throw new \Exception('Mail templates path is not set');
@@ -57,7 +55,7 @@ class Mailer implements ServiceManagerAwareInterface
         $language = $params['language'];
 
         // get mail template
-        $templatesTable = $this->serviceManager->get('Msingi\Cms\Db\Table\MailTemplates');
+        $templatesTable = $this->getServiceLocator()->get('Msingi\Cms\Db\Table\MailTemplates');
         $template = $templatesTable->fetchOrCreate($templateName, $language);
 
         // replace tokens
@@ -155,10 +153,22 @@ class Mailer implements ServiceManagerAwareInterface
     }
 
     /**
-     * @param ServiceManager $serviceManager
+     * Set service locator
+     *
+     * @param ServiceLocatorInterface $serviceLocator
      */
-    public function setServiceManager(ServiceManager $serviceManager)
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
-        $this->serviceManager = $serviceManager;
+        $this->serviceLocator = $serviceLocator;
+    }
+
+    /**
+     * Get service locator
+     *
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
     }
 }

@@ -4,6 +4,7 @@ namespace Msingi\Cms\Controller\Backend;
 
 use Msingi\Cms\Form\Backend\LoginForm;
 use Zend\Mvc\MvcEvent;
+use Zend\View\Model\ViewModel;
 
 /**
  * Class LoginController
@@ -12,7 +13,8 @@ use Zend\Mvc\MvcEvent;
  */
 class LoginController extends ActionController
 {
-    protected $storage;
+    /** @var \Msingi\Cms\Service\AuthStorage */
+    protected $sessionStorage;
 
     /**
      * @param MvcEvent $e
@@ -26,15 +28,15 @@ class LoginController extends ActionController
     }
 
     /**
-     * @return array|object
+     * @return \Msingi\Cms\Service\AuthStorage
      */
     public function getSessionStorage()
     {
-        if (!$this->storage) {
-            $this->storage = $this->getServiceLocator()->get('Msingi\Cms\Service\Backend\AuthStorage');
+        if (!$this->sessionStorage) {
+            $this->sessionStorage = $this->getServiceLocator()->get('Msingi\Cms\Service\Backend\AuthStorage');
         }
 
-        return $this->storage;
+        return $this->sessionStorage;
     }
 
     /**
@@ -48,6 +50,7 @@ class LoginController extends ActionController
 
         $form = new LoginForm();
 
+        /** @var \Zend\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $form->setData($request->getPost());
@@ -67,7 +70,7 @@ class LoginController extends ActionController
 
                 //
                 if ($result->isValid()) {
-                    //
+                    // authentication succeeded
                     if ($request->getPost('rememberme') == 1) {
                         $this->getSessionStorage()->setRememberMe(1);
 
@@ -82,7 +85,9 @@ class LoginController extends ActionController
             }
         }
 
-        return array('form' => $form);
+        return new ViewModel(array(
+            'form' => $form
+        ));
     }
 
     /**
@@ -97,7 +102,7 @@ class LoginController extends ActionController
         $this->getSessionStorage()->forgetMe();
         $this->getAuthService()->clearIdentity();
 
-        $this->flashmessenger()->addMessage("You've been logged out");
+        $this->flashmessenger()->addMessage($this->_("You've been logged out"));
 
         return $this->redirect()->toRoute('backend/login');
     }

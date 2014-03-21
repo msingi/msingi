@@ -33,6 +33,13 @@ class Page
     protected $parent = null;
 
     /**
+     * @ORM\OneToMany(targetEntity="Msingi\Cms\Entity\Page", mappedBy="parent")
+     * @ORM\OrderBy({"type" = "DESC", "path" = "ASC"})
+     * @var \Msingi\Cms\Entity\Page[]
+     */
+    protected $children = null;
+
+    /**
      * @ORM\Column(type="page_type")
      * @var string
      */
@@ -55,6 +62,12 @@ class Page
      * @var \Msingi\Cms\Entity\PageFragment[]
      */
     protected $fragments = null;
+
+    /**
+     * @ORM\OneToMany(targetEntity="\Msingi\Cms\Entity\PageI18n",mappedBy="parent")
+     * @var \Msingi\Cms\Entity\PageI18n[]
+     */
+    protected $i18n = null;
 
     /**
      * @param int $id
@@ -136,5 +149,59 @@ class Page
         return $this->type;
     }
 
+    /**
+     * @param \Msingi\Cms\Entity\Page[] $children
+     */
+    public function setChildren($children)
+    {
+        $this->children = $children;
+    }
 
+    /**
+     * @return \Msingi\Cms\Entity\Page[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param \Msingi\Cms\Entity\PageFragment[] $fragments
+     */
+    public function setFragments($fragments)
+    {
+        $this->fragments = $fragments;
+    }
+
+    /**
+     * @return \Msingi\Cms\Entity\PageFragment[]
+     */
+    public function getFragments()
+    {
+        return $this->fragments;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasChildren()
+    {
+        return !empty($this->children);
+    }
+
+    /**
+     * @param \Msingi\Cms\Entity\PageI18n[] $i18n
+     */
+    public function setI18n($i18n)
+    {
+        $this->i18n = $i18n;
+    }
+
+    /**
+     * @return \Msingi\Cms\Entity\PageI18n[]
+     */
+    public function getI18n()
+    {
+        return $this->i18n;
+    }
 }

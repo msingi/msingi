@@ -3,6 +3,7 @@
 namespace Msingi\Cms\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Msingi\Cms\Entity\PageFragment;
 
 /**
  * Class PageFragments
@@ -33,5 +34,28 @@ class PageFragments extends EntityRepository
         }
 
         return $fragments;
+    }
+
+    /**
+     * @param $page
+     * @param $fragment
+     * @return PageFragment|null|object
+     */
+    public function fetchOrCreate($page, $fragment)
+    {
+        $page_fragment = $this->findOneBy(array('page' => $page, 'name' => $fragment));
+
+        if ($page_fragment == null) {
+            $page_fragment = new PageFragment();
+            $page_fragment->setPage($page);
+            $page_fragment->setName($fragment);
+
+            $this->getEntityManager()->persist($page_fragment);
+
+            $this->getEntityManager()->flush();
+        }
+
+        return $page_fragment;
+
     }
 }

@@ -12,6 +12,8 @@ use Doctrine\ORM\EntityRepository;
 class Menus extends EntityRepository
 {
     /**
+     * Fetch menu as array for use with Navigation
+     *
      * @param string $name
      * @param string $language
      * @return array

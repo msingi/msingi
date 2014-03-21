@@ -4,11 +4,13 @@ namespace Msingi\Cms\Controller\Backend;
 
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use Doctrine\ORM\EntityManager;
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 
 /**
  * Class AbstractEntitiesController
+ *
+ * Manage lists of entities in simple way
+ *
  * @package Msingi\Cms\Controller\Backend
  */
 abstract class AbstractEntitiesController extends AuthenticatedController
@@ -16,11 +18,17 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     /** @var \Doctrine\ORM\EntityManager */
     protected $entityManager;
 
+    /** @var  \Doctrine\ORM\EntityRepository */
+    protected $entityRepository;
+
     /** @var string */
     protected $entityClass;
 
     /** @var string */
     protected $indexRoute;
+
+    /** @var int */
+    protected $itemsPerPage = 10;
 
     /**
      * @return string
@@ -55,7 +63,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     protected function getItemsCountPerPage()
     {
-        return 10;
+        return $this->itemsPerPage;
     }
 
     /**
@@ -75,11 +83,15 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     protected function getRepository()
     {
-        return $this->getEntityManager()->getRepository($this->entityClass);
+        if (null === $this->entityRepository) {
+            $this->entityRepository = $this->getEntityManager()->getRepository($this->entityClass);
+        }
+
+        return $this->entityRepository;
     }
 
     /**
-     * Get paginator adapter
+     * Get query for paginator
      *
      * @param array|null $filter
      * @return \Doctrine\ORM\Query
@@ -133,6 +145,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     public function editAction()
     {
+        // get form
         $form = $this->getEditForm();
         if ($form == null)
             return $this->redirect()->toRoute($this->indexRoute);
@@ -170,6 +183,8 @@ abstract class AbstractEntitiesController extends AuthenticatedController
 
                 //
                 $this->getEntityManager()->persist($entity);
+
+                // save updates
                 $this->getEntityManager()->flush();
 
                 //
@@ -177,15 +192,6 @@ abstract class AbstractEntitiesController extends AuthenticatedController
 
                 // redirect back to index action
                 return $this->redirect()->toRoute($this->indexRoute);
-            } else {
-//
-//                var_dump($this->params()->fromPost());
-//
-//                die;
-//                // try to fetch entity?
-//                $entity = $this->getEntityManager()->find($this->getEntityClass(), $this->params()->fromPost('id'));
-//                if ($entity == null)
-//                    return $this->redirect()->toRoute($this->getIndexRoute());
             }
         } else {
             // try to fetch entity
@@ -194,7 +200,6 @@ abstract class AbstractEntitiesController extends AuthenticatedController
                 return $this->redirect()->toRoute($this->indexRoute);
 
             // set form data
-            //$form->setEntity($entity);
             $this->populateForm($form, $entity);
         }
 
@@ -256,6 +261,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     protected function updateEntity($entity, $form)
     {
+
     }
 
     /**
@@ -266,5 +272,6 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     protected function onEntitySaved($entity, $values)
     {
+
     }
 }

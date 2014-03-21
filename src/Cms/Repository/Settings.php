@@ -24,7 +24,8 @@ class Settings extends EntityRepository
 
         $result = array();
         foreach ($qb->getQuery()->getResult() as $row) {
-            $result[$row['name']] = $row['value'];
+            $value = @unserialize($row['value']);
+            $result[$row['name']] = ($value !== false) ? $value : $row['value'];
         }
 
         return $result;

@@ -14,7 +14,6 @@ use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -23,7 +22,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  *
  * @package Msingi
  */
-class Module implements AutoloaderProviderInterface, ConfigProviderInterface, BootstrapListenerInterface, ServiceProviderInterface
+class Module implements AutoloaderProviderInterface, ConfigProviderInterface, BootstrapListenerInterface
 {
     /**
      * @param EventInterface $e
@@ -136,33 +135,8 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
     }
 
     /**
-     * @return array
-     */
-    public function getServiceConfig()
-    {
-        return array(
-            'factories' => array(
-                // content manager
-                'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManagerFactory',
-
-                // backend authentication
-                'Msingi\Cms\Service\Backend\AuthStorage' => function ($sm) {
-                        return new \Msingi\Cms\Service\AuthStorage('Msingi\Cms\Backend\AuthStorage');
-                    },
-                'Msingi\Cms\Service\Backend\AuthService' => 'Msingi\Cms\Service\Backend\AuthServiceFactory',
-
-                // mailer
-                'Msingi\Cms\Mailer\Mailer' => function ($sm) {
-                        $mailer = new Cms\Mailer\Mailer();
-                        $mailer->setServiceManager($sm);
-                        return $mailer;
-                    }
-            ),
-        );
-    }
-
-    /**
      * @todo check this code
+     *
      * @param EventInterface $e
      */
     protected function initLayouts(EventInterface $e)

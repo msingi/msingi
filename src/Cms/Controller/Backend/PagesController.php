@@ -2,16 +2,22 @@
 
 namespace Msingi\Cms\Controller\Backend;
 
+use Msingi\Cms\Entity\Enum\PageType;
 use Msingi\Cms\Form\Backend\PagePropertiesForm;
-use Msingi\Cms\Model\Page;
 use Msingi\Util\StripAttributes;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+/**
+ * Class PagesController
+ * @package Msingi\Cms\Controller\Backend
+ */
 class PagesController extends AuthenticatedController
 {
-    protected $pagesTable;
+    /** @var \Doctrine\ORM\EntityManager */
+    protected $entityManager;
 
+    /** @var array */
     protected $allowedTags = array(
         'div' => array('class'),
         'p' => array('class'),
@@ -45,8 +51,12 @@ class PagesController extends AuthenticatedController
      */
     public function indexAction()
     {
+        /** @var \Msingi\Cms\Repository\Pages $pages */
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
+
         return new ViewModel(array(
-            'pages' => $this->getPagesTable()->fetchTree()
+            'pages' => $pages->findAll(),
+            'root' => $pages->find(1),
         ));
     }
 
@@ -55,12 +65,19 @@ class PagesController extends AuthenticatedController
      */
     public function addAction()
     {
-        $page = $this->getPagesTable()->createRow(array(
-            'parent_id' => 1,
-            'type' => Page::TYPE_STATIC,
-            'path' => trim($this->params()->fromPost('path')),
-            'template' => 'default'
-        ));
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
+
+        $root = $pages->find(1);
+
+        /** @var \Msingi\Cms\Entity\Page $page */
+        $page = $this->getServiceLocator()->get('Msingi\Cms\Entity\Page');
+        $page->setParent($root);
+        $page->setType(PageType::PAGE_STATIC);
+        $page->setPath(trim($this->params()->fromPost('path')));
+        $page->setTemplate('default');
+
+        $this->getEntityManager()->persist($page);
+        $this->getEntityManager()->flush();
 
         return $this->redirect()->toRoute('backend/pages');
     }
@@ -72,8 +89,9 @@ class PagesController extends AuthenticatedController
     {
         $settings = $this->getServiceLocator()->get('Settings');
 
-        $page_id = intval($this->params()->fromQuery('id'));
-        $page = $this->getPagesTable()->fetchById($page_id);
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
+
+        $page = $pages->find(intval($this->params()->fromQuery('id')));
         if ($page == null) {
             return $this->redirect()->toRoute('backend/pages');
         }
@@ -91,10 +109,13 @@ class PagesController extends AuthenticatedController
     public function deleteAction()
     {
         $page_id = intval($this->params()->fromQuery('id'));
-        $page = $this->getPagesTable()->fetchById($page_id);
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
 
+        /** @var \Msingi\Cms\Entity|Page $page */
+        $page = $pages->find($page_id);
         if ($page != null) {
-            $this->getPagesTable()->delete(array('id' => $page->id));
+            $this->getEntityManager()->remove($page);
+            $this->getEntityManager()->flush();
         }
 
         return $this->redirect()->toRoute('backend/pages');
@@ -108,40 +129,52 @@ class PagesController extends AuthenticatedController
         $page_id = intval($this->params()->fromPost('page'));
         $language = trim($this->params()->fromPost('language'));
 
-        $page = $this->getPagesTable()->fetchById($page_id);
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
+        $templates = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\PageTemplate');
+        $page_fragments = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\PageFragment');
+        $page_fragments_i18n = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\PageFragmentI18n');
+
+        /** @var \Msingi\Cms\Entity\Page $page */
+        $page = $pages->find($page_id);
         if ($page != null) {
 
-            $contents = $this->getPageFragmentsTable()->fetchFragments($page->id, $language);
+            $meta = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\PageI18n')->fetchOrCreate($page, $language);
 
-            $pageTemplate = $this->getPageTemplatesTable()->fetchByName($page->template);
+            /** @var \Msingi\Cms\Entity\PageTemplate $pageTemplate */
+            $pageTemplate = $templates->findOneBy(array('name' => $page->getTemplate()));
 
             $fragments = array();
-            foreach (explode(',', $pageTemplate['fragments']) as $fragment) {
+            foreach (explode(',', $pageTemplate->getFragments()) as $fragment) {
                 $fragment = trim($fragment);
-                if ($fragment != '') {
-                    $fragments[$fragment] = isset($contents[$fragment]) ? $contents[$fragment] : '';
-                }
+                if ($fragment == '')
+                    continue;
+
+                $page_fragment = $page_fragments->fetchOrCreate($page, $fragment);
+
+                $content = $page_fragments_i18n->fetchOrCreate($page_fragment, $language);
+
+                $fragments[$fragment] = $content->getContent();
             }
 
             // set page data
-            $vm = new ViewModel(array(
+            $viewModel = new ViewModel(array(
                 'language' => $language,
                 'page' => $page,
-                'meta' => $this->getPagesTable()->fetchMeta($page->id, $language),
+                'meta' => $meta,
                 'fragments' => $fragments,
             ));
 
             // disable layout
-            $vm->setTerminal(true);
+            $viewModel->setTerminal(true);
 
             // render the template
-            $template = 'backend/pages/templates/' . preg_replace('/[^a-z0-9_]+/', '_', $page->template);
+            $template = 'backend/pages/templates/' . preg_replace('/[^a-z0-9_]+/', '_', $page->getTemplate());
             $resolver = $this->getEvent()->getApplication()->getServiceManager()->get('Zend\View\Resolver\TemplatePathStack');
             $template = $resolver->resolve($template) ? $template : 'backend/pages/templates/default';
-            $vm->setTemplate($template);
+            $viewModel->setTemplate($template);
         }
 
-        return $vm;
+        return $viewModel;
     }
 
     /**
@@ -149,20 +182,31 @@ class PagesController extends AuthenticatedController
      */
     public function saveMetaAction()
     {
-        $page_id = intval($this->params()->fromPost('pk'));
-        list($meta, $language) = explode('_', $this->params()->fromPost('name'));
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
+        /** @var \Msingi\Cms\Entity\Page $page */
+        $page = $pages->find($this->params()->fromPost('pk'));
+
+        list($meta_name, $language) = explode('_', $this->params()->fromPost('name'));
 
         //
         $content = trim(strip_tags($this->params()->fromPost('value')));
 
-        if (in_array($meta, array('title', 'keywords', 'description'))) {
-            $page = $this->getPagesTable()->fetchById($page_id);
-            if ($page != null) {
-                $this->getPagesTable()->update_i18n($page->id, $language, array(
-                    $meta => $content
-                ));
-            }
+        /** @var \Msingi\Cms\Entity\PageI18n $meta */
+        $meta = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\PageI18n')->fetchOrCreate($page, $language);
+
+        switch ($meta_name) {
+            case 'title':
+                $meta->setTitle($content);
+                break;
+            case 'keywords':
+                $meta->setKeywords($content);
+                break;
+            case 'description':
+                $meta->setDescription($content);
+                break;
         }
+
+        $this->getEntityManager()->flush();
 
         return $this->getResponse();
     }
@@ -172,23 +216,27 @@ class PagesController extends AuthenticatedController
      */
     public function saveFragmentAction()
     {
-        $page_id = intval($this->params()->fromPost('page'));
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
+        $page_fragments = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\PageFragment');
+        $page_fragments_i18n = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\PageFragmentI18n');
+
+        /** @var \Msingi\Cms\Entity\Page $page */
+        $page = $pages->find($this->params()->fromPost('page'));
+
         $language = trim($this->params()->fromPost('language'));
         $fragment = trim(str_replace('fragment_', '', $this->params()->fromPost('fragment')));
 
-        $content = $this->filterContent($this->params()->fromPost('content'));
-
-        $page = $this->getPagesTable()->fetchById($page_id);
         if ($page != null) {
 
-            $fragment = $this->getPageFragmentsTable()->fetchOrCreate(array(
-                'page_id' => $page->id,
-                'name' => $fragment
-            ));
+            $page_fragment = $page_fragments->fetchOrCreate($page, $fragment);
 
-            $this->getPageFragmentsTable()->update_i18n($fragment->id, $language, array(
-                'content' => $content
-            ));
+            $page_fragment_i18n = $page_fragments_i18n->fetchOrCreate($page_fragment, $language);
+
+            $content = $this->filterContent($this->params()->fromPost('content'));
+
+            $page_fragment_i18n->setContent($content);
+
+            $this->getEntityManager()->flush();
         }
 
         return $this->getResponse();
@@ -217,29 +265,29 @@ class PagesController extends AuthenticatedController
      */
     public function propertiesAction()
     {
-        //
-        $settings = $this->getServiceLocator()->get('Settings');
-
         $page_id = intval(str_replace('page-', '', $this->params()->fromQuery('page')));
-        $page = $this->getPagesTable()->fetchById($page_id);
-        if ($page == null) {
 
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
+        $page_templates = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\PageTemplate');
+
+        /** @var \Msingi\Cms\Entity\Page $page */
+        $page = $pages->find($page_id);
+        if ($page != null) {
+            //
+            $form = new PagePropertiesForm();
+            $form->get('id')->setValue($page->getId());
+            $form->get('path')->setValue($page->getPath());
+            $form->get('template')->setValueOptions($page_templates->fetchOptions());
+
+            $vm = new ViewModel(array(
+                'page' => $page,
+                'form' => $form,
+            ));
+
+            // disable layout
+            $vm->setTerminal(true);
         }
 
-        //
-        $form = new PagePropertiesForm();
-        $form->get('template')->setValueOptions($this->getPageTemplatesTable()->fetchOptions());
-
-        $form->bind($page);
-
-        $vm = new ViewModel(array(
-            'page' => $page,
-            'form' => $form,
-            'languages' => $settings->get('frontend:languages:enabled'),
-        ));
-
-        // disable layout
-        $vm->setTerminal(true);
 
         return $vm;
     }
@@ -251,12 +299,16 @@ class PagesController extends AuthenticatedController
     public function savepropsAction()
     {
         $page_id = intval($this->params()->fromPost('id'));
-        $page = $this->getPagesTable()->fetchById($page_id);
-        if ($page != null) {
-            $page->path = trim($this->params()->fromPost('path'));
-            $page->template = trim($this->params()->fromPost('template'));
 
-            $this->getPagesTable()->save($page);
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
+        /** @var \Msingi\Cms\Entity\Page $page */
+        $page = $pages->find($page_id);
+
+        if ($page != null) {
+            $page->setPath(trim(strip_tags($this->params()->fromPost('path'))));
+            $page->setTemplate(trim(strip_tags($this->params()->fromPost('template'))));
+
+            $this->getEntityManager()->flush();
         }
 
         return $this->redirect()->toRoute('backend/pages');
@@ -267,56 +319,37 @@ class PagesController extends AuthenticatedController
      */
     public function setParentAction()
     {
-        $pagesTable = $this->getPagesTable();
+        $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
 
         $parent_id = intval(str_replace('page-', '', $this->params()->fromQuery('parent')));
         $child_id = intval(str_replace('page-', '', $this->params()->fromQuery('child')));
 
-        $parent = $pagesTable->fetchById($parent_id);
-        $child = $pagesTable->fetchById($child_id);
+        /** @var \Msingi\Cms\Entity\Page $page */
+        $parent = $pages->find($parent_id);
+        /** @var \Msingi\Cms\Entity\Page $child */
+        $child = $pages->find($child_id);
 
         if ($parent != null && $child != null) {
-            $child->parent_id = $parent->id;
-            $result = $pagesTable->save($child);
+            $child->setParent($parent);
 
-            return new JsonModel(array('success' => true, 'result' => $result, 'parent_id' => $child->parent_id));
+            $this->getEntityManager()->flush();
+
+            return new JsonModel(array('success' => true, 'parent_id' => $parent_id));
         }
 
         return new JsonModel(array('success' => false));
     }
 
     /**
-     * @return \Msingi\Cms\Db\Table\Pages
+     * @return \Doctrine\ORM\EntityManager
      */
-    protected function getPagesTable()
+    public function getEntityManager()
     {
-        if ($this->pagesTable == null) {
-            $serviceManager = $this->getServiceLocator();
-
-            $this->pagesTable = $serviceManager->get('Msingi\Cms\Db\Table\Pages');
+        if (null === $this->entityManager) {
+            $this->entityManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
         }
 
-        return $this->pagesTable;
-    }
-
-    /**
-     * @return \Msingi\Cms\Db\Table\PageTemplates
-     */
-    protected function getPageTemplatesTable()
-    {
-        $serviceManager = $this->getServiceLocator();
-
-        return $serviceManager->get('Msingi\Cms\Db\Table\PageTemplates');
-    }
-
-    /**
-     * @return \Msingi\Cms\Db\Table\PageFragments
-     */
-    protected function getPageFragmentsTable()
-    {
-        $serviceManager = $this->getServiceLocator();
-
-        return $serviceManager->get('Msingi\Cms\Db\Table\PageFragments');
+        return $this->entityManager;
     }
 
 }
