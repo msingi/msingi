@@ -83,7 +83,7 @@ return array(
     'doctrine' => array(
         'driver' => array(
             'application_entities' => array(
-                'paths' => array(__DIR__ . '/../src/Cms/Entity')
+                'paths' => array(__DIR__ . '/../src/Msingi/Cms/Entity')
             ),
 
             'orm_default' => array(
