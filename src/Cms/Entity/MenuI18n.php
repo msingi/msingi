@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @package Msingi\Cms\Entity
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Msingi\Cms\Repository\MenusI18n")
  * @ORM\Table(name="cms_menu_i18n", indexes={
  * @ORM\Index(columns={"parent_id", "language"}),
  * })

@@ -44,7 +44,7 @@ class Menu
     protected $menu = '';
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="`order`", type="integer")
      * @var int
      */
     protected $order = 0;

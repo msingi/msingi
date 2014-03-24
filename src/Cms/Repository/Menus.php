@@ -3,6 +3,7 @@
 namespace Msingi\Cms\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
  * Class Menus
@@ -25,9 +26,8 @@ class Menus extends EntityRepository
         /* @todo optimize query */
         $qb->select(array('m.id', 'mp.id AS parent_id', 'm.route', 'm.params', 'ml.label'))
             ->leftJoin('m.parent', 'mp')
-            ->leftJoin('m.i18n', 'ml')
+            ->leftJoin('m.i18n', 'ml', 'WITH', 'ml.language = :language')
             ->where('m.menu = :name')
-            ->andWhere('ml.language = :language')
             ->orderBy('m.order', 'ASC');
 
         $qb->setParameters(array('name' => $name, 'language' => $language));
@@ -36,6 +36,7 @@ class Menus extends EntityRepository
 
         $pages = array();
         foreach ($qb->getQuery()->getResult() as $row) {
+
             $page = array(
                 'id' => $row['id'],
                 'label' => $row['label'],
@@ -73,4 +74,22 @@ class Menus extends EntityRepository
         // return root
         return $pages[0];
     }
+
+    /**
+     * @param $menu
+     * @return int
+     */
+    public function fetchMaxOrder($menu)
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('max_order', 'max_order', 'integer');
+
+        $query = $this->getEntityManager()->createNativeQuery('SELECT MAX(`order`) AS max_order FROM cms_menu AS m WHERE menu = :menu', $rsm);
+        $query->setParameter('menu', $menu);
+
+        $res = $query->getOneOrNullResult();
+
+        return $res['max_order'];
+    }
+
 }
