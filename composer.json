@@ -2,7 +2,7 @@
     "name": "msingi/msingi",
     "type": "library",
     "description": "Set of classes to build Zend Framework 2.x based CMS",
-    "keywords": ["zf2","cms","msingi"],
+    "keywords": ["zf2", "cms", "msingi"],
     "homepage": "http://github.com/msingi/msingi",
     "license": "MIT",
     "authors": [
@@ -15,12 +15,15 @@
     ],
     "require": {
         "php": ">=5.3.0",
-	"zendframework/zendframework": "2.*",
-	"doctrine/doctrine-orm-module": "0.7.*"
+        "zendframework/zendframework": "2.*",
+        "doctrine/doctrine-orm-module": "0.7.*"
     },
     "autoload": {
         "psr-0": {
             "Msingi\\": "src"
-        }
+        },
+        "classmap": [
+            "./Module.php"
+        ]
     }
 }
