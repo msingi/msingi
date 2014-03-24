@@ -1,0 +1,26 @@
+{
+    "name": "msingi/msingi",
+    "type": "library",
+    "description": "Set of classes to build Zend Framework 2.x based CMS",
+    "keywords": ["zf2","cms","msingi"],
+    "homepage": "http://github.com/msingi/msingi",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andrey Ovcharov",
+            "email": "andrew.ovcharov@gmail.com",
+            "homepage": "http://ovcharov.me/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+	"zendframework/zendframework": "2.*",
+	"doctrine/doctrine-orm-module": "0.7.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Msingi": "src"
+        }
+    }
+}
