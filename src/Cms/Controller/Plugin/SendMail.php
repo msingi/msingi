@@ -2,7 +2,7 @@
 
 namespace Msingi\Cms\Controller\Plugin;
 
-use Zend\I18n\Translator\Translator;
+use Zend\Mvc\I18n\Translator;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Msingi\Cms\Mailer\Mailer;
 use Zend\Mvc\Router\RouteStackInterface;

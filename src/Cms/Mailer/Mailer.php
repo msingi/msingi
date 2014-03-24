@@ -31,6 +31,8 @@ class Mailer implements ServiceLocatorAwareInterface
     {
         $config = $this->getServiceLocator()->get('Config');
         $settings = $this->getServiceLocator()->get('Settings');
+        /** @var \Doctrine\ORM\EntityManager $entityManager */
+        $entityManager = $this->getServiceLocator()->get('Doctrine\ORM\EntityManager');
 
         if (!isset($config['mailer']['templates_path'])) {
             throw new \Exception('Mail templates path is not set');
@@ -55,12 +57,18 @@ class Mailer implements ServiceLocatorAwareInterface
         $language = $params['language'];
 
         // get mail template
-        $templatesTable = $this->getServiceLocator()->get('Msingi\Cms\Db\Table\MailTemplates');
-        $template = $templatesTable->fetchOrCreate($templateName, $language);
+//        $templatesTable = $this->getServiceLocator()->get('Msingi\Cms\Db\Table\MailTemplates');
+        $templates_repository = $entityManager->getRepository('Msingi\Cms\Entity\MailTemplate');
+        $template = $templates_repository->fetchOrCreate($templateName);
+
+        /** @var \Msingi|Cms\Repository\MailTemplatesI18n $templates_i18n_repository */
+        $templates_i18n_repository = $entityManager->getRepository('Msingi\Cms\Entity\MailTemplateI18n');
+        /** @var \Msingi\Cms\Entity\MailTemplateI18n $i18n */
+        $i18n = $templates_i18n_repository->fetchOrCreate($template, $language);
 
         // replace tokens
-        $subject = $this->processTokens($template->subject, $params);
-        $message = $this->processTokens($template->template, $params);
+        $subject = $this->processTokens($i18n->getSubject(), $params);
+        $message = $this->processTokens($i18n->getTemplate(), $params);
 
         // initialize renderer
         $renderer = new PhpRenderer();
@@ -112,6 +120,11 @@ class Mailer implements ServiceLocatorAwareInterface
 
         // log message
         if ($settings->get('mail:log')) {
+
+            if(!is_dir($config['mailer']['log_dir'])) {
+                mkdir($config['mailer']['log_dir']);
+            }
+
             $transport = new \Zend\Mail\Transport\File();
             $options = new \Zend\Mail\Transport\FileOptions(array(
                 'path' => $config['mailer']['log_dir'],
