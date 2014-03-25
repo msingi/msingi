@@ -2,11 +2,22 @@
 
 namespace Msingi\Cms\View\Helper;
 
+/**
+ * Class HeadLess
+ * @package Msingi\Cms\View\Helper
+ */
 class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalone
 {
+    /** @var string */
     protected $_less_js;
+
+    /** @var string */
     protected $_environment;
+
+    /** @var bool */
     protected $_debug = false;
+
+    /** @var bool */
     protected $async = false;
 
     /**
@@ -15,7 +26,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     public function __construct()
     {
         parent::__construct();
-        $this->_environment = getenv('APPLICATION_ENV');
+        $this->_environment = getenv('APPLICATION_ENV') ? : 'production';
         $this->setSeparator(PHP_EOL);
     }
 
@@ -28,7 +39,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     }
 
     /**
-     * @param $value
+     * @param string $value
      */
     public function setLessCompiler($value)
     {
@@ -36,7 +47,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     }
 
     /**
-     * @param $debug
+     * @param bool $debug
      */
     public function setDebug($debug)
     {
@@ -52,7 +63,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     }
 
     /**
-     * @param $url
+     * @param string $url
      * @param bool $forceRefresh
      * @return \Zend\View\Helper\Placeholder\Container\AbstractContainer
      */
@@ -67,7 +78,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     }
 
     /**
-     * @param null $indent
+     * @param int|null $indent
      * @return string
      */
     public function toString($indent = null)
@@ -127,7 +138,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     }
 
     /**
-     * @param boolean $async
+     * @param bool $async
      */
     public function setAsync($async)
     {
@@ -135,7 +146,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isAsync()
     {
