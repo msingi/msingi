@@ -7,14 +7,26 @@ use Zend\View\Helper\AbstractHelper;
 
 /**
  * Class PageMeta
+ *
  * @package Msingi\Cms\View\Helper
  */
 class PageMeta extends AbstractHelper
 {
+    /** @var \Doctrine\Orm\EntityManager */
+    protected $entityManager;
+
+    /** @var \Msingi\Cms\Entity\Page */
     protected $page;
+
+    /** @var \Msingi\Cms\Entity\PageI18n */
     protected $meta;
+
+    /** @var \Zend\Mvc\MvcEvent */
     protected $event;
 
+    /**
+     * @param MvcEvent $event
+     */
     public function __construct(MvcEvent $event)
     {
         $this->event = $event;
@@ -22,7 +34,7 @@ class PageMeta extends AbstractHelper
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return string
      */
     public function __invoke($name)
@@ -31,15 +43,37 @@ class PageMeta extends AbstractHelper
 
             $serviceManager = $this->event->getApplication()->getServiceManager();
 
-            $pagesTable = $serviceManager->get('Msingi\Cms\Db\Table\Pages');
-
             $translator = $serviceManager->get('Translator');
 
             $locale = $translator->getLocale();
 
-            $this->meta = $pagesTable->fetchMeta($this->page->id, \Locale::getPrimaryLanguage($locale));
+            /** @var \Msingi\Cms\Repository\PageI18ns $meta_repository */
+            $meta_repository = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\PageI18n');
+
+            $this->meta = $meta_repository->fetchOrCreate($this->page, \Locale::getPrimaryLanguage($locale));
         }
 
-        return isset($this->meta[$name]) ? $this->meta[$name] : '';
+        switch ($name) {
+            case 'title':
+                return $this->meta->getTitle();
+            case 'keywords':
+                return $this->meta->getKeywords();
+            case 'description':
+                return $this->meta->getDescription();
+        }
+
+        return '';
+    }
+
+    /**
+     * @return \Doctrine\ORM\EntityManager
+     */
+    public function getEntityManager()
+    {
+        if (null === $this->entityManager) {
+            $this->entityManager = $this->event->getApplication()->getServiceManager()->get('Doctrine\ORM\EntityManager');
+        }
+
+        return $this->entityManager;
     }
 }

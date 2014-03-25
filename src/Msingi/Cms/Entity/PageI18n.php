@@ -25,7 +25,7 @@ class PageI18n
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Msingi\Cms\Entity\Page")
+     * @ORM\ManyToOne(targetEntity="Msingi\Cms\Entity\Page", cascade={"persist"})
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      * @var \Msingi\Cms\Entity\Page
      */

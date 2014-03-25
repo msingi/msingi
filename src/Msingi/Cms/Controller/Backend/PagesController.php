@@ -144,16 +144,18 @@ class PagesController extends AuthenticatedController
             $pageTemplate = $templates->findOneBy(array('name' => $page->getTemplate()));
 
             $fragments = array();
-            foreach (explode(',', $pageTemplate->getFragments()) as $fragment) {
-                $fragment = trim($fragment);
-                if ($fragment == '')
-                    continue;
+            if ($pageTemplate != null) {
+                foreach (explode(',', $pageTemplate->getFragments()) as $fragment) {
+                    $fragment = trim($fragment);
+                    if ($fragment == '')
+                        continue;
 
-                $page_fragment = $page_fragments->fetchOrCreate($page, $fragment);
+                    $page_fragment = $page_fragments->fetchOrCreate($page, $fragment);
 
-                $content = $page_fragments_i18n->fetchOrCreate($page_fragment, $language);
+                    $content = $page_fragments_i18n->fetchOrCreate($page_fragment, $language);
 
-                $fragments[$fragment] = $content->getContent();
+                    $fragments[$fragment] = $content->getContent();
+                }
             }
 
             // set page data
