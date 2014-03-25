@@ -22,7 +22,7 @@ class LoginController extends ActionController
      */
     public function onDispatch(MvcEvent $e)
     {
-        $this->layout('layout/login');
+        $this->layout('backend/layout/login');
 
         return parent::onDispatch($e);
     }

@@ -15,6 +15,7 @@ use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
+use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -143,17 +144,27 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
     {
         $eventManager = $e->getApplication()->getEventManager();
 
-        $eventManager->getSharedManager()->attach('Zend\Mvc\Controller\AbstractController', 'dispatch', function ($e) {
-            $controller = $e->getTarget();
+        $eventManager->getSharedManager()->attach('Zend\Mvc\Controller\AbstractController', 'dispatch', function (MvcEvent $event) {
+            $controller = $event->getTarget();
             $controllerClass = get_class($controller);
             $moduleNamespace = substr($controllerClass, 0, strpos($controllerClass, '\\'));
-            $config = $e->getApplication()->getServiceManager()->get('config');
+
+            $config = $event->getApplication()->getServiceManager()->get('config');
+
             if (isset($config['module_layouts'][$moduleNamespace])) {
-                $controller->layout($config['module_layouts'][$moduleNamespace]);
+                $layout = $config['module_layouts'][$moduleNamespace];
             } else {
-                $controller->layout('layout/' . strtolower($moduleNamespace));
+                $layout = strtolower($moduleNamespace) . '/layout/layout';
             }
+
+            $controller->layout($layout);
+
         }, 100);
+
+        $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, function (MvcEvent $event) {
+            $viewModel = $event->getViewModel();
+            $viewModel->setTemplate('frontend/layout/error');
+        }, -200);
 
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);

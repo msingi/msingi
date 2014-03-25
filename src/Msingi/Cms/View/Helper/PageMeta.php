@@ -30,7 +30,10 @@ class PageMeta extends AbstractHelper
     public function __construct(MvcEvent $event)
     {
         $this->event = $event;
-        $this->page = $event->getRouteMatch()->getParam('cms_page');
+        $routeMatch = $event->getRouteMatch();
+        if ($routeMatch) {
+            $this->page = $routeMatch->getParam('cms_page');
+        }
     }
 
     /**
