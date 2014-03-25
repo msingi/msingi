@@ -39,7 +39,7 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
         // route matching
         $eventManager->attach($serviceManager->get('Msingi\Cms\Event\RouteListener'));
         // determine locale
-        //$eventManager->attach($serviceManager->get('Msingi\Cms\Event\LocaleListener'));
+        $eventManager->attach($serviceManager->get('Msingi\Cms\Event\LocaleListener'));
         // http processing
         $eventManager->attach($serviceManager->get('Msingi\Cms\Event\HttpListener'));
 
