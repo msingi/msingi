@@ -70,6 +70,7 @@ class SettingsController extends AuthenticatedController
     protected function saveSettings($data)
     {
         $config = $this->getServiceLocator()->get('Config');
+        /** @var \Msingi\Cms\Settings $settings */
         $settings = $this->getServiceLocator()->get('Settings');
 
         $settingsConfig = $config['settings'];

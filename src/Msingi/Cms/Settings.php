@@ -36,6 +36,31 @@ class Settings implements ServiceLocatorAwareInterface
     }
 
     /**
+     * @param $name
+     * @param $value
+     */
+    public function set($name, $value)
+    {
+        $this->values[$name] = $value;
+
+        /** @var \Msingi\Cms\Repository\Settings $settings */
+        $settings = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Setting');
+
+        if (is_array($value)) {
+            $settings->set($name, serialize($value));
+        } else {
+            $settings->set($name, $value);
+        }
+
+        // try to get fragments from cache
+        $cache = $this->getServiceLocator()->get('Application\Cache');
+        if ($cache) {
+            $cacheKey = sprintf('settings');
+            $cache->removeItem($cacheKey);
+        }
+    }
+
+    /**
      * @return EntityManager
      */
     public function getEntityManager()

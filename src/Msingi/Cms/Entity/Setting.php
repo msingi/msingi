@@ -11,7 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity(repositoryClass="Msingi\Cms\Repository\Settings")
  * @ORM\Table(name="cms_settings", indexes={
- * @ORM\Index(columns={"name"}),
  * })
  */
 class Setting
@@ -25,7 +24,7 @@ class Setting
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true)
      * @var string
      */
     protected $name = '';

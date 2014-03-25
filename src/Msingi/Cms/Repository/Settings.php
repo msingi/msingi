@@ -3,6 +3,7 @@
 namespace Msingi\Cms\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Msingi\Cms\Entity\Setting;
 
 /**
  * Class Settings
@@ -29,5 +30,30 @@ class Settings extends EntityRepository
         }
 
         return $result;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     */
+    public function set($name, $value)
+    {
+        $qb = $this->createQueryBuilder('s');
+
+        $qb->select()->where('s.name = :name');
+
+        $qb->setParameter('name', $name);
+
+        $setting = $qb->getQuery()->getOneOrNullResult();
+        if ($setting == null) {
+            $setting = new Setting();
+            $setting->setName($name);
+
+            $this->getEntityManager()->persist($setting);
+        }
+
+        $setting->setValue($value);
+
+        $this->getEntityManager()->flush();
     }
 }
