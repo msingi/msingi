@@ -42,12 +42,14 @@ class LocaleListener implements ListenerAggregateInterface
     /**
      * Called after routing
      *
-     * @param MvcEvent $e
+     * @param MvcEvent $event
      */
-    public function onRoute(MvcEvent $e)
+    public function onRoute(MvcEvent $event)
     {
+        $serviceManager = $event->getApplication()->getServiceManager();
+
         /* @var RouteMatch $routeMatch */
-        $routeMatch = $e->getRouteMatch();
+        $routeMatch = $event->getRouteMatch();
 
         // check if the language is set by routing (parameter, domain name, etc)
         if ($routeMatch->getParam('language') == '') {
@@ -56,8 +58,8 @@ class LocaleListener implements ListenerAggregateInterface
             //
             $module = $route[0];
 
-            /** @var \Msingi\Cms\Model\Settings $settings */
-            $settings = $e->getApplication()->getServiceManager()->get('Settings');
+            /** @var \Msingi\Cms\Settings $settings */
+            $settings = $event->getApplication()->getServiceManager()->get('Settings');
 
             // get defaults from settings
             $multilanguage = (bool)$settings->get($module . ':languages:multilanguage');
@@ -66,11 +68,11 @@ class LocaleListener implements ListenerAggregateInterface
 
             if ($multilanguage && is_array($languages_enabled)) {
                 /** @var \Zend\Http\Request $request */
-                $request = $e->getRequest();
+                $request = $event->getRequest();
 
                 // try to get language from cookie
                 if ($request->getCookie('language') != '') {
-                    $language = $e->getRequest()->getCookie('language');
+                    $language = $event->getRequest()->getCookie('language');
                 }
 
                 // try to get language from browser
@@ -89,9 +91,10 @@ class LocaleListener implements ListenerAggregateInterface
             }
 
             $routeMatch->setParam('language', $language);
+        } else {
+            $language = $routeMatch->getParam('language');
+            $language_default = $language;
         }
-
-        $serviceManager = $e->getApplication()->getServiceManager();
 
         // translator
         $translator = $serviceManager->get('Translator');
@@ -99,6 +102,8 @@ class LocaleListener implements ListenerAggregateInterface
 
         // cache
         $cache = $serviceManager->get('Application\Cache');
-        $translator->setCache($cache);
+        if ($cache) {
+            $translator->setCache($cache);
+        }
     }
 }
