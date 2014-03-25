@@ -229,6 +229,14 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     }
 
     /**
+     * @return null|object
+     */
+    protected function getEntity()
+    {
+        return $this->getRepository()->find($this->params()->fromQuery('id'));
+    }
+
+    /**
      * @param $values
      * @param $form
      * @return array|object

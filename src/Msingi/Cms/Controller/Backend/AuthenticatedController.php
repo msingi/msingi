@@ -4,6 +4,11 @@ namespace Msingi\Cms\Controller\Backend;
 
 use Zend\Mvc\MvcEvent;
 
+/**
+ * Class AuthenticatedController
+ *
+ * @package Msingi\Cms\Controller\Backend
+ */
 class AuthenticatedController extends ActionController
 {
     /**
