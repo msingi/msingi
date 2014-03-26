@@ -13,24 +13,10 @@ use Zend\View\Model\ViewModel;
  *
  * @package Msingi\Cms\Controller\Backend
  */
-class MailTemplatesController extends AuthenticatedController
+class MailTemplatesController extends AbstractEntitiesController
 {
-    /** @var \Msingi\Cms\Db\Table\MailTemplates */
-    protected $mailTemplatesTable;
-
-    /**
-     * @return array|ViewModel
-     */
-    public function indexAction()
-    {
-        $paginator = new Paginator($this->getPaginatorAdapter());
-        $paginator->setItemCountPerPage(10);
-        $paginator->setCurrentPageNumber($this->params()->fromQuery('page', 1));
-
-        return new ViewModel(array(
-            'paginator' => $paginator
-        ));
-    }
+    protected $entityClass = 'Msingi\Cms\Entity\MailTemplate';
+    protected $indexRoute = 'backend/mailtemplates';
 
     /**
      * @return ViewModel
@@ -40,9 +26,9 @@ class MailTemplatesController extends AuthenticatedController
         $settings = $this->getServiceLocator()->get('Settings');
 
         $template_id = intval($this->params()->fromQuery('id'));
-        $template = $this->getTemplatesTable()->fetchById($template_id);
+        $template = $this->getRepository()->find($template_id);
         if ($template == null) {
-            return $this->redirect()->toRoute('backend/mailtemplates');
+            return $this->redirect()->toRoute($this->getIndexRoute());
         }
 
         //
@@ -60,10 +46,13 @@ class MailTemplatesController extends AuthenticatedController
         $template_id = intval($this->params()->fromPost('template'));
         $language = trim($this->params()->fromPost('language'));
 
-        $template = $this->getTemplatesTable()->fetchById($template_id);
+        /** @var \Msingi\Cms\Entity\MailTemplate $template */
+        $template = $this->getRepository()->find($template_id);
         if ($template != null) {
 
-            $content = $this->getTemplatesTable()->fetch_i18n($template->id, $language);
+            $i18n_repository = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\MailTemplateI18n');
+
+            $content = $i18n_repository->fetchOrCreate($template, $language);
 
             // set page data
             $vm = new ViewModel(array(
@@ -91,11 +80,17 @@ class MailTemplatesController extends AuthenticatedController
         $content = trim(strip_tags($this->params()->fromPost('value')));
 
         if (in_array($meta, array('subject'))) {
-            $template = $this->getTemplatesTable()->fetchById($template_id);
+            $template = $this->getRepository()->find($template_id);
             if ($template != null) {
-                $this->getTemplatesTable()->update_i18n($template->id, $language, array(
-                    'subject' => $content
-                ));
+
+                $i18n_repository = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\MailTemplateI18n');
+
+                $i18n = $i18n_repository->fetchOrCreate($template, $language);
+
+                $i18n->setSubject($content);
+
+                $this->getEntityManager()->persist($i18n);
+                $this->getEntityManager()->flush();
             }
         }
 
@@ -114,42 +109,18 @@ class MailTemplatesController extends AuthenticatedController
 
         $content = $filter->filterTags($this->params()->fromPost('content'));
 
-        $template = $this->getTemplatesTable()->fetchById($template_id);
+        $template = $this->getRepository()->find($template_id);
         if ($template != null) {
-            $this->getTemplatesTable()->update_i18n($template->id, $language, array(
-                'template' => $content
-            ));
+            $i18n_repository = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\MailTemplateI18n');
+
+            $i18n = $i18n_repository->fetchOrCreate($template, $language);
+
+            $i18n->setTemplate($content);
+
+            $this->getEntityManager()->persist($i18n);
+            $this->getEntityManager()->flush();
         }
 
         return $this->getResponse();
-    }
-
-    /**
-     * Get storage
-     *
-     */
-    protected function getTemplatesTable()
-    {
-        if (!$this->mailTemplatesTable) {
-            $sm = $this->getServiceLocator();
-            $this->mailTemplatesTable = $sm->get('Msingi\Cms\Db\Table\MailTemplates');
-        }
-
-        return $this->mailTemplatesTable;
-    }
-
-
-    /**
-     * Get query for paginator adapter
-     *
-     * @param $request
-     * @param $filter
-     * @return Select
-     */
-    protected function getPaginatorAdapter($filter = null)
-    {
-        $select = $this->getTemplatesTable()->getSql()->select();
-
-        return new DbSelect($select, $this->getTemplatesTable()->getAdapter(), $this->getTemplatesTable()->getResultSetPrototype());;
     }
 }

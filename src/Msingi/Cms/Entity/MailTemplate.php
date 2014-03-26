@@ -43,6 +43,12 @@ class MailTemplate
     protected $tokens = '';
 
     /**
+     * @ORM\OneToMany(targetEntity="\Msingi\Cms\Entity\MailTemplateI18n",mappedBy="parent")
+     * @var \Msingi\Cms\Entity\MailTemplateI18n[]
+     */
+    protected $i18n = null;
+
+    /**
      * @param string $description
      */
     public function setDescription($description)
@@ -105,6 +111,4 @@ class MailTemplate
     {
         return $this->tokens;
     }
-
-
 }
