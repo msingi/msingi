@@ -34,8 +34,8 @@ class StaticPage implements RouteInterface, ServiceLocatorAwareInterface
     public function __construct(array $defaults = array())
     {
         $this->defaults = array_merge(array(
-            'controller' => 'frontend-index-page',
-            'action' => 'page'
+            //'controller' => 'frontend-index-page',
+            //'action' => 'page'
         ), $defaults);
     }
 
@@ -58,7 +58,8 @@ class StaticPage implements RouteInterface, ServiceLocatorAwareInterface
 
         /** @var array $routeParams */
         $routeParams = array_merge($this->defaults, array(
-            'cms_page' => $page
+            'cms_page' => $page,
+            'path' => $page->getPath(),
         ));
 
         $routeMatch = new RouteMatch($routeParams, strlen($page->getPath()));
