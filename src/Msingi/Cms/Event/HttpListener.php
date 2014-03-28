@@ -2,6 +2,7 @@
 
 namespace Msingi\Cms\Event;
 
+use Msingi\Util\HTMLMinifier;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Http\PhpEnvironment\Response;
@@ -120,6 +121,13 @@ class HttpListener implements ListenerAggregateInterface
      */
     protected function minifyHtml(MvcEvent $e)
     {
+        /** @var \Zend\Http\Response $response */
+        $response = $e->getResponse();
 
+        $content = $response->getContent();
+
+        $minifier = new HTMLMinifier($content);
+
+        $response->setContent($minifier->process());
     }
 }
