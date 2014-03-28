@@ -58,4 +58,26 @@ class Pages extends EntityRepository
 
         return $page;
     }
+
+    /**
+     *
+     */
+    public function fetchTree()
+    {
+//        $qb = $this->createQueryBuilder('p');
+//
+//        $qb->select(array('p.id', 'p.path', 'p.type', 'parent.id AS parent_id'))
+//            ->leftJoin('p.parent', 'parent');
+//
+//        $pages = array();
+//
+//        foreach ($qb->getQuery()->getResult() as $pageRow) {
+//
+//            if($pageRow['type'] == PageType::PAGE_MVC) {
+//                $path = explode('/', $pageRow['path'];
+//            }
+//        }
+//
+//        return $pages;
+    }
 }

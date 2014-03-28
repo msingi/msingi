@@ -55,7 +55,7 @@ class PagesController extends AuthenticatedController
         $pages = $this->getEntityManager()->getRepository('Msingi\Cms\Entity\Page');
 
         return new ViewModel(array(
-            'pages' => $pages->findAll(),
+            //'pages_tree' => $pages->fetchTree(),
             'root' => $pages->find(1),
         ));
     }
