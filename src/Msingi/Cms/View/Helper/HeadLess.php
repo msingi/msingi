@@ -4,18 +4,21 @@ namespace Msingi\Cms\View\Helper;
 
 /**
  * Class HeadLess
+ *
+ * Use less.js compiler for stylesheets in development environment
+ *
  * @package Msingi\Cms\View\Helper
  */
 class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalone
 {
     /** @var string */
-    protected $_less_js;
+    protected $less_js_compiler;
 
     /** @var string */
-    protected $_environment;
+    protected $environment;
 
     /** @var bool */
-    protected $_debug = false;
+    protected $debug = false;
 
     /** @var bool */
     protected $async = false;
@@ -26,7 +29,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     public function __construct()
     {
         parent::__construct();
-        $this->_environment = getenv('APPLICATION_ENV') ? : 'production';
+        $this->environment = getenv('APPLICATION_ENV') ? : 'production';
         $this->setSeparator(PHP_EOL);
     }
 
@@ -43,7 +46,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
      */
     public function setLessCompiler($value)
     {
-        $this->_less_js = $value;
+        $this->less_js_compiler = $value;
     }
 
     /**
@@ -51,7 +54,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
      */
     public function setDebug($debug)
     {
-        $this->_debug = $debug;
+        $this->debug = $debug;
     }
 
     /**
@@ -59,7 +62,7 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
      */
     public function isProduction()
     {
-        return $this->_environment == 'production';
+        return $this->environment == 'production';
     }
 
     /**
@@ -89,27 +92,30 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
 
         $items = array();
 
-        // add less.js file
-        if (getenv('APPLICATION_ENV') != 'production' && $this->_less_js != '') {
-            $view = $this->getView();
-
-            $script = array();
-            if ($this->_debug) {
-                $script[] = 'env:"development"';
-            }
-            if ($this->async) {
-                $script[] = 'async:true';
-            }
-            if (!empty($script)) {
-                $view->headScript()->appendScript('less={' . implode(',', $script) . '};');
-            }
-
-            $view->headScript()->appendFile($this->_less_js);
-        }
-
         $this->getContainer()->ksort();
         foreach ($this as $item) {
             $items[] = $this->itemToString($item, $indent);
+        }
+
+        // add less.js file
+        if (count($items) > 0 && !$this->isProduction() && $this->less_js_compiler != '') {
+            $view = $this->getView();
+
+            $script = array();
+
+            if ($this->debug) {
+                $script[] = 'env: "development"';
+            }
+
+            if ($this->async) {
+                $script[] = 'async: true';
+            }
+
+            if (!empty($script)) {
+                $view->headScript()->appendScript('less = {' . implode(',', $script) . '};');
+            }
+
+            $view->headScript()->appendFile($this->less_js_compiler);
         }
 
         return $indent . implode($this->getSeparator() . $indent, $items) . $this->getSeparator();
@@ -124,14 +130,21 @@ class HeadLess extends \Zend\View\Helper\Placeholder\Container\AbstractStandalon
     {
         $url = str_replace('.less', '', $item->url);
 
-        // change .less to .css for production environment
-        $ext = $this->isProduction() ? 'css' : 'less';
-        $rel = $this->isProduction() ? 'stylesheet' : 'stylesheet/less';
+        if($this->isProduction()) {
+            // change .less to .css for production environment
+            $ext = 'css';
+            $rel = 'stylesheet';
+            $url .= '.' . $ext;
+        }
+        else {
+            // change .less to .css for production environment
+            $ext = 'less';
+            $rel = 'stylesheet/less';
+            $url .= '.' . $ext;
 
-        $url .= '.' . $ext;
-
-        if ($item->forceRefresh) {
-            $url .= '?r=' . time();
+            if ($item->forceRefresh) {
+                $url .= '?r=' . time();
+            }
         }
 
         return '<link href="' . $url . '" rel="' . $rel . '" type="text/css">';
