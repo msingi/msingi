@@ -4,8 +4,14 @@ namespace Msingi\InputFilter;
 
 use Msingi\Util\StripAttributes;
 
+/**
+ * Class PageTagsFilter
+ *
+ * @package Msingi\InputFilter
+ */
 class PageTagsFilter
 {
+    /** @var array */
     protected $allowedTags = array(
         'div' => array('class'),
         'p' => array('class'),
@@ -27,7 +33,6 @@ class PageTagsFilter
         'h4' => array(),
         'h5' => array(),
         'h6' => array(),
-        'table' => array(),
         'ul' => array('class'),
         'ol' => array('class'),
         'li' => array()
@@ -35,17 +40,20 @@ class PageTagsFilter
 
     /**
      * @param string $text
+     * @param array $allowedTags
      * @return string
      */
-    public function filterTags($text)
+    public function filterTags($text, $allowedTags = array())
     {
+        $allowedTags = array_merge_recursive($this->allowedTags, $allowedTags);
+
         // filter tags
-        $tags = '<' . implode('><', array_keys($this->allowedTags)) . '>';
+        $tags = '<' . implode('><', array_keys($allowedTags)) . '>';
         $text = strip_tags($text, $tags);
 
         // filter attributes
         $sa = new StripAttributes();
-        $sa->exceptions = $this->allowedTags;
+        $sa->exceptions = $allowedTags;
         $text = $sa->strip($text);
 
         return $text;
