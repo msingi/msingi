@@ -2,6 +2,7 @@
 
 namespace Msingi\Cms\Controller\Backend;
 
+use Msingi\Doctrine\EntityManagerAwareInterface;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
@@ -245,6 +246,10 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     {
         // create new entity
         $entity = $this->getServiceLocator()->get($this->entityClass);
+
+        if ($entity instanceof EntityManagerAwareInterface) {
+            $entity->setEntityManager($this->getEntityManager());
+        }
 
         return $entity;
     }
