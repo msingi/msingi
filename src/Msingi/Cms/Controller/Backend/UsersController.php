@@ -26,6 +26,32 @@ class UsersController extends AbstractEntitiesController
     }
 
     /**
+     * @param UserForm $form
+     * @param \Msingi\Cms\Entity\BackendUser $entity
+     */
+    protected function populateForm($form, $entity)
+    {
+        $form->get('name')->setValue($entity->getName());
+        $form->get('username')->setValue($entity->getUsername());
+        $form->get('email')->setValue($entity->getEmail());
+        $form->get('role')->setValue($entity->getRole());
+    }
+
+    /**
+     * @param \Msingi\Cms\Entity\BackendUser $entity
+     * @param UserForm $form
+     */
+    protected function updateEntity($entity, $form)
+    {
+        $data = $form->getData();
+
+        $entity->setName($data['name']);
+        $entity->setUsername($data['username']);
+        $entity->setEmail($data['email']);
+        $entity->setRole($data['role']);
+    }
+
+    /**
      * @param $user
      * @param $values
      */
