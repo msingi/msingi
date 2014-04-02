@@ -40,7 +40,7 @@ class Mailer implements ServiceLocatorAwareInterface
         }
 
         // get from addresss
-        if (isset($params['from'])) {
+        if (!isset($params['from'])) {
             $params['from'] = $settings->get('mail:from');
         }
 
