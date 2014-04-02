@@ -9,7 +9,8 @@ use Zend\View\Resolver;
 use Msingi\Util\HTML2Text;
 use Zend\Mail;
 use Zend\Mime;
-use Zend\Mail\Transport\Sendmail;
+use Zend\Mail\Transport\Sendmail as SendmailTransport;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
 
 /**
  * Class Mailer
@@ -118,10 +119,13 @@ class Mailer implements ServiceLocatorAwareInterface
         $mail->setBody($messageBody);
         $mail->getHeaders()->get('Content-Type')->setType('multipart/alternative');
 
+        //
+        $mailer_config = $config['mailer'];
+
         // log message
         if ($settings->get('mail:log')) {
 
-            if(!is_dir($config['mailer']['log_dir'])) {
+            if (!is_dir($config['mailer']['log_dir'])) {
                 mkdir($config['mailer']['log_dir']);
             }
 
@@ -138,7 +142,15 @@ class Mailer implements ServiceLocatorAwareInterface
 
         // send message
         if ($settings->get('mail:send')) {
-            $transport = new Sendmail();
+
+            if (isset($mailer_config['transport']) && $mailer_config['transport'] == 'smtp') {
+                $transport = new SmtpTransport();
+                $options = new Mail\Transport\SmtpOptions($mailer_config['smtp_options']);
+                $transport->setOptions($options);
+            } else {
+                $transport = new SendmailTransport();
+            }
+
             $transport->send($mail);
         }
 
