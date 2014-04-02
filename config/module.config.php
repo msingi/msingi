@@ -35,7 +35,7 @@ return array(
             // memcached caching for doctrine
             'doctrine.cache.memcached' => 'Msingi\Doctrine\MemcacheFactory',
             // content manager
-            'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManagerFactory',
+            'Msingi\Cms\ContentManager' => 'Msingi\Cms\Service\ContentManager',
             // backend authentication
             'Msingi\Cms\Service\Backend\AuthStorage' => 'Msingi\Cms\Service\Backend\AuthStorageFactory',
             'Msingi\Cms\Service\Backend\AuthService' => 'Msingi\Cms\Service\Backend\AuthServiceFactory',

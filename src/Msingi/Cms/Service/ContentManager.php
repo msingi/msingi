@@ -3,18 +3,17 @@
 namespace Msingi\Cms\Service;
 
 use Msingi\Util\ImageResizer;
+use Zend\ServiceManager\FactoryInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
-class ContentManager
+/**
+ * Class ContentManager
+ *
+ * @package Msingi\Cms\Service
+ */
+class ContentManager implements FactoryInterface
 {
     protected $config;
-
-    /**
-     * @param array $config
-     */
-    public function __construct(array $config)
-    {
-        $this->config = $config;
-    }
 
     /**
      * Get Root URL for content
@@ -232,5 +231,32 @@ class ContentManager
         }
 
         return $storage_dir;
+    }
+
+    /**
+     * Create service
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     * @return mixed
+     */
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        $config = $serviceLocator->get('Config');
+
+        $service_config = $config['content'];
+
+        $content_manager = new ContentManager();
+
+        $content_manager->setConfig($service_config);
+
+        return $content_manager;
+    }
+
+    /**
+     * @param $service_config
+     */
+    protected function setConfig($service_config)
+    {
+        $this->config = $service_config;
     }
 }
