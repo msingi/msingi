@@ -41,11 +41,10 @@ class Mailer implements ServiceLocatorAwareInterface
 
         // get from addresss
         if (isset($params['from'])) {
-            $from = $params['from'];
-        } else {
-            $from = $settings->get('mail:from');
+            $params['from'] = $settings->get('mail:from');
         }
 
+        $from = $params['from'];
         if ($from == '') {
             throw new \Exception('Can\'t send mail - from address not given');
         }
