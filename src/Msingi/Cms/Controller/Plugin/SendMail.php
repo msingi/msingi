@@ -32,11 +32,11 @@ class SendMail extends AbstractPlugin
      *
      *
      * @param string $templateName
-     * @param string $email
+     * @param string $to
      * @param array $params
      * @return
      */
-    public function __invoke($templateName, $email, array $params = array())
+    public function __invoke($templateName, $to, array $params = array())
     {
         // set mail language if not given
         if (!isset($params['language']) && $this->translator) {
@@ -49,9 +49,9 @@ class SendMail extends AbstractPlugin
         }
 
         //
-        $params['email'] = $email;
+        $params['to'] = $to;
 
-        return $this->mailer->sendMail($templateName, $email, $params);
+        return $this->mailer->sendMail($templateName, $to, $params);
     }
 
     /**

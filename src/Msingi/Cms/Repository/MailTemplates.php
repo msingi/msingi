@@ -21,6 +21,7 @@ class MailTemplates extends EntityRepository
         $qb = $this->createQueryBuilder('t');
         $qb->select()->where('t.name = :name');
         $qb->setParameter('name', $templateName);
+        $qb->getQuery()->useResultCache(true);
 
         /** @var \Msingi\Cms\Entity\MailTemplate $template */
         $template = $qb->getQuery()->getOneOrNullResult();
