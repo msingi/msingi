@@ -17,11 +17,11 @@ class AuthenticatedController extends ActionController
      */
     public function onDispatch(MvcEvent $e)
     {
+        $e->getResponse()->setMetadata('No-Cache', true);
+
         if (!$this->getAuthService()->hasIdentity()) {
             return $this->redirect()->toRoute('backend/login');
         }
-
-        $e->getResponse()->setMetadata('No-Cache', true);
 
         return parent::onDispatch($e);
     }
