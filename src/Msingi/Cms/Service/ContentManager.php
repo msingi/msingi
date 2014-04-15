@@ -204,7 +204,11 @@ class ContentManager implements FactoryInterface
     protected function getStorageDir($object, $attachment)
     {
         // get object's class
-        $class = get_class($object);
+        if ($object instanceof \Doctrine\ORM\Proxy\Proxy) {
+            $class = get_parent_class($object);
+        } else {
+            $class = get_class($object);
+        }
 
         // get class related storage settings
         if (!isset($this->config['attachments'][$class]) || !isset($this->config['attachments'][$class][$attachment]))
