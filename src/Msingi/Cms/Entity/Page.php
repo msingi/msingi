@@ -64,6 +64,12 @@ class Page
     protected $fragments = null;
 
     /**
+     * @ORM\Column(type="boolean")
+     * @var bool
+     */
+    protected $editable = false;
+
+    /**
      * @ORM\OneToMany(targetEntity="\Msingi\Cms\Entity\PageI18n",mappedBy="parent")
      * @var \Msingi\Cms\Entity\PageI18n[]
      */
@@ -203,5 +209,21 @@ class Page
     public function getI18n()
     {
         return $this->i18n;
+    }
+
+    /**
+     * @param boolean $editable
+     */
+    public function setEditable($editable)
+    {
+        $this->editable = $editable;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getEditable()
+    {
+        return $this->editable;
     }
 }
