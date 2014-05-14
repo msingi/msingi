@@ -1,10 +1,15 @@
 <?php
-namespace Application\DBAL;
+namespace Msingi\Doctrine\DBAL;
 
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\Lexer;
 
-class YEAR extends FunctionNode
+/**
+ * Implementation of MySQL function YEAR()
+ *
+ * @package Msingi\Doctrine\DBAL
+ */
+class Year extends FunctionNode
 {
     protected $expr;
 

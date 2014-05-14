@@ -94,6 +94,7 @@ return array(
         ),
 
         'enums' => array(
+            'article_status' => 'Msingi\Cms\Entity\Enum\ArticleStatus',
             'page_type' => 'Msingi\Cms\Entity\Enum\PageType',
         ),
     ),

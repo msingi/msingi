@@ -1,9 +1,14 @@
 <?php
-namespace Application\DBAL;
+namespace Msingi\Doctrine\DBAL;
 
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\Lexer;
 
+/**
+ * Geodistance function call
+ *
+ * @package Msingi\Doctrine\DBAL
+ */
 class GeoDistance extends FunctionNode
 {
     protected $from_lat;
@@ -18,21 +23,20 @@ class GeoDistance extends FunctionNode
      */
     public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker)
     {
-        return 'geodistance('
-        . $this->from_lat->dispatch($sqlWalker) . ', '
-        . $this->from_lon->dispatch($sqlWalker) . ', '
-        . $this->to_lat->dispatch($sqlWalker) . ', '
-        . $this->to_lon->dispatch($sqlWalker) . ')';
+        return 'GEODISTANCE(' . implode(', ', array(
+            $this->from_lat->dispatch($sqlWalker),
+            $this->from_lon->dispatch($sqlWalker),
+            $this->to_lat->dispatch($sqlWalker),
+            $this->to_lon->dispatch($sqlWalker)
+        )) . ')';
     }
 
     /**
      * @param \Doctrine\ORM\Query\Parser $parser
-     *
-     * @return void
      */
     public function parse(\Doctrine\ORM\Query\Parser $parser)
     {
-        $lexer = $parser->getLexer();
+//        $lexer = $parser->getLexer();
 
         $parser->match(Lexer::T_IDENTIFIER);
         $parser->match(Lexer::T_OPEN_PARENTHESIS);

@@ -1,9 +1,14 @@
 <?php
-namespace Application\DBAL;
+namespace Msingi\Doctrine\DBAL;
 
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\Lexer;
 
+/**
+ * Implementation of MySQL function RAND()
+ *
+ * @package Msingi\Doctrine\DBAL
+ */
 class Rand extends FunctionNode
 {
     protected $expr;
