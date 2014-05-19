@@ -30,6 +30,7 @@ return array(
             'Msingi\Cms\Form\Backend\SettingsForm' => 'Msingi\Cms\Form\Backend\SettingsForm',
             //
             'Msingi\Cms\Entity\Page' => 'Msingi\Cms\Entity\Page',
+            'Msingi\Cms\Entity\Article' => 'Msingi\Cms\Entity\Article',
         ),
         'factories' => array(
             // memcached caching for doctrine
