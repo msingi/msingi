@@ -10,14 +10,16 @@ namespace Msingi\Util;
 class ImageResizer
 {
     /**
-     * @param $sourceImage
-     * @param $targetImage
-     * @param $width
-     * @param $height
-     * @param bool $crop
+     * Resize image and apply filters
+     *
+     * @param string $sourceImage path to source image file
+     * @param string $targetImage path to target image file
+     * @param int $width width of target image
+     * @param int $height height of target image
+     * @param array $filters Array of filters to apply
      * @return bool
      */
-    public static function resize($sourceImage, $targetImage, $width, $height, $crop = false)
+    public static function resize($sourceImage, $targetImage, $width, $height, $filters = array())
     {
         if (!ImageResizer::isImage($sourceImage))
             return false;
@@ -49,6 +51,8 @@ class ImageResizer
             $y_ratio = $height / $size[1];
         }
 
+        $crop = in_array('crop', $filters);
+
         //
         if ($x_ratio < 1.0 || $y_ratio < 1.0) {
             if ($crop) {
@@ -63,21 +67,38 @@ class ImageResizer
             } else {
                 $ratio = min($x_ratio, $y_ratio);
 
-                $new_width = floor($size[0] * $ratio);
-                $new_height = floor($size[1] * $ratio);
+                $width = floor($size[0] * $ratio);
+                $height = floor($size[1] * $ratio);
 
-                $idest = imagecreatetruecolor($new_width, $new_height);
+                $idest = imagecreatetruecolor($width, $height);
 
-                imagecopyresampled($idest, $isrc, 0, 0, 0, 0, $new_width, $new_height, $size[0], $size[1]);
+                imagecopyresampled($idest, $isrc, 0, 0, 0, 0, $width, $height, $size[0], $size[1]);
             }
         } else {
-            $new_width = $size[0];
-            $new_height = $size[1];
+            $width = $size[0];
+            $height = $size[1];
 
-            $idest = imagecreatetruecolor($new_width, $new_height);
+            $idest = imagecreatetruecolor($width, $height);
 
-            imagecopy($idest, $isrc, 0, 0, 0, 0, $new_width, $new_height);
+            imagecopy($idest, $isrc, 0, 0, 0, 0, $width, $height);
         }
+
+        $pixelate = in_array('pixelate', $filters);
+        if ($pixelate) {
+            // pixelate image
+            $pixelated_width = $width / 20;
+            $pixelated_height = $height / 20;
+            $pixelated = imagecreatetruecolor($pixelated_width, $pixelated_height);
+
+            // resize image to 20 times smaller
+            imagecopyresampled($pixelated, $idest, 0, 0, 0, 0, $pixelated_width, $pixelated_height, $width, $height);
+
+            // resize it back to original size
+            imagecopyresampled($idest, $pixelated, 0, 0, 0, 0, $width, $height, $pixelated_width, $pixelated_height);
+
+            imagedestroy($pixelated);
+        }
+
 
         //
         imageinterlace($idest, true);

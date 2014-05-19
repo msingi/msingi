@@ -125,12 +125,13 @@ class ContentManager implements FactoryInterface
                 list($width, $height) = explode('x', $params[0]);
 
                 // crop
-                $crop = in_array('crop', $params);
+                //$crop = in_array('crop', $params);
+                $filters = array_slice($params, 1);
 
                 // name of resized file
                 $resized_file = $storage_dir . '/' . $attachment . '-' . $size . '.jpg';
 
-                ImageResizer::resize($image_file, $resized_file, $width, $height, $crop);
+                ImageResizer::resize($image_file, $resized_file, $width, $height, $filters);
             }
         }
 
