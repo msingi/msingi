@@ -121,7 +121,7 @@ class ContentManager implements FactoryInterface
         foreach ($storage['sizes'] as $size => $spec) {
             if ($spec == 'original') {
                 // name of resized file
-                $resized_file = $storage_dir . '/' . $this->getFileName($attachment . '-original', 'jpg');
+                $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-original', 'jpg');
                 $this->saveImage($image, $resized_file);
             } else {
                 $filtered_image = $this->duplicateImage($image, $image_size);
@@ -132,7 +132,7 @@ class ContentManager implements FactoryInterface
                 }
 
                 // name of resized file
-                $resized_file = $storage_dir . '/' . $this->getFileName($attachment . '-' . $size, 'jpg');
+                $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-' . $size, 'jpg');
 
                 $this->saveImage($filtered_image, $resized_file);
 
@@ -150,7 +150,7 @@ class ContentManager implements FactoryInterface
      * @param string $extension
      * @return string
      */
-    protected function getFileName($name, $extension)
+    protected function getImageFileName($name, $extension)
     {
         $filename = base_convert(crc32($name), 10, 26);
 
@@ -255,7 +255,7 @@ class ContentManager implements FactoryInterface
     {
         $storage_dir = $this->getStorageDir($object, $attachment);
 
-        $resized_file = $storage_dir . '/' . $this->getFileName($attachment . '-' . $size, 'jpg');
+        $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-' . $size, 'jpg');
         //echo $resized_file; die;
         if (!is_file($this->getContentDir() . '/' . $resized_file))
             return null;
