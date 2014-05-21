@@ -5,6 +5,8 @@ namespace Msingi\Util;
 /**
  * Class ImageResizer
  *
+ * @todo use ImageFilter
+ *
  * @package Msingi\Util
  */
 class ImageResizer

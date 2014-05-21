@@ -2,7 +2,7 @@
 
 namespace Msingi\Cms\Service;
 
-use Msingi\Util\ImageResizer;
+use Msingi\Util\ImageFilter;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -94,6 +94,11 @@ class ContentManager implements FactoryInterface
             return false;
 
         $image_file = $image['tmp_name'];
+        $image_size = getimagesize($image_file);
+        if ($image_size === false) {
+            // not an image
+            return false;
+        }
 
         $storage = $this->config['attachments'][$class][$attachment];
 
@@ -106,36 +111,87 @@ class ContentManager implements FactoryInterface
                 return false;
         }
 
+        /** @var resource $image */
+        $image = $this->loadImage($image_file);
+
+        //
+        $imageFilter = new ImageFilter();
+
         // store all sizes
         foreach ($storage['sizes'] as $size => $spec) {
             if ($spec == 'original') {
-                //
-                $size = getimagesize($image_file);
-
                 // name of resized file
                 $resized_file = $storage_dir . '/' . $attachment . '-original.jpg';
-
-                ImageResizer::resize($image_file, $resized_file, $size[0], $size[1], false);
-
+                $this->saveImage($image, $resized_file);
             } else {
-                // parse params
-                $params = explode(',', $spec);
+                $filtered_image = $this->duplicateImage($image, $image_size);
 
-                // get width and height
-                list($width, $height) = explode('x', $params[0]);
-
-                // crop
-                //$crop = in_array('crop', $params);
-                $filters = array_slice($params, 1);
+                $filters = explode(',', $spec);
+                foreach ($filters as $filter) {
+                    $filtered_image = $imageFilter->filter($filtered_image, $image_size, trim($filter));
+                }
 
                 // name of resized file
                 $resized_file = $storage_dir . '/' . $attachment . '-' . $size . '.jpg';
 
-                ImageResizer::resize($image_file, $resized_file, $width, $height, $filters);
+                $this->saveImage($filtered_image, $resized_file);
+
+                imagedestroy($filtered_image);
             }
         }
 
+        imagedestroy($image);
+
         return true;
+    }
+
+    /**
+     *
+     * @param string $imageFile
+     * @return bool|resource
+     */
+    protected function loadImage($imageFile)
+    {
+        $size = getimagesize($imageFile);
+
+        $format = strtolower(substr($size['mime'], strpos($size['mime'], '/') + 1));
+        $icfunc = "imagecreatefrom" . $format;
+        if (!function_exists($icfunc)) {
+            return false;
+        }
+
+        return $icfunc($imageFile);
+    }
+
+    /**
+     * @param resource $image
+     * @param array $size
+     * @return resource
+     */
+    protected function duplicateImage($image, $size)
+    {
+        $idst = imagecreatetruecolor($size[0], $size[1]);
+
+        imagecopy($idst, $image, 0, 0, 0, 0, $size[0], $size[1]);
+
+        return $idst;
+    }
+
+    /**
+     * @param $image
+     * @param $imageFile
+     * @param int $quality
+     */
+    protected function saveImage($image, $imageFile, $quality = 80)
+    {
+        //
+        imageinterlace($image, true);
+
+        // create destination image
+        imagejpeg($image, $imageFile, $quality);
+
+        // set access rights
+        chmod($imageFile, 0664);
     }
 
     /**
