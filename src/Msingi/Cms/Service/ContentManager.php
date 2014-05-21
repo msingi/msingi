@@ -233,6 +233,10 @@ class ContentManager implements FactoryInterface
      */
     public function getFile($object, $attachment, $name)
     {
+        if ($object == null) {
+            return null;
+        }
+
         $storage_dir = $this->getStorageDir($object, $attachment);
 
         $file = $storage_dir . '/' . $name;
@@ -253,6 +257,10 @@ class ContentManager implements FactoryInterface
      */
     public function getImage($object, $attachment, $size)
     {
+        if ($object == null) {
+            return null;
+        }
+
         $storage_dir = $this->getStorageDir($object, $attachment);
 
         $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-' . $size, 'jpg');
