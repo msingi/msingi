@@ -55,7 +55,7 @@ class PageFragment extends AbstractHelper implements FactoryInterface
         $viewHelper = new PageFragment();
 
         $viewHelper->setEvent($app->getMvcEvent());
-        
+
         return $viewHelper;
     }
 
