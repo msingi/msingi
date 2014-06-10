@@ -11,8 +11,6 @@ use Doctrine\ORM\Query\Lexer;
  */
 class Now extends FunctionNode
 {
-    protected $expr;
-
     /**
      * @param \Doctrine\ORM\Query\SqlWalker $sqlWalker
      *
