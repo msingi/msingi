@@ -79,6 +79,13 @@ return array(
 
             'formElementErrorClass' => 'Msingi\Cms\View\Helper\FormElementErrorClass',
         ),
+        'factories' => array(
+            'currentRoute' => 'Msingi\Cms\View\Helper\CurrentRoute',
+            'fragment' => 'Msingi\Cms\View\Helper\PageFragment',
+            'metaValue' => 'Msingi\Cms\View\Helper\PageMeta',
+            'settingsValue' => 'Msingi\Cms\View\Helper\SettingsValue',
+            'u' => 'Msingi\Cms\View\Helper\Url',
+        ),
     ),
 
     'doctrine' => array(

@@ -70,22 +70,6 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
     /**
      * @return array
      */
-    public function getViewHelperConfig()
-    {
-        return array(
-            'factories' => array(
-                'currentRoute' => 'Msingi\Cms\View\Helper\CurrentRoute',
-                'fragment' => 'Msingi\Cms\View\Helper\PageFragment',
-                'metaValue' => 'Msingi\Cms\View\Helper\PageMeta',
-                'settingsValue' => 'Msingi\Cms\View\Helper\SettingsValue',
-                'u' => 'Msingi\Cms\View\Helper\Url',
-            ),
-        );
-    }
-
-    /**
-     * @return array
-     */
     public function getAutoloaderConfig()
     {
         if (getenv('APPLICATION_ENV') != 'production') {

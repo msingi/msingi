@@ -32,13 +32,31 @@ class PageFragment extends AbstractHelper implements FactoryInterface
     /**
      * @param MvcEvent $event
      */
-    public function __construct(MvcEvent $event)
+    public function setEvent(MvcEvent $event)
     {
         $this->event = $event;
         $this->page = $event->getRouteMatch()->getParam('cms_page');
         if (!$this->page) {
             $this->fragments = array();
         }
+    }
+
+    /**
+     * Create service
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     * @return PageFragment
+     */
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        $services = $serviceLocator->getServiceLocator();
+        $app = $services->get('Application');
+
+        $viewHelper = new PageFragment();
+
+        $viewHelper->setEvent($app->getMvcEvent());
+        
+        return $viewHelper;
     }
 
     /**
@@ -82,18 +100,5 @@ class PageFragment extends AbstractHelper implements FactoryInterface
         }
 
         return isset($this->fragments[$name]) ? $this->fragments[$name] : '';
-    }
-
-    /**
-     * Create service
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return PageFragment
-     */
-    public function createService(ServiceLocatorInterface $serviceLocator)
-    {
-        $services = $serviceLocator->getServiceLocator();
-        $app = $services->get('Application');
-        return new PageFragment($app->getMvcEvent());
     }
 }
