@@ -3,6 +3,8 @@
 namespace Msingi\Cms\View\Helper;
 
 use Zend\Mvc\MvcEvent;
+use Zend\ServiceManager\FactoryInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Helper\AbstractHelper;
 
 /**
@@ -10,7 +12,7 @@ use Zend\View\Helper\AbstractHelper;
  *
  * @package Msingi\Cms\View\Helper
  */
-class PageMeta extends AbstractHelper
+class PageMeta extends AbstractHelper implements FactoryInterface
 {
     /** @var \Doctrine\Orm\EntityManager */
     protected $entityManager;
@@ -78,5 +80,18 @@ class PageMeta extends AbstractHelper
         }
 
         return $this->entityManager;
+    }
+
+    /**
+     * Create service
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     * @return mixed
+     */
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        $services = $serviceLocator->getServiceLocator();
+        $app = $services->get('Application');
+        return new PageMeta($app->getMvcEvent());
     }
 }

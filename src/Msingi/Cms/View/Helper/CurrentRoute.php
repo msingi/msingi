@@ -2,16 +2,16 @@
 
 namespace Msingi\Cms\View\Helper;
 
+use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Helper\AbstractHelper;
-
 
 /**
  * Class CurrentRoute
  * @package Msingi\Cms\View\Helper
  */
-class CurrentRoute extends AbstractHelper implements ServiceLocatorAwareInterface
+class CurrentRoute extends AbstractHelper implements ServiceLocatorAwareInterface, FactoryInterface
 {
     /* @var ServiceLocatorInterface */
     protected $serviceLocator;
@@ -46,4 +46,16 @@ class CurrentRoute extends AbstractHelper implements ServiceLocatorAwareInterfac
         return $this->serviceLocator;
     }
 
+    /**
+     * Create service
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     * @return mixed
+     */
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        $viewHelper = new CurrentRoute();
+        $viewHelper->setServiceLocator($serviceLocator->getServiceLocator());
+        return $viewHelper;
+    }
 }

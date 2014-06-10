@@ -3,11 +3,6 @@
 namespace Msingi;
 
 use Doctrine\DBAL\Types\Type;
-use Msingi\Cms\View\Helper\CurrentRoute;
-use Msingi\Cms\View\Helper\PageFragment;
-use Msingi\Cms\View\Helper\PageMeta;
-use Msingi\Cms\View\Helper\SettingsValue;
-use Msingi\Cms\View\Helper\Url;
 use Msingi\Doctrine\InjectListener;
 use Zend\Authentication\Adapter\DbTable;
 use Zend\EventManager\EventInterface;
@@ -16,7 +11,6 @@ use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Class Module
@@ -80,33 +74,11 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
     {
         return array(
             'factories' => array(
-                'currentRoute' => function (ServiceLocatorInterface $helpers) {
-                        $viewHelper = new CurrentRoute();
-                        $viewHelper->setServiceLocator($helpers->getServiceLocator());
-                        return $viewHelper;
-                    },
-                'fragment' => function (ServiceLocatorInterface $helpers) {
-                        $services = $helpers->getServiceLocator();
-                        $app = $services->get('Application');
-                        return new PageFragment($app->getMvcEvent());
-                    },
-                'metaValue' => function (ServiceLocatorInterface $helpers) {
-                        $services = $helpers->getServiceLocator();
-                        $app = $services->get('Application');
-                        return new PageMeta($app->getMvcEvent());
-                    },
-                'settingsValue' => function (ServiceLocatorInterface $helpers) {
-                        $viewHelper = new SettingsValue();
-                        $viewHelper->setServiceLocator($helpers->getServiceLocator());
-                        return $viewHelper;
-                    },
-                'u' => function (ServiceLocatorInterface $helpers) {
-                        $helper = new Url();
-                        $helper->setRouter($helpers->getServiceLocator()->get('Router'));
-                        $match = $helpers->getServiceLocator()->get('Application')->getMvcEvent()->getRouteMatch();
-                        $helper->setRouteMatch($match);
-                        return $helper;
-                    },
+                'currentRoute' => 'Msingi\Cms\View\Helper\CurrentRoute',
+                'fragment' => 'Msingi\Cms\View\Helper\PageFragment',
+                'metaValue' => 'Msingi\Cms\View\Helper\PageMeta',
+                'settingsValue' => 'Msingi\Cms\View\Helper\SettingsValue',
+                'u' => 'Msingi\Cms\View\Helper\Url',
             ),
         );
     }

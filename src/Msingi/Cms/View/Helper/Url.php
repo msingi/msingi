@@ -4,11 +4,17 @@ namespace Msingi\Cms\View\Helper;
 
 use Zend\Mvc\Router\RouteMatch;
 use Zend\Mvc\Router\RouteStackInterface;
+use Zend\ServiceManager\FactoryInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Exception;
 use Zend\Stdlib\Exception as StdlibException;
 use Zend\View\Helper\AbstractHelper;
 
-class Url extends AbstractHelper
+/**
+ * Class Url
+ * @package Msingi\Cms\View\Helper
+ */
+class Url extends AbstractHelper implements FactoryInterface
 {
     /**
      * RouteStackInterface instance.
@@ -67,5 +73,20 @@ class Url extends AbstractHelper
     {
         $this->routeMatch = $routeMatch;
         return $this;
+    }
+
+    /**
+     * Create service
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     * @return mixed
+     */
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        $helper = new Url();
+        $helper->setRouter($serviceLocator->getServiceLocator()->get('Router'));
+        $match = $serviceLocator->getServiceLocator()->get('Application')->getMvcEvent()->getRouteMatch();
+        $helper->setRouteMatch($match);
+        return $helper;
     }
 }

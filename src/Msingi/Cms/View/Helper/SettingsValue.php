@@ -2,11 +2,12 @@
 
 namespace Msingi\Cms\View\Helper;
 
+use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Helper\AbstractHelper;
 
-class SettingsValue extends AbstractHelper implements ServiceLocatorAwareInterface
+class SettingsValue extends AbstractHelper implements ServiceLocatorAwareInterface, FactoryInterface
 {
     protected $serviceLocator;
 
@@ -41,5 +42,18 @@ class SettingsValue extends AbstractHelper implements ServiceLocatorAwareInterfa
     public function getServiceLocator()
     {
         return $this->serviceLocator;
+    }
+
+    /**
+     * Create service
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     * @return SettingsValue
+     */
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        $viewHelper = new SettingsValue();
+        $viewHelper->setServiceLocator($serviceLocator->getServiceLocator());
+        return $viewHelper;
     }
 }

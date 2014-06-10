@@ -3,6 +3,8 @@
 namespace Msingi\Cms\View\Helper;
 
 use Zend\Mvc\MvcEvent;
+use Zend\ServiceManager\FactoryInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Helper\AbstractHelper;
 
 /**
@@ -10,7 +12,7 @@ use Zend\View\Helper\AbstractHelper;
  *
  * @package Msingi\Cms\View\Helper
  */
-class PageFragment extends AbstractHelper
+class PageFragment extends AbstractHelper implements FactoryInterface
 {
     /**
      * @var \Msingi\Cms\Entity\Page|null
@@ -80,5 +82,18 @@ class PageFragment extends AbstractHelper
         }
 
         return isset($this->fragments[$name]) ? $this->fragments[$name] : '';
+    }
+
+    /**
+     * Create service
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     * @return PageFragment
+     */
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        $services = $serviceLocator->getServiceLocator();
+        $app = $services->get('Application');
+        return new PageFragment($app->getMvcEvent());
     }
 }
