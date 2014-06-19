@@ -15,6 +15,10 @@ class ImageAttachment extends AbstractHelper
      */
     public function __invoke($object, $attachment, $size, $params = array())
     {
+        if ($object == null) {
+            return '';
+        }
+
         /* @var \Msingi\Cms\Service\ContentManager $contentManager */
         $contentManager = $this->serviceLocator->getServiceLocator()->get('Msingi\Cms\ContentManager');
 
