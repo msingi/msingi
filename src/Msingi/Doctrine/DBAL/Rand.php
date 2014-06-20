@@ -11,7 +11,7 @@ use Doctrine\ORM\Query\Lexer;
  */
 class Rand extends FunctionNode
 {
-    protected $expr;
+//    protected $expr;
 
     /**
      * @param \Doctrine\ORM\Query\SqlWalker $sqlWalker
@@ -20,7 +20,8 @@ class Rand extends FunctionNode
      */
     public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker)
     {
-        return 'RAND(' . $this->expr->dispatch($sqlWalker) . ')';
+        //return 'RAND(' . $this->expr->dispatch($sqlWalker) . ')';
+        return 'RAND()';
     }
 
     /**
@@ -30,12 +31,10 @@ class Rand extends FunctionNode
      */
     public function parse(\Doctrine\ORM\Query\Parser $parser)
     {
-        $lexer = $parser->getLexer();
-
         $parser->match(Lexer::T_IDENTIFIER);
         $parser->match(Lexer::T_OPEN_PARENTHESIS);
 
-        $this->expr = $parser->ArithmeticPrimary();
+        //$this->expr = $parser->ArithmeticPrimary();
 
         $parser->match(Lexer::T_CLOSE_PARENTHESIS);
     }
