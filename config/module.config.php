@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Config
+ * Msingi module configuration
  */
 return array(
 

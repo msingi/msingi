@@ -16,14 +16,10 @@ use Zend\Stdlib\RequestInterface;
  */
 class StaticPage implements RouteInterface, ServiceLocatorAwareInterface
 {
-    /**
-     * @var array
-     */
+    /** @var array  */
     protected $defaults = array();
 
-    /**
-     * @var null
-     */
+    /** @var null */
     protected $routePluginManager = null;
 
     /**
