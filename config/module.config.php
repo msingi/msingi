@@ -61,6 +61,8 @@ return array(
             'locale' => 'Msingi\Cms\View\Helper\Locale',
 
             'date' => 'Msingi\Cms\View\Helper\Date',
+            'time' => 'Msingi\Cms\View\Helper\Time',
+            'datetime' => 'Msingi\Cms\View\Helper\DateTime',
             'relativeDate' => 'Msingi\Cms\View\Helper\RelativeDate',
 
             'selectOptions' => 'Msingi\Cms\View\Helper\SelectOptions',
