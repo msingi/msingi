@@ -107,6 +107,16 @@ return array(
             'article_status' => 'Msingi\Cms\Entity\Enum\ArticleStatus',
             'page_type' => 'Msingi\Cms\Entity\Enum\PageType',
         ),
+
+        'functions' => array(
+            'datetime' => array(
+                'now' => 'Msingi\Doctrine\DBAL\Now',
+            ),
+            'numeric' => array(
+                'geodistance' => 'Msingi\Doctrine\DBAL\GeoDistance',
+                'rand' => 'Msingi\Doctrine\DBAL\Rand',
+            ),
+        ),
     ),
 
     'settings' => include 'settings.php',

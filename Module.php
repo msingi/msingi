@@ -44,15 +44,9 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
         /** @var \Doctrine\ORM\EntityManager $entityManager */
         $entityManager = $serviceManager->get('Doctrine\ORM\EntityManager');
 
-        $platform = $entityManager->getConnection()->getDatabasePlatform();
-        $platform->registerDoctrineTypeMapping('enum', 'string');
+        $this->registerDoctrineEnums($entityManager, $config);
 
-        // Register enum types
-        if (isset($config['doctrine']['enums'])) {
-            foreach ($config['doctrine']['enums'] as $enum => $className) {
-                Type::addType($enum, $className);
-            }
-        }
+        $this->registerDoctrineFunctions($entityManager, $config);
 
         //
         $eventManager = $entityManager->getEventManager();
@@ -124,5 +118,53 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
 
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
+    }
+
+    /**
+     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param array $config
+     */
+    protected function registerDoctrineEnums($entityManager, $config)
+    {
+        $platform = $entityManager->getConnection()->getDatabasePlatform();
+        $platform->registerDoctrineTypeMapping('enum', 'string');
+
+        if (isset($config['doctrine']['enums'])) {
+            foreach ($config['doctrine']['enums'] as $enum => $className) {
+                Type::addType($enum, $className);
+            }
+        }
+    }
+
+    /**
+     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param array $config
+     */
+    protected function registerDoctrineFunctions($entityManager, $config)
+    {
+        if (isset($config['doctrine']['functions'])) {
+            $emConfig = $entityManager->getConfiguration();
+
+            // datetime functions
+            if (isset($config['doctrine']['functions']['datetime'])) {
+                foreach ($config['doctrine']['functions']['datetime'] as $function => $className) {
+                    $emConfig->addCustomDatetimeFunction($function, $className);
+                }
+            }
+
+            // numeric functions
+            if (isset($config['doctrine']['functions']['numeric'])) {
+                foreach ($config['doctrine']['functions']['numeric'] as $function => $className) {
+                    $emConfig->addCustomNumericFunction($function, $className);
+                }
+            }
+
+            // string functions
+            if (isset($config['doctrine']['functions']['string'])) {
+                foreach ($config['doctrine']['functions']['string'] as $function => $className) {
+                    $emConfig->addCustomStringFunction($function, $className);
+                }
+            }
+        }
     }
 }
