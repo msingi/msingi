@@ -13,7 +13,11 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  */
 class ContentManager implements FactoryInterface
 {
+    /** @var array */
     protected $config;
+
+    /** @var int */
+    protected $urlCalls = 0;
 
     /**
      * Get Root URL for content
@@ -23,10 +27,24 @@ class ContentManager implements FactoryInterface
      */
     public function getContentUrl($file = '')
     {
-        $url = $this->config['root_url'];
+        $hostnames = $this->config['root_url'];
+
+        if (is_array($hostnames)) {
+            $load = isset($this->config['load']) ? $this->config['load'] : 4;
+
+            $index = ($this->urlCalls / $load) % count($hostnames);
+
+            $url = $hostnames[$index];
+        } else {
+            $url = $hostnames;
+        }
+
         if ($file != '') {
             $url .= '/' . ltrim($file, '/');
         }
+
+        $this->urlCalls += 1;
+
         return $url;
     }
 
@@ -55,10 +73,10 @@ class ContentManager implements FactoryInterface
     public function attachFile($object, $attachment, $file)
     {
         // check if attachement definition exists
-        // @todo exception?
         $class = get_class($object);
-        if (!isset($this->config['attachments'][$class][$attachment]))
-            return false;
+        if (!isset($this->config['attachments'][$class][$attachment])) {
+            throw new \Exception(sprintf(_('Content definition for class %s is not set'), $class));
+        }
 
         // get storage directory
         $storage_dir = $this->config['store_dir'] . '/' . $this->getStorageDir($object, $attachment);
@@ -90,8 +108,9 @@ class ContentManager implements FactoryInterface
         // check if attachement definition exists
         // @todo exception?
         $class = get_class($object);
-        if (!isset($this->config['attachments'][$class][$attachment]))
-            return false;
+        if (!isset($this->config['attachments'][$class][$attachment])) {
+            throw new \Exception(sprintf(_('Content definition for class %s is not set'), $class));
+        }
 
         $image_file = $image['tmp_name'];
         $image_size = getimagesize($image_file);

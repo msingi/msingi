@@ -3,25 +3,104 @@
 namespace Msingi\Cms\View\Helper;
 
 use Msingi\Cms\View\AbstractHelper;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
+/**
+ * Class Assets
+ *
+ * @package Msingi\Cms\View\Helper
+ */
 class Assets extends AbstractHelper
 {
+    /** @var array */
+    protected $config;
+
+    /** @var ServiceLocatorInterface */
+    protected $serviceManager;
+
+    /** @var string */
+    protected $moduleName;
+
+    /** @var int */
+    protected $call = 0;
+
     /**
      * @return string
      */
     public function __invoke()
     {
-        $config = $this->serviceLocator->getServiceLocator()->get('Config');
+        $config = $this->getConfig();
 
-        $route_match = $this->serviceLocator->getServiceLocator()->get('application')->getMvcEvent()->getRouteMatch();
-        if ($route_match == null) {
-            return $config['assets']['frontend'];
+        $moduleName = $this->getModuleName();
+
+        if (is_array($config[$moduleName])) {
+
+            $hostnames = $config[$moduleName]['hostnames'];
+
+            $load = isset($config[$moduleName]['load']) ? $config[$moduleName]['load'] : 4;
+
+            $index = ($this->call / $load) % count($hostnames);
+
+            $assetsHost = $hostnames[$index];
+        } else {
+            $assetsHost = $config[$moduleName];
         }
 
-        $route_name = $route_match->getMatchedRouteName();
+        $this->call += 1;
 
-        $module = substr($route_name, 0, strpos($route_name, '/'));
+        return $assetsHost;
+    }
 
-        return $config['assets'][$module];
+    /**
+     * @return mixed
+     */
+    protected function getConfig()
+    {
+        if (!$this->config) {
+            $config = $this->getServiceManager()->get('Config');
+
+            $this->config = $config['assets'];
+        }
+
+        return $this->config;
+    }
+
+    /**
+     * @return ServiceLocatorInterface
+     */
+    protected function getServiceManager()
+    {
+        if (!$this->serviceManager) {
+            $this->serviceManager = $this->serviceLocator->getServiceLocator();
+        }
+
+        return $this->serviceManager;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getModuleName()
+    {
+        if (!$this->moduleName) {
+
+            $moduleName = 'frontend';
+
+            /** @var \Zend\Mvc\Application $application */
+            $application = $this->getServiceManager()->get('Application');
+
+            $mvcEvent = $application->getMvcEvent();
+
+            $route_match = $mvcEvent->getRouteMatch();
+            if ($route_match != null) {
+                $route_name = $route_match->getMatchedRouteName();
+
+                $moduleName = substr($route_name, 0, strpos($route_name, '/'));
+            }
+
+            $this->moduleName = $moduleName;
+        }
+
+        return $this->moduleName;
     }
 }

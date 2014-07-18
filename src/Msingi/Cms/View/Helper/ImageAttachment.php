@@ -4,6 +4,11 @@ namespace Msingi\Cms\View\Helper;
 
 use Msingi\Cms\View\AbstractHelper;
 
+/**
+ * Class ImageAttachment
+ *
+ * @package Msingi\Cms\View\Helper
+ */
 class ImageAttachment extends AbstractHelper
 {
     /**
