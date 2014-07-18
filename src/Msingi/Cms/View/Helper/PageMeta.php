@@ -2,7 +2,6 @@
 
 namespace Msingi\Cms\View\Helper;
 
-use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Helper\AbstractHelper;
@@ -25,18 +24,6 @@ class PageMeta extends AbstractHelper implements FactoryInterface
 
     /** @var \Zend\Mvc\MvcEvent */
     protected $event;
-
-    /**
-     * @param MvcEvent $event
-     */
-    public function __construct(MvcEvent $event)
-    {
-        $this->event = $event;
-        $routeMatch = $event->getRouteMatch();
-        if ($routeMatch) {
-            $this->page = $routeMatch->getParam('cms_page');
-        }
-    }
 
     /**
      * @param string $name
@@ -91,7 +78,19 @@ class PageMeta extends AbstractHelper implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $services = $serviceLocator->getServiceLocator();
+
         $app = $services->get('Application');
-        return new PageMeta($app->getMvcEvent());
+
+        $event = $app->getMvcEvent();
+
+        $meta = new PageMeta();
+
+        $meta->event = $event;
+        $routeMatch = $event->getRouteMatch();
+        if ($routeMatch) {
+            $meta->page = $routeMatch->getParam('cms_page');
+        }
+
+        return $meta;
     }
 }
