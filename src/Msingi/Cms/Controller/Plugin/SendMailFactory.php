@@ -20,11 +20,16 @@ class SendMailFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
+        /** @var ServiceLocatorInterface $serviceManager */
+        $serviceManager = $serviceLocator->getServiceLocator();
+
         /** @var \Zend\I18n\Translator\Translator $translator */
-        $translator = $serviceLocator->getServiceLocator()->get('Translator');
-        $router = $serviceLocator->getServiceLocator()->get('Router');
+        $translator = $serviceManager->get('Translator');
+
+        $router = $serviceManager->get('Router');
+
         /** @var \Msingi\Cms\Mailer\Mailer $mailer */
-        $mailer = $serviceLocator->getServiceLocator()->get('Msingi\Cms\Mailer\Mailer');
+        $mailer = $serviceManager->get('Msingi\Cms\Mailer\Mailer');
 
         $plugin = new \Msingi\Cms\Controller\Plugin\SendMail();
         $plugin->setTranslator($translator);

@@ -2,15 +2,15 @@
 
 namespace Msingi\Cms\Mailer;
 
+use Msingi\Util\HTML2Text;
+use Zend\Mail\Transport\Sendmail as SendmailTransport;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
+use Zend\Mail;
+use Zend\Mime;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
-use Msingi\Util\HTML2Text;
-use Zend\Mail;
-use Zend\Mime;
-use Zend\Mail\Transport\Sendmail as SendmailTransport;
-use Zend\Mail\Transport\Smtp as SmtpTransport;
 
 /**
  * Class Mailer
@@ -61,7 +61,7 @@ class Mailer implements ServiceLocatorAwareInterface
         $templates_repository = $entityManager->getRepository('Msingi\Cms\Entity\MailTemplate');
         $template = $templates_repository->fetchOrCreate($templateName);
 
-        /** @var \Msingi|Cms\Repository\MailTemplatesI18n $templates_i18n_repository */
+        /** @var \Msingi\Cms\Repository\MailTemplatesI18n $templates_i18n_repository */
         $templates_i18n_repository = $entityManager->getRepository('Msingi\Cms\Entity\MailTemplateI18n');
         /** @var \Msingi\Cms\Entity\MailTemplateI18n $i18n */
         $i18n = $templates_i18n_repository->fetchOrCreate($template, $language);
