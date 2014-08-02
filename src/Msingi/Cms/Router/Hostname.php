@@ -18,12 +18,19 @@ class Hostname implements RouteInterface
     /** @var array */
     protected $hostnames = array();
 
+    /** @var string */
+    protected $default = '';
+
+    /** @var array */
+    protected $assembledParams = array();
+
     /**
      * @param array $hostnames
      */
-    public function __construct(array $hostnames = array())
+    public function __construct(array $hostnames = array(), $default = '')
     {
         $this->hostnames = array_merge(array(), $hostnames);
+        $this->default = $default;
     }
 
     /**
@@ -35,6 +42,13 @@ class Hostname implements RouteInterface
      */
     public function assemble(array $params = array(), array $options = array())
     {
+        $this->assembledParams = array();
+
+        if (isset($options['uri'])) {
+            $options['uri']->setHost($this->default);
+        }
+
+        // A hostname does not contribute to the path, thus nothing is returned.
         return '';
     }
 
@@ -45,7 +59,7 @@ class Hostname implements RouteInterface
      */
     public function getAssembledParams()
     {
-        return array();
+        return $this->assembledParams;
     }
 
     /**
@@ -66,7 +80,11 @@ class Hostname implements RouteInterface
             $options['hostnames'] = array();
         }
 
-        return new static($options['hostnames']);
+        if (!isset($options['default'])) {
+            $options['default'] = count($options['hostnames']) > 0 ? $options['hostnames'][0] : '';
+        }
+
+        return new static($options['hostnames'], $options['default']);
     }
 
     /**
