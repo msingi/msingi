@@ -222,7 +222,9 @@ class ContentManager implements FactoryInterface
         imagejpeg($image, $imageFile, $quality);
 
         // set access rights
-        chmod($imageFile, 0664);
+        if (is_file($imageFile)) {
+            chmod($imageFile, 0664);
+        }
     }
 
     /**
