@@ -80,14 +80,17 @@ class EasyRoutes
             } else if ($type == 'Literal') {
                 $route['may_terminate'] = true;
                 $route['options']['route'] = '/' . $routePath;
+                if (isset($routeSpec['defaults'])) {
+                    $route['options']['defaults'] = array_merge($route['options']['defaults'], $routeSpec['defaults']);
+                }
             } else if ($type == 'Action') {
 
             } else if ($type == 'Segment') {
                 $route['type'] = 'Segment';
                 $route['may_terminate'] = true;
                 $route['options']['route'] = $routeSpec['route'];
-                $route['options']['constraints'] = $routeSpec['constraints'];
                 $route['options']['defaults'] = array_merge($route['options']['defaults'], $routeSpec['defaults']);
+                $route['options']['constraints'] = $routeSpec['constraints'];
             }
 
             if (isset($routeSpec['actions'])) {
