@@ -111,6 +111,7 @@ return array(
         'functions' => array(
             'datetime' => array(
                 'now' => 'Msingi\Doctrine\DBAL\Now',
+                'date' => 'Msingi\Doctrine\DBAL\Date',
             ),
             'numeric' => array(
                 'geodistance' => 'Msingi\Doctrine\DBAL\GeoDistance',
