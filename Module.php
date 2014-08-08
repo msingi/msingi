@@ -46,6 +46,8 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
 
         $this->registerDoctrineEnums($entityManager, $config);
 
+        $this->registerDoctrineSets($entityManager, $config);
+
         $this->registerDoctrineFunctions($entityManager, $config);
 
         //
@@ -132,6 +134,22 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Bo
         if (isset($config['doctrine']['enums'])) {
             foreach ($config['doctrine']['enums'] as $enum => $className) {
                 Type::addType($enum, $className);
+            }
+        }
+    }
+
+    /**
+     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param array $config
+     */
+    protected function registerDoctrineSets($entityManager, $config)
+    {
+        $platform = $entityManager->getConnection()->getDatabasePlatform();
+        $platform->registerDoctrineTypeMapping('set', 'string');
+
+        if (isset($config['doctrine']['sets'])) {
+            foreach ($config['doctrine']['sets'] as $set => $className) {
+                Type::addType($set, $className);
             }
         }
     }
