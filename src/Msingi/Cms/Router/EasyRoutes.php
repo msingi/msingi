@@ -79,7 +79,7 @@ class EasyRoutes
                 $route['options']['defaults']['action'] = 'page';
             } else if ($type == 'Literal') {
                 $route['may_terminate'] = true;
-                $route['options']['route'] = '/' . $routePath;
+                $route['options']['route'] = isset($routeSpec['route']) ? $routeSpec['route'] : '/' . $routePath;
                 if (isset($routeSpec['defaults'])) {
                     $route['options']['defaults'] = array_merge($route['options']['defaults'], $routeSpec['defaults']);
                 }
