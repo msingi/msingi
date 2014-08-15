@@ -131,7 +131,7 @@ class ContentManager implements FactoryInterface
         }
 
         /** @var resource $image */
-        $image = $this->loadImage($image_file);
+        list($image, $format) = $this->loadImage($image_file);
 
         //
         $imageFilter = new ImageFilter();
@@ -140,8 +140,9 @@ class ContentManager implements FactoryInterface
         foreach ($storage['sizes'] as $size => $spec) {
             if ($spec == 'original') {
                 // name of resized file
-                $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-original', 'jpg');
-                $this->saveImage($image, $resized_file);
+                $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-original', $format);
+
+                $this->saveImage($image, $resized_file, $format);
             } else {
                 $filtered_image = $this->duplicateImage($image, $image_size);
 
@@ -151,9 +152,9 @@ class ContentManager implements FactoryInterface
                 }
 
                 // name of resized file
-                $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-' . $size, 'jpg');
+                $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-' . $size, $format);
 
-                $this->saveImage($filtered_image, $resized_file);
+                $this->saveImage($filtered_image, $resized_file, $format);
 
                 imagedestroy($filtered_image);
             }
@@ -191,7 +192,7 @@ class ContentManager implements FactoryInterface
             return false;
         }
 
-        return $icfunc($imageFile);
+        return array($icfunc($imageFile), $format);
     }
 
     /**
@@ -203,6 +204,9 @@ class ContentManager implements FactoryInterface
     {
         $idst = imagecreatetruecolor($size[0], $size[1]);
 
+        imagealphablending($idst, false);
+        imagesavealpha($idst, true);
+
         imagecopy($idst, $image, 0, 0, 0, 0, $size[0], $size[1]);
 
         return $idst;
@@ -213,13 +217,19 @@ class ContentManager implements FactoryInterface
      * @param $imageFile
      * @param int $quality
      */
-    protected function saveImage($image, $imageFile, $quality = 80)
+    protected function saveImage($image, $imageFile, $format, $quality = 80)
     {
         //
         imageinterlace($image, true);
 
-        // create destination image
-        imagejpeg($image, $imageFile, $quality);
+        switch ($format) {
+            case 'jpeg':
+                imagejpeg($image, $imageFile, 60);
+                break;
+            case 'png':
+                imagepng($image, $imageFile, 9);
+                break;
+        }
 
         // set access rights
         if (is_file($imageFile)) {
@@ -284,10 +294,12 @@ class ContentManager implements FactoryInterface
 
         $storage_dir = $this->getStorageDir($object, $attachment);
 
-        $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-' . $size, 'jpg');
-        //echo $resized_file; die;
-        if (!is_file($this->getContentDir() . '/' . $resized_file))
-            return null;
+        $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-' . $size, 'jpeg');
+        if (!is_file($this->getContentDir() . '/' . $resized_file)) {
+            $resized_file = $storage_dir . '/' . $this->getImageFileName($object->getId() . '-' . $attachment . '-' . $size, 'png');
+            if (!is_file($this->getContentDir() . '/' . $resized_file))
+                return null;
+        }
 
         return $resized_file;
     }
@@ -320,7 +332,7 @@ class ContentManager implements FactoryInterface
         $storage_dir = $storage['dir'];
 
         // replace tokens
-        if (preg_match_all('/\[([a-z0-9_]+)\]/i', $storage_dir, $matches)) {
+        if (preg_match_all('/\[([a-z0-9_:]+)\]/i', $storage_dir, $matches)) {
             foreach ($matches[1] as $match) {
 
                 $method = 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $match)));

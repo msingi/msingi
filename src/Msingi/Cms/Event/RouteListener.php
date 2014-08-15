@@ -51,7 +51,8 @@ class RouteListener implements ListenerAggregateInterface
 
         $routeName = $this->formatRouteName($routeMatch);
 
-        if (substr($routeName, 0, 9) == 'frontend/') {
+        // we don't use static page in the backend
+        if (substr($routeName, 0, 8) != 'backend/') {
             /** @var \Msingi\Cms\Entity\Page $cms_page */
             $cms_page = $routeMatch->getParam('cms_page');
             if ($cms_page == null) {

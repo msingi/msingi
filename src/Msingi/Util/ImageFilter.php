@@ -67,6 +67,9 @@ class ImageFilter
         /** @var resource $croppedImage */
         $croppedImage = imagecreatetruecolor($width, $height);
 
+        imagealphablending($croppedImage, false);
+        imagesavealpha($croppedImage, true);
+
         imagecopyresampled($croppedImage, $image, 0, 0, $src_left, $src_top, $width, $height,
             $width / $ratiomax, $height / $ratiomax);
 
@@ -88,6 +91,9 @@ class ImageFilter
         $pixelated_height = $size[1] / $pixel;
 
         $pixelated = imagecreatetruecolor($pixelated_width, $pixelated_height);
+
+        imagealphablending($pixelated, false);
+        imagesavealpha($pixelated, true);
 
         // resize image to 20 times smaller
         imagecopyresampled($pixelated, $image, 0, 0, 0, 0, $pixelated_width, $pixelated_height, $size[0], $size[1]);
