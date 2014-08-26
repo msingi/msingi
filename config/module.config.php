@@ -31,6 +31,7 @@ return array(
             //
             'Msingi\Cms\Entity\Page' => 'Msingi\Cms\Entity\Page',
             'Msingi\Cms\Entity\Article' => 'Msingi\Cms\Entity\Article',
+            'Msingi\Cms\Entity\BackendUser' => 'Msingi\Cms\Entity\BackendUser',
         ),
         'factories' => array(
             // memcached caching for doctrine
