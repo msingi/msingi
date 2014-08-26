@@ -2,10 +2,10 @@
 
 namespace Msingi\Cms\Controller\Backend;
 
+use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 use Msingi\Doctrine\EntityManagerAwareInterface;
 use Zend\Paginator\Paginator;
 use Zend\View\Model\ViewModel;
-use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 
 /**
  * Class AbstractEntitiesController
@@ -220,7 +220,7 @@ abstract class AbstractEntitiesController extends AuthenticatedController
      */
     public function deleteAction()
     {
-        $entity = $this->getRepository()->find($this->params()->fromQuery('id'));
+        $entity = $this->findEntity();
         if ($entity != null) {
             $this->getEntityManager()->remove($entity);
             $this->getEntityManager()->flush();
@@ -286,5 +286,14 @@ abstract class AbstractEntitiesController extends AuthenticatedController
     protected function onEntitySaved($entity, $values)
     {
 
+    }
+
+    /**
+     * @return null|object
+     */
+    protected function findEntity()
+    {
+        $entity = $this->getRepository()->find($this->params()->fromQuery('id'));
+        return $entity;
     }
 }
