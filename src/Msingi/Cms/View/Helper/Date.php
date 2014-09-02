@@ -11,8 +11,8 @@ class Date extends DateTime
     /**
      * @param \DateTime $date
      */
-    public function __invoke($date, $datetype = \IntlDateFormatter::MEDIUM)
+    public function __invoke($date, $datetype = \IntlDateFormatter::MEDIUM, $timetype = \IntlDateFormatter::NONE)
     {
-        return parent::__invoke($date, $datetype, \IntlDateFormatter::NONE);
+        return parent::__invoke($date, $datetype, $timetype);
     }
 }

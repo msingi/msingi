@@ -13,7 +13,7 @@ class DateTime extends AbstractTranslatorHelper
     /**
      * @param \DateTime $date
      */
-    public function __invoke($date, $datetype = \IntlDateFormatter::MEDIUM, $timetype = \IntlDateFormatter::NONE)
+    public function __invoke($date, $datetype = \IntlDateFormatter::MEDIUM, $timetype = \IntlDateFormatter::SHORT)
     {
         if (!$date) {
             return '';
