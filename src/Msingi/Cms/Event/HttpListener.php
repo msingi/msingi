@@ -47,27 +47,31 @@ class HttpListener implements ListenerAggregateInterface
      */
     public function onFinish(MvcEvent $e)
     {
-        $serviceManager = $e->getApplication()->getServiceManager();
-        $settings = $serviceManager->get('Settings');
+        $response = $e->getResponse();
 
-        $responseHeaders = $e->getResponse()->getHeaders();
-        if (!$responseHeaders->has('Content-Type')) {
-            $responseHeaders->addHeaderLine('Content-Type', 'text/html; charset=UTF-8');
-        }
+        if ($response instanceof \Zend\Http\Response) {
+            $serviceManager = $e->getApplication()->getServiceManager();
+            $settings = $serviceManager->get('Settings');
 
-        if ($settings->get('performance:minify_html')) {
-            $this->minifyHtml($e);
-        }
-
-        if ($settings->get('performance:cache_control')) {
-            if ($e->getResponse()->getMetadata('No-Cache')) {
-                $this->addCacheControl($e, false);
-            } else {
-                $this->addCacheControl($e, $settings->get('performance:cache_lifetime', 300));
+            $responseHeaders = $response->getHeaders();
+            if (!$responseHeaders->has('Content-Type')) {
+                $responseHeaders->addHeaderLine('Content-Type', 'text/html; charset=UTF-8');
             }
 
-            if ($settings->get('performance:conditional')) {
-                $this->addConditional($e);
+            if ($settings->get('performance:minify_html')) {
+                $this->minifyHtml($e);
+            }
+
+            if ($settings->get('performance:cache_control')) {
+                if ($response->getMetadata('No-Cache')) {
+                    $this->addCacheControl($e, false);
+                } else {
+                    $this->addCacheControl($e, $settings->get('performance:cache_lifetime', 300));
+                }
+
+                if ($settings->get('performance:conditional')) {
+                    $this->addConditional($e);
+                }
             }
         }
     }
