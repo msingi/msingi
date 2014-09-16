@@ -31,6 +31,8 @@ class UsersController extends AbstractEntitiesController
      */
     protected function populateForm($form, $entity)
     {
+        $form->get('id')->setValue($entity->getId());
+
         $form->get('name')->setValue($entity->getName());
         $form->get('username')->setValue($entity->getUsername());
         $form->get('email')->setValue($entity->getEmail());
