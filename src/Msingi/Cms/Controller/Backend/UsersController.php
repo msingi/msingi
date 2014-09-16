@@ -54,7 +54,7 @@ class UsersController extends AbstractEntitiesController
     }
 
     /**
-     * @param $user
+     * @param \Msingi\Cms\Entity\BackendUser $user
      * @param $values
      */
     protected function onEntitySaved($user, $values)
@@ -69,12 +69,10 @@ class UsersController extends AbstractEntitiesController
 
             $new_password = sha1($salt . $values['password'] . $password_salt);
 
-            $this->getTable()->update(array(
-                'password' => $new_password,
-                'password_salt' => $password_salt
-            ), array(
-                'id' => $values['id']
-            ));
+            $user->setPassword($new_password);
+            $user->setPasswordSalt($password_salt);
+
+            $this->getEntityManager()->flush($user);
         }
     }
 }
