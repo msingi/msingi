@@ -57,7 +57,7 @@ class UsersController extends AbstractEntitiesController
      * @param $user
      * @param $values
      */
-    protected function onEntitySave($user, $values)
+    protected function onEntitySaved($user, $values)
     {
         if ($values['password'] != '' && $values['password'] == $values['password_confirm']) {
 
