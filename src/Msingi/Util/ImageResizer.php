@@ -95,12 +95,15 @@ class ImageResizer
             // resize image to 20 times smaller
             imagecopyresampled($pixelated, $idest, 0, 0, 0, 0, $pixelated_width, $pixelated_height, $width, $height);
 
+            // recreate idest to get pixelated image
+            imagedestroy($idest);
+            $idest = imagecreatetruecolor($width, $height);
+
             // resize it back to original size
             imagecopyresampled($idest, $pixelated, 0, 0, 0, 0, $width, $height, $pixelated_width, $pixelated_height);
 
             imagedestroy($pixelated);
         }
-
 
         //
         imageinterlace($idest, true);
