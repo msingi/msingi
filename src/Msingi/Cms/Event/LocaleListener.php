@@ -51,6 +51,8 @@ class LocaleListener implements ListenerAggregateInterface
         /* @var RouteMatch $routeMatch */
         $routeMatch = $event->getRouteMatch();
 
+        $language = '';
+
         // check if the language is set by routing (parameter, domain name, etc)
         if ($routeMatch->getParam('language') == '') {
             // get route
