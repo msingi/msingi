@@ -87,22 +87,18 @@ class ImageFilter
     protected function pixelateImage($image, $size, $pixel)
     {
         // pixelate image
-        $pixelated_width = $size[0] / $pixel;
-        $pixelated_height = $size[1] / $pixel;
+        for($y = 0;$y < $size[0];$y += $pixel+1)
+        {
+            for($x = 0;$x < $size[1];$x += $pixel+1)
+            {
+                // get the color for current pixel
+                $rgb = imagecolorsforindex($image, imagecolorat($image, $x, $y));
 
-        $pixelated = imagecreatetruecolor($pixelated_width, $pixelated_height);
-
-        imagealphablending($pixelated, false);
-        imagesavealpha($pixelated, true);
-
-        // resize image to 20 times smaller
-        imagecopyresampled($pixelated, $image, 0, 0, 0, 0, $pixelated_width, $pixelated_height, $size[0], $size[1]);
-
-        // resize it back to original size
-        imagecopyresampled($image, $pixelated, 0, 0, 0, 0, $size[0], $size[1], $pixelated_width, $pixelated_height);
-
-        imagedestroy($pixelated);
-
+                // get the closest color from palette
+                $color = imagecolorclosest($image, $rgb['red'], $rgb['green'], $rgb['blue']);
+                imagefilledrectangle($image, $x, $y, $x+$pixel, $y+$pixel, $color);
+            }
+        }
         return $image;
     }
 }
