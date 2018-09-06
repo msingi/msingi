@@ -118,8 +118,38 @@ class Mailer implements ServiceLocatorAwareInterface
         $mail->setBody($messageBody);
         $mail->getHeaders()->get('Content-Type')->setType('multipart/alternative');
 
+        // Send all emails as hidden copy for administrator if needed
+        if ($settings->get("mail:bcc")) { 
+            $mail->addBcc($settings->get("mail:bcc"));
+        }
+
         //
         $mailer_config = $config['mailer'];
+
+        // Customizable config for email from Backend
+        if ($settings->get("mail:system:adapter")) {
+            $mailer_config["transport"] = $settings->get("mail:system:adapter");
+        }
+        if ($mailer_config["transport"] == "smtp") {
+            if ($settings->get("mail:system:smtp:name")) {
+                $mailer_config["smtp_options"]["name"] = $settings->get("mail:system:smtp:name");
+            }
+            if ($settings->get("mail:system:smtp:host")) {
+                $mailer_config["smtp_options"]["host"] = $settings->get("mail:system:smtp:host");
+            }
+            if ($settings->get("mail:system:smtp:port")) {
+                $mailer_config["smtp_options"]["port"] = $settings->get("mail:system:smtp:port");
+            }
+            if ($settings->get("mail:system:smtp:connection_class")) {
+                $mailer_config["smtp_options"]["connection_class"] = $settings->get("mail:system:smtp:connection_class");
+            }
+            if ($settings->get("mail:system:smtp:username")) {
+                $mailer_config["smtp_options"]["connection_config"]["username"] = $settings->get("mail:system:smtp:username");
+            }
+            if ($settings->get("mail:system:smtp:password")) {
+                $mailer_config["smtp_options"]["connection_config"]["password"] = $settings->get("mail:system:smtp:password");
+            }
+        }
 
         // log message
         if ($settings->get('mail:log')) {
